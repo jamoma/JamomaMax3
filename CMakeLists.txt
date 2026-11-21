@@ -28,7 +28,6 @@ add_subdirectory(core)
 
 include(cmake/JamomaExternal.cmake)
 add_subdirectory(externals)
-add_subdirectory(spikes/shared-state)
 
 # Doxygen gate: fails the build on any warning (see Doxyfile).
 find_package(Doxygen)
