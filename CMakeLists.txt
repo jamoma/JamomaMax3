@@ -17,10 +17,11 @@ if(APPLE)
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "YES")
 endif()
 
-# Windows: static C runtime (/MT), as max-sdk-base uses for externals. Each DLL then has its own heap, so no
-# allocation may cross the core API (see docs/decisions/0001-shared-state.md).
+# Windows: dynamic C runtime (/MD) for the core and every external, so they share one heap and standard-library
+# objects (std::string, std::vector) may cross the core API. (max-sdk-base uses /MT for plain externals; ours share state.)
+# UNTESTED on Windows. See docs/decisions/0001-shared-state.md.
 if(WIN32)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 enable_testing()

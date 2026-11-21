@@ -4,7 +4,9 @@
 # The core library: Max-free C++20, shared by every external through one copy of the binary.
 add_library(jamoma_core SHARED
     src/version.cpp
-    src/registry.cpp)
+    src/registry.cpp
+    src/atom.cpp
+    src/address.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
@@ -24,7 +26,9 @@ include(Catch)
 
 add_executable(jamoma_core_tests
     tests/version_test.cpp
-    tests/registry_test.cpp)
+    tests/registry_test.cpp
+    tests/atom_test.cpp
+    tests/address_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 # PRE_TEST: discover at ctest time, because the Xcode generator signs the binary only after post-build steps run.
 # DL_PATHS: on Windows the test executable finds jamoma_core.dll only through PATH (there is no rpath).
