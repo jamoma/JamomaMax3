@@ -25,8 +25,9 @@ Registry::Registry() noexcept
 
 Registry& Registry::instance() noexcept
 {
-    static Registry registry;
-    return registry;
+    // Leaked on purpose (see the header): never destroyed, so it outlives every static destructor.
+    static Registry* const registry = new Registry;
+    return *registry;
 }
 
 std::uint64_t Registry::instance_id() const noexcept

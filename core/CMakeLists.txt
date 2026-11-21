@@ -6,7 +6,8 @@ add_library(jamoma_core SHARED
     src/version.cpp
     src/registry.cpp
     src/atom.cpp
-    src/address.cpp)
+    src/address.cpp
+    src/namespace.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
@@ -28,8 +29,14 @@ add_executable(jamoma_core_tests
     tests/version_test.cpp
     tests/registry_test.cpp
     tests/atom_test.cpp
-    tests/address_test.cpp)
+    tests/address_test.cpp
+    tests/namespace_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
+# The registry must outlive static destruction (its own executable, checked through its exit code).
+add_executable(registry_exit_test tests/registry_exit_test.cpp)
+target_link_libraries(registry_exit_test PRIVATE jamoma::core)
+add_test(NAME registry_outlives_static_destruction COMMAND registry_exit_test)
+
 # PRE_TEST: discover at ctest time, because the Xcode generator signs the binary only after post-build steps run.
 # DL_PATHS: on Windows the test executable finds jamoma_core.dll only through PATH (there is no rpath).
 catch_discover_tests(jamoma_core_tests DISCOVERY_MODE PRE_TEST
