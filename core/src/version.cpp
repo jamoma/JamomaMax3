@@ -17,7 +17,7 @@ Version version() noexcept
 
 int abi_version() noexcept
 {
-    return 1;
+    return kAbiVersion;
 }
 
 } // namespace jamoma

@@ -8,6 +8,8 @@ add_library(jamoma_core SHARED
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
+# The shared library goes into the Max package, where every external finds it through its rpath.
+set_target_properties(jamoma_core PROPERTIES LIBRARY_OUTPUT_DIRECTORY "$<1:${CMAKE_SOURCE_DIR}/package/Jamoma/support>")
 
 # Unit tests (Catch2, no Max needed).
 include(FetchContent)

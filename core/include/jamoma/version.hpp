@@ -12,6 +12,14 @@
 
 namespace jamoma {
 
+/**
+ * The binary-interface version this header describes.
+ *
+ * It is compiled into every external that includes the header, so an external
+ * built against an older header reports an older value than the installed library.
+ */
+inline constexpr int kAbiVersion = 1;
+
 /** A semantic version number. */
 struct Version {
     int major; /**< Incremented for incompatible changes. */

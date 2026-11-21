@@ -24,3 +24,9 @@ TEST_CASE("abi version is 1")
 {
     REQUIRE(jamoma::abi_version() == 1);
 }
+
+/** The constant that externals compile in equals what the installed library reports. */
+TEST_CASE("abi constant matches the library")
+{
+    REQUIRE(jamoma::kAbiVersion == jamoma::abi_version());
+}

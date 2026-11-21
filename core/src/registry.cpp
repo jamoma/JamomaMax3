@@ -44,6 +44,15 @@ void Registry::attach_loader() noexcept
     loader_attached_.store(true, std::memory_order_release);
 }
 
+bool Registry::try_attach_loader(int caller_abi) noexcept
+{
+    if (!check_abi(caller_abi)) {
+        return false;
+    }
+    attach_loader();
+    return true;
+}
+
 bool Registry::check_abi(int caller_abi) noexcept
 {
     return caller_abi == abi_version();

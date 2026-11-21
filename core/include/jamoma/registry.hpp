@@ -46,6 +46,13 @@ public:
     void attach_loader() noexcept;
 
     /**
+     * @brief Attaches the start-up loader if it was built against this library's ABI.
+     * @param caller_abi The ABI version the loader was built with (jamoma::kAbiVersion).
+     * @return True if the loader is now attached; false if the ABI differs, in which case nothing is attached.
+     */
+    bool try_attach_loader(int caller_abi) noexcept;
+
+    /**
      * @brief Checks that a caller was built against this library's binary interface.
      * @param caller_abi The ABI version the caller was built with.
      * @return True if it equals abi_version().

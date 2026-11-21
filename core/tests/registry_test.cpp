@@ -44,6 +44,20 @@ TEST_CASE("usable without loader")
     REQUIRE(jamoma::Registry::instance().instance_id() != 0);
 }
 
+/** A loader built against another ABI is refused and nothing is attached. */
+TEST_CASE("try_attach_loader rejects an ABI mismatch")
+{
+    REQUIRE_FALSE(jamoma::Registry::instance().try_attach_loader(jamoma::kAbiVersion + 1));
+    REQUIRE_FALSE(jamoma::Registry::instance().loader_attached());
+}
+
+/** A loader built against this ABI is accepted and attached. */
+TEST_CASE("try_attach_loader accepts the current ABI")
+{
+    REQUIRE(jamoma::Registry::instance().try_attach_loader(jamoma::kAbiVersion));
+    REQUIRE(jamoma::Registry::instance().loader_attached());
+}
+
 /** Attaching the loader twice changes nothing the second time. */
 TEST_CASE("attach_loader is idempotent")
 {
