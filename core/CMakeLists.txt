@@ -11,14 +11,15 @@ add_library(jamoma_core SHARED
     src/clip.cpp
     src/command.cpp
     src/data.cpp
-    src/dataspace.cpp)
+    src/dataspace.cpp
+    src/ramp.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
 # The shared library goes into the Max package, where every external finds it through its rpath.
 set_target_properties(jamoma_core PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "$<1:${CMAKE_SOURCE_DIR}/package/Jamoma/support>"
-    RUNTIME_OUTPUT_DIRECTORY "$<1:${CMAKE_SOURCE_DIR}/package/Jamoma/support>")
+    LIBRARY_OUTPUT_DIRECTORY "$<1:${JAMOMA_PACKAGE_DIR}/support>"
+    RUNTIME_OUTPUT_DIRECTORY "$<1:${JAMOMA_PACKAGE_DIR}/support>")
 
 # Unit tests (Catch2, no Max needed).
 include(FetchContent)
@@ -38,7 +39,8 @@ add_executable(jamoma_core_tests
     tests/clip_test.cpp
     tests/command_test.cpp
     tests/data_test.cpp
-    tests/dataspace_test.cpp)
+    tests/dataspace_test.cpp
+    tests/ramp_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 # The registry must outlive static destruction (its own executable, checked through its exit code).
 add_executable(registry_exit_test tests/registry_exit_test.cpp)
@@ -48,4 +50,4 @@ add_test(NAME registry_outlives_static_destruction COMMAND registry_exit_test)
 # PRE_TEST: discover at ctest time, because the Xcode generator signs the binary only after post-build steps run.
 # DL_PATHS: on Windows the test executable finds jamoma_core.dll only through PATH (there is no rpath).
 catch_discover_tests(jamoma_core_tests DISCOVERY_MODE PRE_TEST
-    DL_PATHS "${CMAKE_SOURCE_DIR}/package/Jamoma/support")
+    DL_PATHS "${JAMOMA_PACKAGE_DIR}/support")

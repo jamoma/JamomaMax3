@@ -6,8 +6,7 @@
  * @brief The data object behind j.parameter, j.message and j.return.
  *
  * A port of the behaviour of the old TTData (TTData.cpp and TTDataTypedMethods.cpp): typed values, range and clip mode,
- * repetition filter, default and init, step size, active, and a re-entrancy guard. Units and ramps are added in later
- * tasks of milestone 1.
+ * repetition filter, default and init, step size, active, dataspace units, ramps and a re-entrancy guard.
  */
 
 #pragma once
@@ -23,6 +22,7 @@
 #include "jamoma/command.hpp"
 #include "jamoma/export.hpp"
 #include "jamoma/namespace.hpp"
+#include "jamoma/ramp.hpp"
 
 namespace jamoma {
 
@@ -115,6 +115,22 @@ public:
     /** @return The unit of the value: the one set, else the neutral unit of the dataspace, else an empty string. */
     std::string unit() const;
 
+    /**
+     * @brief Sets the clock that drives ramps; it must outlive this object (declare it first in the owner).
+     * @param clock The clock, or null for none (ramp times are then ignored and the target is set at once).
+     */
+    void set_clock(Clock* clock);
+    /** @brief Sets the ramp drive: none, max or system (system is the same as max). Numeric types default to max, the others to none. @param drive The drive name. */
+    void set_ramp_drive(std::string drive);
+    /** @return The ramp drive name. */
+    std::string ramp_drive() const;
+    /** @brief Sets the ramp function; only linear exists, any other name behaves as linear. @param function The function name. */
+    void set_ramp_function(std::string function);
+    /** @return The ramp function name. */
+    std::string ramp_function() const;
+    /** @return True while a ramp is running. */
+    bool ramp_running() const;
+
     /** @return A copy of the current value. */
     Value value() const;
     /** @return True once a value has been output (or after a command) and until the next init. */
@@ -124,7 +140,11 @@ public:
     void set_output(std::function<void(const Value&)> output);
 
     /**
-     * @brief Sends a message to the object: parse (numeric types), convert to the type, repetition filter, clip, store, output.
+     * @brief Sends a message to the object: parse (numeric types), stop a running ramp, convert to the type, repetition filter, clip, store, output.
+     *
+     * Any command, an empty one included, stops a running ramp (as the old object did). A numeric command with `ramp <ms>` and a
+     * clock starts a ramp from the current value instead of setting it; each tick passes through unit conversion, the repetition
+     * filter and clipping like a plain command.
      *
      * An empty message (a bang) outputs the current value. A symbol sent to a decimal, integer or array becomes 0; the boolean
      * type rejects a symbol silently. A string keeps only the first atom and turns a number into its text.
@@ -140,7 +160,7 @@ public:
 
 private:
     struct Impl;                    /**< The state, hidden from the header. */
-    std::unique_ptr<Impl> impl_;    /**< The state. */
+    std::shared_ptr<Impl> impl_;    /**< The state (shared weakly with pending ramp ticks). */
 };
 
 } // namespace jamoma

@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <optional>
 
 #include "jamoma/dataspace.hpp"
 
@@ -50,7 +51,7 @@ std::string_view data_type_name(DataType type)
 }
 
 /** The state of a data object. */
-struct Data::Impl {
+struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     /** @param s The service. */
     explicit Impl(Service s) : service(s) { apply_type_defaults(); }
 
@@ -74,6 +75,20 @@ struct Data::Impl {
     std::function<void(const Value&)> output; /**< The output function. */
     mutable std::mutex mutex;              /**< Guards the state. */
     std::atomic<bool> sending{false};      /**< The re-entrancy guard. */
+    Clock* clock = nullptr;                /**< The clock that drives ramps, or null. */
+    std::string ramp_drive = "none";       /**< The ramp drive: none, max or system. */
+    bool ramp_drive_explicit = false;      /**< Whether the drive was set by the user. */
+    std::string ramp_function = "linear";  /**< The ramp function name. */
+    std::unique_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp. */
+    std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
+
+    /** A ramp to start once the command has been processed and its lock and guard released. */
+    struct RampPlan {
+        std::vector<double> from;          /**< The start vector, in the ramp's unit. */
+        std::vector<double> to;            /**< The target vector, in the ramp's unit. */
+        double duration_ms = 0.0;          /**< The duration. */
+        std::string function;              /**< The function name. */
+    };
 
     /** @return The unit the value is kept in: the one set, else the neutral unit of a valid dataspace, else empty. */
     std::string effective_unit() const
@@ -88,6 +103,9 @@ struct Data::Impl {
     /** Resets value, default, step size and range to the defaults of the current type (as the old setType). */
     void apply_type_defaults()
     {
+        if (!ramp_drive_explicit) {
+            ramp_drive = (type == DataType::Integer || type == DataType::Decimal || type == DataType::Array) ? "max" : "none";
+        }
         switch (type) {
         case DataType::Integer:
             value = default_value = Value{integer(0)};
@@ -138,13 +156,135 @@ struct Data::Impl {
         }
     }
 
+    /** @return True if a numeric command with a ramp time can start a ramp now. */
+    bool ramp_available() const
+    {
+        return clock != nullptr && (ramp_drive == "max" || ramp_drive == "system");
+    }
+
+    /**
+     * Plans a ramp from the current value to the command's values (in the command's unit, if it has a valid one).
+     * @param command The parsed command.
+     * @param a The target values.
+     * @return The plan; also records the ramp's unit.
+     */
+    RampPlan make_plan(const Command& command, const Value& a)
+    {
+        RampPlan plan;
+        for (const Atom& atom : a) {
+            plan.to.push_back(atom.as_double());
+        }
+        Value start = value;
+        ramp_unit.clear();
+        const Dataspace* space = Dataspace::find(dataspace);
+        const std::string own_unit = effective_unit();
+        if (!command.unit.empty() && space != nullptr && space->has_unit(command.unit) && space->has_unit(own_unit)) {
+            ramp_unit = command.unit;
+            start = *space->convert(value, own_unit, command.unit);
+        }
+        for (const Atom& atom : start) {
+            plan.from.push_back(atom.as_double());
+        }
+        plan.duration_ms = *command.ramp_ms;
+        plan.function = ramp_function;
+        return plan;
+    }
+
+    /**
+     * Casts a numeric value to the type, applies the repetition filter, the clip mode and integer truncation, and stores it.
+     * @param a The new value (empty means only output the current value).
+     * @param out Receives the value to output.
+     * @return True if the value is to be output (false if the repetition filter dropped it).
+     */
+    bool numeric_store(Value a, Value& out)
+    {
+        if (type == DataType::Decimal && !a.empty()) {
+            a = Value{flt(a[0].as_double())};
+        } else if (type == DataType::Integer && !a.empty()) {
+            a = Value{integer(a[0].as_int())};
+        } else if (type == DataType::Array) {
+            for (Atom& atom : a) {
+                atom = flt(atom.as_double());
+            }
+        }
+        if (!a.empty()) {
+            const Value previous = value;
+            value = std::move(a);
+            if (repetitions_filter && initialized && value == previous) {
+                return false; // compared before clipping, as the old object did
+            }
+            apply_clip(value);
+            if (type == DataType::Integer) {
+                for (Atom& atom : value) {
+                    atom = integer(atom.as_int());
+                }
+            }
+        }
+        initialized = true;
+        out = value;
+        return true;
+    }
+
+    /** @return The ramp engine, created on first use. */
+    Ramp* ensure_ramp()
+    {
+        if (!ramp) {
+            std::weak_ptr<Impl> weak = weak_from_this();
+            ramp = std::make_unique<Ramp>(*clock, [weak](const std::vector<double>& v) {
+                if (auto state = weak.lock()) {
+                    state->apply_ramp_value(v);
+                }
+            });
+        }
+        return ramp.get();
+    }
+
+    /** Handles one value emitted by the ramp: unit conversion, filter, clip, store, output. @param v The ramp's vector. */
+    void apply_ramp_value(const std::vector<double>& v)
+    {
+        if (sending.exchange(true)) {
+            return;
+        }
+        struct Release {
+            std::atomic<bool>& flag; /**< The guard to clear. */
+            ~Release() { flag.store(false); }
+        } release{sending};
+        Value out;
+        std::function<void(const Value&)> callback;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (!active) {
+                return;
+            }
+            Value a;
+            for (double d : v) {
+                a.push_back(flt(d));
+            }
+            if (!ramp_unit.empty()) {
+                const Dataspace* space = Dataspace::find(dataspace);
+                const std::string own_unit = effective_unit();
+                if (space != nullptr && space->has_unit(ramp_unit) && space->has_unit(own_unit)) {
+                    a = *space->convert(a, ramp_unit, own_unit);
+                }
+            }
+            if (!numeric_store(std::move(a), out)) {
+                return;
+            }
+            callback = output;
+        }
+        if (callback) {
+            callback(out);
+        }
+    }
+
     /**
      * Runs a message through the pipeline of the current type (the lock is held).
      * @param input The message.
      * @param out Receives the value to output.
+     * @param plan Receives a ramp to start, if the message asks for one (then nothing is output now).
      * @return True if the value is to be output.
      */
-    bool process(const Value& input, Value& out)
+    bool process(const Value& input, Value& out, std::optional<RampPlan>& plan)
     {
         switch (type) {
         case DataType::None:
@@ -215,10 +355,17 @@ struct Data::Impl {
         case DataType::Integer:
         case DataType::Decimal:
         case DataType::Array: {
-            const Command command = parse_command(input, true); // a ramp is handled in a later task
+            const Command command = parse_command(input, true);
+            if (ramp) {
+                ramp->stop(); // any command stops a running ramp, as the old object did
+            }
             Value a = command.values;
             if (type != DataType::Array && a.size() > 1) {
                 a.resize(1);
+            }
+            if (command.ramp_ms.has_value() && *command.ramp_ms > 0.0 && ramp_available() && !a.empty()) {
+                plan = make_plan(command, a);
+                return false;
             }
             if (!command.unit.empty() && !a.empty()) {
                 const Dataspace* space = Dataspace::find(dataspace);
@@ -227,41 +374,23 @@ struct Data::Impl {
                     a = *space->convert(a, command.unit, own_unit);
                 } // an unknown unit, or a unit without a dataspace, is ignored
             }
-            if (type == DataType::Decimal && !a.empty()) {
-                a = Value{flt(a[0].as_double())};
-            } else if (type == DataType::Integer && !a.empty()) {
-                a = Value{integer(a[0].as_int())};
-            } else if (type == DataType::Array) {
-                for (Atom& atom : a) {
-                    atom = flt(atom.as_double());
-                }
-            }
-            if (!a.empty()) {
-                const Value previous = value;
-                value = a;
-                if (repetitions_filter && initialized && value == previous) {
-                    return false; // compared before clipping, as the old object did
-                }
-                apply_clip(value);
-                if (type == DataType::Integer) {
-                    for (Atom& atom : value) {
-                        atom = integer(atom.as_int());
-                    }
-                }
-                initialized = true;
-            }
-            initialized = true;
-            out = value;
-            return true;
+            return numeric_store(std::move(a), out);
         }
         }
         return false;
     }
 };
 
-Data::Data(Service service) : impl_(std::make_unique<Impl>(service)) {}
+Data::Data(Service service) : impl_(std::make_shared<Impl>(service)) {}
 
-Data::~Data() = default;
+Data::~Data()
+{
+    // Stop the ramp so that no tick is pending; the clock must still be alive (it outlives this object).
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    if (impl_->ramp) {
+        impl_->ramp->stop();
+    }
+}
 
 Service Data::service() const noexcept { return impl_->service; }
 
@@ -412,6 +541,47 @@ std::string Data::unit() const
     return impl_->effective_unit();
 }
 
+void Data::set_clock(Clock* clock)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    if (impl_->ramp) {
+        impl_->ramp->stop();
+        impl_->ramp.reset();
+    }
+    impl_->clock = clock;
+}
+
+void Data::set_ramp_drive(std::string drive)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->ramp_drive = std::move(drive);
+    impl_->ramp_drive_explicit = true;
+}
+
+std::string Data::ramp_drive() const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->ramp_drive;
+}
+
+void Data::set_ramp_function(std::string function)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->ramp_function = std::move(function);
+}
+
+std::string Data::ramp_function() const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->ramp_function;
+}
+
+bool Data::ramp_running() const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->ramp && impl_->ramp->running();
+}
+
 Value Data::value() const
 {
     std::lock_guard<std::mutex> lock(impl_->mutex);
@@ -433,27 +603,37 @@ void Data::set_output(std::function<void(const Value&)> output)
 void Data::command(const Value& input)
 {
     Impl& s = *impl_;
-    if (s.sending.exchange(true)) {
-        return; // another command is in progress (possibly this thread's own output callback): dropped
-    }
-    struct Release {
-        std::atomic<bool>& flag; /**< The guard to clear. */
-        ~Release() { flag.store(false); }
-    } release{s.sending};
-
-    Value out;
-    bool emit = false;
-    std::function<void(const Value&)> callback;
+    std::optional<Impl::RampPlan> plan;
+    Ramp* ramp = nullptr;
     {
-        std::lock_guard<std::mutex> lock(s.mutex);
-        if (!s.active) {
-            return;
+        if (s.sending.exchange(true)) {
+            return; // another command is in progress (possibly this thread's own output callback): dropped
         }
-        emit = s.process(input, out);
-        callback = s.output;
-    }
-    if (emit && callback) {
-        callback(out);
+        struct Release {
+            std::atomic<bool>& flag; /**< The guard to clear. */
+            ~Release() { flag.store(false); }
+        } release{s.sending};
+
+        Value out;
+        bool emit = false;
+        std::function<void(const Value&)> callback;
+        {
+            std::lock_guard<std::mutex> lock(s.mutex);
+            if (!s.active) {
+                return;
+            }
+            emit = s.process(input, out, plan);
+            callback = s.output;
+            if (plan) {
+                ramp = s.ensure_ramp();
+            }
+        }
+        if (emit && callback) {
+            callback(out);
+        }
+    } // the guard is released here, so the ramp's first value can pass through it
+    if (plan && ramp != nullptr) {
+        ramp->start(plan->from, plan->to, plan->duration_ms, plan->function);
     }
 }
 

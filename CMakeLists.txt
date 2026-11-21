@@ -24,6 +24,9 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
+# Where the Max package is assembled (libraries and externals are written there); override for scratch builds such as sanitizer runs.
+set(JAMOMA_PACKAGE_DIR "${CMAKE_SOURCE_DIR}/package/Jamoma" CACHE PATH "Output folder of the Max package")
+
 enable_testing()
 
 add_subdirectory(core)

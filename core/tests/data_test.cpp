@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "jamoma/data.hpp"
+#include "manual_clock.hpp"
 
 using jamoma::Atom;
 using jamoma::ClipMode;
@@ -569,4 +570,266 @@ TEST_CASE("array converts a position vector")
     REQUIRE(std::fabs(x.outputs.back()[0].as_double() - 1.0) < 1e-9);
     REQUIRE(std::fabs(x.outputs.back()[1].as_double()) < 1e-9);
     REQUIRE(std::fabs(x.outputs.back()[2].as_double()) < 1e-9);
+}
+
+namespace {
+
+/** A decimal data object with a manual clock and the max ramp drive; records every output. */
+struct RampFixture {
+    /** @param type The data type. */
+    explicit RampFixture(DataType type = DataType::Decimal)
+    {
+        data.set_type(type);
+        data.set_ramp_drive("max");
+        data.set_clock(&clock);
+        data.set_output([this](const Value& v) { outputs.push_back(v); });
+    }
+    ManualClock clock;           /**< The clock (declared before the data, so it outlives it). */
+    Data data;                   /**< The object under test. */
+    std::vector<Value> outputs;  /**< Everything output. */
+
+    /** @return The first element of every output. */
+    std::vector<double> firsts() const
+    {
+        std::vector<double> out;
+        for (const Value& v : outputs) {
+            out.push_back(v.at(0).as_double());
+        }
+        return out;
+    }
+};
+
+} // namespace
+
+/** Numeric types default to the max drive; the others to none. */
+TEST_CASE("ramp drive defaults by type")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    REQUIRE(d.ramp_drive() == "max");
+    d.set_type(DataType::String);
+    REQUIRE(d.ramp_drive() == "none");
+    d.set_ramp_drive("system");
+    REQUIRE(d.ramp_drive() == "system");
+    REQUIRE(d.ramp_function() == "linear");
+}
+
+/** Old test ramp_and_clipmode: range 0..80, `0.` then `100. ramp 100`, per clip mode. */
+TEST_CASE("ramp with fold clipmode matches the old sequence")
+{
+    RampFixture x;
+    x.data.set_range(Value{f(0.0), f(80.0)});
+    x.data.set_clipmode(ClipMode::Fold);
+    x.data.command(Value{f(0.0)});
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(100.0);
+    REQUIRE(x.firsts() == std::vector<double>{0, 0, 20, 40, 60, 80, 60});
+    REQUIRE_FALSE(x.data.ramp_running());
+}
+
+/** Wrap. */
+TEST_CASE("ramp with wrap clipmode matches the old sequence")
+{
+    RampFixture x;
+    x.data.set_range(Value{f(0.0), f(80.0)});
+    x.data.set_clipmode(ClipMode::Wrap);
+    x.data.command(Value{f(0.0)});
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(100.0);
+    REQUIRE(x.firsts() == std::vector<double>{0, 0, 20, 40, 60, 0, 20});
+}
+
+/** High and both stop at the upper bound; low reaches the target. */
+TEST_CASE("ramp with high both and low clipmodes matches the old sequences")
+{
+    for (ClipMode mode : {ClipMode::High, ClipMode::Both}) {
+        RampFixture x;
+        x.data.set_range(Value{f(0.0), f(80.0)});
+        x.data.set_clipmode(mode);
+        x.data.command(Value{f(0.0)});
+        x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+        x.clock.advance(100.0);
+        REQUIRE(x.firsts() == std::vector<double>{0, 0, 20, 40, 60, 80, 80});
+    }
+    RampFixture low;
+    low.data.set_range(Value{f(0.0), f(80.0)});
+    low.data.set_clipmode(ClipMode::Low);
+    low.data.command(Value{f(0.0)});
+    low.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    low.clock.advance(100.0);
+    REQUIRE(low.firsts() == std::vector<double>{0, 0, 20, 40, 60, 80, 100});
+}
+
+/** Old timing test: 0 then `1000. ramp 200` gives 0 and then 0 100 ... 1000. */
+TEST_CASE("ramp timing matches the old test")
+{
+    RampFixture x;
+    x.data.command(Value{f(0.0)});
+    x.data.command(Value{f(1000.0), Atom("ramp"), i(200)});
+    x.clock.advance(200.0);
+    REQUIRE(x.firsts() == std::vector<double>{0, 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000});
+}
+
+/** Without a clock, or with the drive none, the ramp time is ignored and the target is set at once. */
+TEST_CASE("ramp without a clock or drive sets the target at once")
+{
+    Fixture x(DataType::Decimal);
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    REQUIRE(x.outputs.size() == 1);
+    REQUIRE(x.outputs[0] == Value{f(100.0)});
+    RampFixture y;
+    y.data.set_ramp_drive("none");
+    y.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    REQUIRE(y.outputs.size() == 1);
+    REQUIRE(y.outputs[0] == Value{f(100.0)});
+}
+
+/** A ramp starts from the current value, and ramp/status reports it. */
+TEST_CASE("ramp starts from the current value and reports status")
+{
+    RampFixture x;
+    x.data.command(Value{f(10.0)});
+    x.data.command(Value{f(20.0), Atom("ramp"), i(40)});
+    REQUIRE(x.data.ramp_running());
+    x.clock.advance(20.0);
+    REQUIRE(x.firsts() == std::vector<double>{10, 10, 15});
+    x.clock.advance(20.0);
+    REQUIRE(x.firsts().back() == 20.0);
+    REQUIRE_FALSE(x.data.ramp_running());
+}
+
+/** Review Focus 4: a plain value during a ramp stops it. */
+TEST_CASE("new value during a ramp stops the ramp")
+{
+    RampFixture x;
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(40.0);
+    x.data.command(Value{f(5.0)});
+    const std::size_t before = x.outputs.size();
+    REQUIRE(x.outputs.back() == Value{f(5.0)});
+    x.clock.advance(1000.0);
+    REQUIRE(x.outputs.size() == before);
+    REQUIRE_FALSE(x.data.ramp_running());
+}
+
+/** Review Focus 4: ramp 0 stops the ramp and sets the value; so does a bang (old behaviour). */
+TEST_CASE("ramp zero and bang stop the ramp")
+{
+    RampFixture x;
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(20.0);
+    x.data.command(Value{f(7.0), Atom("ramp"), i(0)});
+    REQUIRE(x.outputs.back() == Value{f(7.0)});
+    REQUIRE_FALSE(x.data.ramp_running());
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(20.0);
+    x.data.command(Value{});
+    REQUIRE_FALSE(x.data.ramp_running());
+    const std::size_t before = x.outputs.size();
+    x.clock.advance(1000.0);
+    REQUIRE(x.outputs.size() == before);
+}
+
+/** Review Focus 4: a range change during a ramp clips the next tick. */
+TEST_CASE("range change during a ramp clips the next tick")
+{
+    RampFixture x;
+    x.data.set_clipmode(ClipMode::Both);
+    x.data.set_range(Value{f(0.0), f(100.0)});
+    x.data.command(Value{f(100.0), Atom("ramp"), i(100)});
+    x.clock.advance(20.0);
+    x.data.set_range(Value{f(0.0), f(30.0)});
+    x.clock.advance(60.0);
+    REQUIRE(x.firsts().back() == 30.0);
+}
+
+/** Review Focus 4: a data object destroyed with a tick pending is never called back. */
+TEST_CASE("data destroyed while a tick is pending never calls back")
+{
+    ManualClock clock;
+    int outputs = 0;
+    {
+        Data d;
+        d.set_type(DataType::Decimal);
+        d.set_ramp_drive("max");
+        d.set_clock(&clock);
+        d.set_output([&](const Value&) { ++outputs; });
+        d.command(Value{f(100.0), Atom("ramp"), i(100)});
+        REQUIRE(outputs == 1);
+        REQUIRE(clock.has_pending());
+    }
+    clock.advance(1000.0);
+    REQUIRE(outputs == 1);
+    REQUIRE_FALSE(clock.has_pending());
+}
+
+/** An integer ramp outputs whole numbers. */
+TEST_CASE("integer ramp outputs whole numbers")
+{
+    RampFixture x(DataType::Integer);
+    x.data.command(Value{i(0)});
+    x.data.command(Value{i(10), Atom("ramp"), i(60)});
+    x.clock.advance(60.0);
+    REQUIRE(x.outputs.back() == Value{i(10)});
+    for (const Value& v : x.outputs) {
+        REQUIRE(v.at(0).is_int());
+    }
+}
+
+/** An array ramps every element. */
+TEST_CASE("array ramp moves every element")
+{
+    RampFixture x(DataType::Array);
+    x.data.command(Value{f(0.0), f(0.0)});
+    x.data.command(Value{f(100.0), f(200.0), Atom("ramp"), i(40)});
+    x.clock.advance(20.0);
+    REQUIRE(x.outputs.back() == Value{f(50.0), f(100.0)});
+    x.clock.advance(20.0);
+    REQUIRE(x.outputs.back() == Value{f(100.0), f(200.0)});
+}
+
+/** Old test ramp_and_dataspace: an object in dB ramps in dB steps. */
+TEST_CASE("ramp in the object unit steps in that unit")
+{
+    RampFixture x;
+    x.data.set_dataspace("gain");
+    x.data.set_unit("db");
+    x.data.command(Value{f(-20.0)});
+    x.data.command(Value{f(0.0), Atom("ramp"), i(200)});
+    x.clock.advance(200.0);
+    const std::vector<double> expected{-20, -20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0};
+    REQUIRE(x.firsts().size() == expected.size());
+    for (std::size_t k = 0; k < expected.size(); ++k) {
+        REQUIRE(std::fabs(x.firsts()[k] - expected[k]) < 1e-9); // the old test also used a tolerance
+    }
+}
+
+/** A ramp with a unit in the command moves in that unit and is converted at every tick; it ends on the converted target. */
+TEST_CASE("ramp with a command unit ends at the converted target")
+{
+    RampFixture x;
+    x.data.set_dataspace("gain");
+    x.data.set_unit("db");
+    x.data.command(Value{f(0.1), Atom("linear")});
+    REQUIRE(std::fabs(x.outputs.back()[0].as_double() - (-20.0)) < 1e-9);
+    x.data.command(Value{f(1.0), Atom("linear"), Atom("ramp"), i(100)});
+    x.clock.advance(100.0);
+    REQUIRE(std::fabs(x.outputs.back()[0].as_double()) < 1e-9);
+    // the middle tick (t = 60 ms) is the linear value 0.1 + 0.9 * 0.6 expressed in dB
+    const double expected = 20.0 * std::log10(0.1 + 0.9 * 0.6);
+    bool found = false;
+    for (const Value& v : x.outputs) {
+        found = found || std::fabs(v[0].as_double() - expected) < 1e-9;
+    }
+    REQUIRE(found);
+}
+
+/** The ramp function and its parameters are attributes. */
+TEST_CASE("ramp function attributes")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    d.set_ramp_function("linear");
+    REQUIRE(d.ramp_function() == "linear");
+    REQUIRE_FALSE(d.ramp_running());
 }

@@ -10,7 +10,6 @@
 
 set(JAMOMA_MIN_API_DIR "${CMAKE_SOURCE_DIR}/third_party/min-api")
 set(JAMOMA_C74_SUPPORT "${JAMOMA_MIN_API_DIR}/max-sdk-base/c74support")
-set(JAMOMA_PACKAGE_DIR "${CMAKE_SOURCE_DIR}/package/Jamoma")
 
 # Max resolves its own API symbols when it loads an external; tell the linker not to demand them.
 if(APPLE)
