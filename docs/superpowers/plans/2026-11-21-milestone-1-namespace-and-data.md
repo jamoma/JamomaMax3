@@ -223,15 +223,16 @@ docs/conformance/m1-results.md                                   final result li
 
 ---
 
-### Task 9: `j.model`, `j.init`, `j.savebang`
+### Task 9: `j.model`, `j.init`, `j.savebang`, `j.pass`
 
 **Files:**
-- Create: `core/include/jamoma/model.hpp`, `core/src/model.cpp`, `core/tests/model_test.cpp`, `externals/j.model/{CMakeLists.txt,j.model.cpp}`, `externals/j.init/{CMakeLists.txt,j.init.cpp}`, `externals/j.savebang/{CMakeLists.txt,j.savebang.cpp}`
+- Create: `core/include/jamoma/model.hpp`, `core/src/model.cpp`, `core/tests/model_test.cpp`, `externals/j.model/{CMakeLists.txt,j.model.cpp}`, `externals/j.init/{CMakeLists.txt,j.init.cpp}`, `externals/j.savebang/{CMakeLists.txt,j.savebang.cpp}`, `externals/j.pass/{CMakeLists.txt,j.pass.cpp}`
 - Modify: `externals/common/data_object.hpp` (subscribe under the enclosing model), `externals/CMakeLists.txt`, `conformance/implemented.txt`
 
 **Interfaces:**
 - Produces (core): `class Model : public Object`: `Model(Namespace&, Address model_address)`; `void set_description(std::string)`; `void set_priority(int)`; `void set_amenities(std::vector<std::string>)` (the attribute is `amenities`, seen in the old `j.model` usages; characterise its effect, probably which UI panels a model offers, and implement only the storage and getter if nothing else in this milestone reads it); `void init()`: starts the initialisation sequence: notifies "init started" observers, calls `init()` on every `Data` below the model in ascending `priority` order (ties in creation order), then notifies "init finished" observers; `Subscription` of the model node as a context so data objects below subscribe relative to it; `void on_init_started(std::function<void()>)`, `void on_init_finished(std::function<void()>)` (what `j.init` uses; returns a handle that unregisters).
 - Max: `j.model` (arguments: optional name; attributes `description`, `priority`, `amenities`; the messages of `docs/inventory/j.model.md` that this milestone needs: `init` and the ones the integration tests send, read `Modular/j.model/audio_gain` neighbours and the `j.model.maxref.xml`), `j.init` (two outlets as in the old `start_out`/`end_out`: a bang when the enclosing model starts initialising and a bang when all defaults have been recalled; binds to the first `j.model` at the same patcher level or above), `j.savebang` (one outlet; a bang when the patcher it lives in is saved, via the patcher's save notification in Min-API / `c74::max::`; if Min-API offers no hook, use the raw Max notification API and say so).
+- `j.pass` (added after the baseline run: the old helper abstraction `test.list.equals` uses it, and 20 of the 82 milestone 1 tests go through that helper): routes messages like `route` but without stripping the first item; arguments are the symbols to match (one outlet each, plus an overflow outlet that doubles as the dump outlet, up to 100 arguments), attributes `strip` and `stripnonmatches` (strip a leading slash); read `source/j.pass/j.pass.cpp` and `Jamoma/docs/refpages/data/j.pass.maxref.xml` for the exact behaviour and write the cases as own `.maxtest.maxpat` tests first.
 - Context rule (from `TTSubscriber::registerContextList`): a model registers a context node for its patcher; data objects in that patcher or in abstractions below subscribe under it; nested models nest. Characterise the exact patcher-to-address mapping (how the name of an abstraction instance becomes `name.1`), write it into `docs/inventory/namespace.md`, then implement.
 
 - [ ] **Step 1: Characterise** the model's init order and the context mapping; extend `docs/inventory/namespace.md`.
