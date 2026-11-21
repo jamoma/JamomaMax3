@@ -106,6 +106,15 @@ public:
     /** @return The tags. */
     std::vector<std::string> tags() const;
 
+    /** @brief Sets the dataspace (gain, time or position) of a numeric object; an unknown name disables conversion. @param name The dataspace name, or empty for none. */
+    void set_dataspace(std::string name);
+    /** @return The dataspace name, or an empty string. */
+    std::string dataspace() const;
+    /** @brief Sets the unit the object's value is kept in; a command may give its own unit. @param unit The unit name. */
+    void set_unit(std::string unit);
+    /** @return The unit of the value: the one set, else the neutral unit of the dataspace, else an empty string. */
+    std::string unit() const;
+
     /** @return A copy of the current value. */
     Value value() const;
     /** @return True once a value has been output (or after a command) and until the next init. */

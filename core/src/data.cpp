@@ -11,6 +11,8 @@
 #include <atomic>
 #include <mutex>
 
+#include "jamoma/dataspace.hpp"
+
 namespace jamoma {
 
 namespace {
@@ -58,6 +60,8 @@ struct Data::Impl {
     bool range_explicit = false;           /**< Whether the range was set by the user. */
     ClipMode clipmode = ClipMode::None;    /**< The clip mode. */
     bool repetitions_filter = false;       /**< The repetition filter. */
+    std::string dataspace;                 /**< The dataspace name, or empty. */
+    std::string unit;                      /**< The unit of the value, or empty for the neutral unit. */
     Value default_value;                   /**< The default value. */
     double stepsize = 0.1;                 /**< The step size. */
     bool stepsize_explicit = false;        /**< Whether the step size was set by the user. */
@@ -70,6 +74,16 @@ struct Data::Impl {
     std::function<void(const Value&)> output; /**< The output function. */
     mutable std::mutex mutex;              /**< Guards the state. */
     std::atomic<bool> sending{false};      /**< The re-entrancy guard. */
+
+    /** @return The unit the value is kept in: the one set, else the neutral unit of a valid dataspace, else empty. */
+    std::string effective_unit() const
+    {
+        if (!unit.empty()) {
+            return unit;
+        }
+        const Dataspace* space = Dataspace::find(dataspace);
+        return space != nullptr ? space->default_unit() : std::string();
+    }
 
     /** Resets value, default, step size and range to the defaults of the current type (as the old setType). */
     void apply_type_defaults()
@@ -201,9 +215,17 @@ struct Data::Impl {
         case DataType::Integer:
         case DataType::Decimal:
         case DataType::Array: {
-            Value a = parse_command(input, true).values; // unit and ramp are handled in later tasks
+            const Command command = parse_command(input, true); // a ramp is handled in a later task
+            Value a = command.values;
             if (type != DataType::Array && a.size() > 1) {
                 a.resize(1);
+            }
+            if (!command.unit.empty() && !a.empty()) {
+                const Dataspace* space = Dataspace::find(dataspace);
+                const std::string own_unit = effective_unit();
+                if (space != nullptr && space->has_unit(command.unit) && space->has_unit(own_unit)) {
+                    a = *space->convert(a, command.unit, own_unit);
+                } // an unknown unit, or a unit without a dataspace, is ignored
             }
             if (type == DataType::Decimal && !a.empty()) {
                 a = Value{flt(a[0].as_double())};
@@ -364,6 +386,30 @@ std::vector<std::string> Data::tags() const
 {
     std::lock_guard<std::mutex> lock(impl_->mutex);
     return impl_->tags;
+}
+
+void Data::set_dataspace(std::string name)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->dataspace = std::move(name);
+}
+
+std::string Data::dataspace() const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->dataspace;
+}
+
+void Data::set_unit(std::string unit)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->unit = std::move(unit);
+}
+
+std::string Data::unit() const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->effective_unit();
 }
 
 Value Data::value() const

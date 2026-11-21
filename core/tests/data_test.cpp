@@ -492,3 +492,81 @@ TEST_CASE("descriptive attributes are stored")
     REQUIRE(d.tags().size() == 2);
     REQUIRE(d.priority() == 3);
 }
+
+/** A dataspace without an explicit unit uses its neutral unit. */
+TEST_CASE("dataspace defaults to its neutral unit")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    REQUIRE(d.dataspace() == "");
+    d.set_dataspace("gain");
+    REQUIRE(d.dataspace() == "gain");
+    REQUIRE(d.unit() == "linear");
+    d.set_unit("dB");
+    REQUIRE(d.unit() == "dB");
+}
+
+/** A value without a unit in the command is stored as it is, in the object's unit. */
+TEST_CASE("no unit in the command keeps the value as it is")
+{
+    Fixture x(DataType::Decimal);
+    x.data.set_dataspace("gain");
+    x.data.set_unit("db");
+    x.data.command(Value{f(-6.0)});
+    REQUIRE(x.outputs.back() == Value{f(-6.0)});
+}
+
+/** The unit in a command overrides the object's unit (old test: midigain object, linear 1. gives 100.). */
+TEST_CASE("command unit overrides the object unit")
+{
+    Fixture x(DataType::Decimal);
+    x.data.set_dataspace("gain");
+    x.data.set_unit("midigain");
+    x.data.command(Value{f(1.0), Atom("linear")});
+    REQUIRE(std::fabs(x.outputs.back()[0].as_double() - 100.0) < 1e-9);
+    Fixture y(DataType::Decimal);
+    y.data.set_dataspace("gain");
+    y.data.command(Value{f(-6.0206), Atom("dB")});
+    REQUIRE(std::fabs(y.outputs.back()[0].as_double() - 0.5) < 1e-3);
+}
+
+/** An unknown unit in a command is ignored, not fatal. */
+TEST_CASE("unknown unit in the command is ignored")
+{
+    Fixture x(DataType::Decimal);
+    x.data.set_dataspace("gain");
+    x.data.set_unit("db");
+    x.data.command(Value{f(-6.0), Atom("furlongs")});
+    REQUIRE(x.outputs.back() == Value{f(-6.0)});
+}
+
+/** Without a dataspace the unit in a command is dropped. */
+TEST_CASE("unit without a dataspace is dropped")
+{
+    Fixture x(DataType::Decimal);
+    x.data.command(Value{f(3.0), Atom("db")});
+    REQUIRE(x.outputs.back() == Value{f(3.0)});
+}
+
+/** An integer object converts, then truncates. */
+TEST_CASE("integer with a unit converts then truncates")
+{
+    Fixture x(DataType::Integer);
+    x.data.set_dataspace("time");
+    x.data.set_unit("ms");
+    x.data.command(Value{f(2.0), Atom("second")});
+    REQUIRE(x.outputs.back() == Value{i(2000)});
+}
+
+/** An array of positions is converted as a whole vector. */
+TEST_CASE("array converts a position vector")
+{
+    Fixture x(DataType::Array);
+    x.data.set_dataspace("position");
+    x.data.set_unit("xyz");
+    x.data.command(Value{f(90.0), f(0.0), f(1.0), Atom("aed")});
+    REQUIRE(x.outputs.back().size() == 3);
+    REQUIRE(std::fabs(x.outputs.back()[0].as_double() - 1.0) < 1e-9);
+    REQUIRE(std::fabs(x.outputs.back()[1].as_double()) < 1e-9);
+    REQUIRE(std::fabs(x.outputs.back()[2].as_double()) < 1e-9);
+}
