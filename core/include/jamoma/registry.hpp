@@ -46,6 +46,16 @@ public:
     void attach_loader() noexcept;
 
     /**
+     * @brief Lets exactly one caller per process warn that the start-up loader is missing.
+     *
+     * Every external calls this when it starts without the loader; only the first call
+     * (and only while no loader is attached) returns true, so the user sees one warning
+     * however many externals are created.
+     * @return True for the one caller that should log the warning; false for all others.
+     */
+    bool claim_missing_loader_warning() noexcept;
+
+    /**
      * @brief Attaches the start-up loader if it was built against this library's ABI.
      * @param caller_abi The ABI version the loader was built with (jamoma::kAbiVersion).
      * @return True if the loader is now attached; false if the ABI differs, in which case nothing is attached.
@@ -68,6 +78,7 @@ private:
 
     std::uint64_t id_;                       /**< The instance id. */
     std::atomic<bool> loader_attached_{false}; /**< Whether the start-up loader attached. */
+    std::atomic<bool> missing_loader_warned_{false}; /**< Whether a caller has claimed the missing-loader warning. */
 };
 
 } // namespace jamoma

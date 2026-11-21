@@ -64,6 +64,7 @@ for _ in $(seq 1 40); do
 done
 
 STATUS=0
+sleep 5   # ReportCrash writes its report asynchronously, sometimes seconds after the process died
 [[ "$GOT" == "$EXPECTED" ]] || { echo "FAIL: result '$GOT', expected '$EXPECTED'"; STATUS=1; }
 [[ "$EXITED" == "yes" ]] || { echo "FAIL: Max did not quit by itself"; STATUS=1; }
 CRASHES="$(find "$HOME/Library/Logs/DiagnosticReports" -name 'Max*' -newer "$START" 2>/dev/null | head -3)"

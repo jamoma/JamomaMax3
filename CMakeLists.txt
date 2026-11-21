@@ -17,7 +17,8 @@ if(APPLE)
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "YES")
 endif()
 
-# Windows: static C runtime, as the Max SDK expects (MAXAPI_USE_MSCRT); the core API passes only plain data.
+# Windows: static C runtime (/MT), as max-sdk-base uses for externals. Each DLL then has its own heap, so no
+# allocation may cross the core API (see docs/decisions/0001-shared-state.md).
 if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()

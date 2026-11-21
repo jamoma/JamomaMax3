@@ -44,6 +44,14 @@ void Registry::attach_loader() noexcept
     loader_attached_.store(true, std::memory_order_release);
 }
 
+bool Registry::claim_missing_loader_warning() noexcept
+{
+    if (loader_attached()) {
+        return false;
+    }
+    return !missing_loader_warned_.exchange(true, std::memory_order_acq_rel);
+}
+
 bool Registry::try_attach_loader(int caller_abi) noexcept
 {
     if (!check_abi(caller_abi)) {

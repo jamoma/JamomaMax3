@@ -58,6 +58,21 @@ TEST_CASE("try_attach_loader accepts the current ABI")
     REQUIRE(jamoma::Registry::instance().loader_attached());
 }
 
+/** The missing-loader warning is claimed by exactly one caller in the process, however many externals ask. */
+TEST_CASE("claim_missing_loader_warning is granted once")
+{
+    REQUIRE(jamoma::Registry::instance().claim_missing_loader_warning());
+    REQUIRE_FALSE(jamoma::Registry::instance().claim_missing_loader_warning());
+    REQUIRE_FALSE(jamoma::Registry::instance().claim_missing_loader_warning());
+}
+
+/** With the loader attached there is nothing to warn about, and the claim is refused. */
+TEST_CASE("claim_missing_loader_warning is refused when the loader attached")
+{
+    jamoma::Registry::instance().attach_loader();
+    REQUIRE_FALSE(jamoma::Registry::instance().claim_missing_loader_warning());
+}
+
 /** Attaching the loader twice changes nothing the second time. */
 TEST_CASE("attach_loader is idempotent")
 {

@@ -27,4 +27,6 @@ add_executable(jamoma_core_tests
     tests/registry_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 # PRE_TEST: discover at ctest time, because the Xcode generator signs the binary only after post-build steps run.
-catch_discover_tests(jamoma_core_tests DISCOVERY_MODE PRE_TEST)
+# DL_PATHS: on Windows the test executable finds jamoma_core.dll only through PATH (there is no rpath).
+catch_discover_tests(jamoma_core_tests DISCOVERY_MODE PRE_TEST
+    DL_PATHS "${CMAKE_SOURCE_DIR}/package/Jamoma/support")

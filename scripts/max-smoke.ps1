@@ -19,7 +19,8 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $maxExe = "C:\Program Files\Cycling '74\Max 9\Max.exe"
-$packages = Join-Path $env:USERPROFILE "Documents\Max 9\Packages"
+$documents = [Environment]::GetFolderPath("MyDocuments")   # follows a Documents folder redirected to OneDrive
+$packages = Join-Path $documents "Max 9\Packages"
 $link = Join-Path $packages "Jamoma"
 
 if (Get-Process -Name "Max" -ErrorAction SilentlyContinue) { Write-Error "Max is already running; quit it first"; exit 2 }
@@ -27,7 +28,7 @@ if (Test-Path $link) { Write-Error "$link already exists; not touching it"; exit
 
 $work = Join-Path ([System.IO.Path]::GetTempPath()) ("jamoma-smoke-" + [guid]::NewGuid())
 New-Item -ItemType Directory $work | Out-Null
-$stageRoot = if ($OddPath) { Join-Path $env:USERPROFILE "Documents\Jamoma smoke Åpen\Packages-target" } else { Join-Path $work "stage" }
+$stageRoot = if ($OddPath) { Join-Path $documents "Jamoma smoke Åpen\Packages-target" } else { Join-Path $work "stage" }
 New-Item -ItemType Directory -Force $stageRoot | Out-Null
 Copy-Item -Recurse (Join-Path $root "package\Jamoma") (Join-Path $stageRoot "Jamoma")
 if ($NoLoader) { Get-ChildItem (Join-Path $stageRoot "Jamoma\extensions") -Filter "j.loader.*" | Remove-Item -Force }
@@ -52,7 +53,7 @@ try {
 finally {
     if ($proc -and -not $proc.HasExited) { $proc.Kill() }
     if (Test-Path $link) { (Get-Item $link).Delete() }
-    if ($OddPath) { Remove-Item -Recurse -Force (Join-Path $env:USERPROFILE "Documents\Jamoma smoke Åpen") -ErrorAction SilentlyContinue }
+    if ($OddPath) { Remove-Item -Recurse -Force (Join-Path $documents "Jamoma smoke Åpen") -ErrorAction SilentlyContinue }
     Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
 }
 exit $status
