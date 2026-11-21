@@ -17,6 +17,11 @@ if(APPLE)
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "YES")
 endif()
 
+# Windows: static C runtime, as the Max SDK expects (MAXAPI_USE_MSCRT); the core API passes only plain data.
+if(WIN32)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 enable_testing()
 
 add_subdirectory(core)

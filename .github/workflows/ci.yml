@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2026 Trond Lossius
+#
+# Build, unit tests, Python tool tests and the Doxygen gate on macOS and Windows.
+# NOT YET RUN: the repository has no GitHub remote yet.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Doxygen
+        run: brew install doxygen
+      - name: Configure
+        run: cmake --preset macos
+      - name: Build
+        run: cmake --build --preset macos
+      - name: Unit tests
+        run: ctest --preset macos
+      - name: Python tool tests
+        run: |
+          python3 -m unittest discover -s tools/inventory
+          python3 -m unittest discover -s tools/conformance
+      - name: Doxygen gate
+        run: cmake --build --preset macos --target docs
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Doxygen
+        run: choco install doxygen.install -y
+      - name: Configure
+        run: cmake --preset windows
+      - name: Build
+        run: cmake --build --preset windows
+      - name: Unit tests
+        run: ctest --preset windows
+      - name: Python tool tests
+        run: |
+          python -m unittest discover -s tools/inventory
+          python -m unittest discover -s tools/conformance
+      - name: Doxygen gate
+        run: cmake --build --preset windows --target docs

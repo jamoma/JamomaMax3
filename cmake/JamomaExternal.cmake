@@ -70,4 +70,22 @@ function(jamoma_add_external)
             COMMAND codesign -s - -f --deep "$<TARGET_BUNDLE_DIR:${target}>"
             VERBATIM)
     endif()
+    if(WIN32)
+        # Windows branch: UNTESTED (no Windows machine available when written); mirrors max-sdk-base's settings.
+        target_compile_definitions(${target} PRIVATE MAXAPI_USE_MSCRT WIN_VERSION _USE_MATH_DEFINES NOMINMAX)
+        target_compile_options(${target} PRIVATE /MP /Zc:__cplusplus /permissive-)
+        target_link_libraries(${target} PRIVATE
+            "${JAMOMA_C74_SUPPORT}/max-includes/x64/MaxAPI.lib"
+            "${JAMOMA_C74_SUPPORT}/msp-includes/x64/MaxAudio.lib"
+            "${JAMOMA_C74_SUPPORT}/jit-includes/x64/jitlib.lib")
+        set_target_properties(${target} PROPERTIES
+            SUFFIX ".mxe64"
+            RUNTIME_OUTPUT_DIRECTORY "$<1:${outdir}>")
+        # A DLL is found next to the module that needs it, not in ../support, so put the core DLL beside every
+        # external. Windows maps a DLL name once per process, so every external shares the first copy loaded
+        # (the loader's, from extensions/). See docs/decisions/0001-shared-state.md.
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:jamoma_core>" "${outdir}/"
+            VERBATIM)
+    endif()
 endfunction()
