@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2026 Trond Lossius
+#
+# Doxygen configuration. Every warning is an error: all C++ must be documented.
+
+PROJECT_NAME           = "JamomaMax3"
+OUTPUT_DIRECTORY       = build/doxygen
+INPUT                  = core
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.cpp
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+GENERATE_LATEX         = NO
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = JAMOMA_API=
