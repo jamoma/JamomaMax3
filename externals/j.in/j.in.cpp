@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2026 Trond Lossius
+
+/**
+ * @file j.in.cpp
+ * @brief j.in (data): the way a model receives data from outside. Values pass through, and the last one is visible in the namespace.
+ *
+ * The object registers a node `data/in.<instance>` in its model (a `Data` of type generic that holds the last value). Attributes `mute`
+ * (nothing passes) and `bypass` (stored only: the link to the `j.out` of the same instance is not built yet). See
+ * docs/inventory/j.in-j.out.md.
+ */
+
+#include <memory>
+#include <string>
+
+#include "c74_min.h"
+
+#include "jamoma/data.hpp"
+#include "jamoma/registry.hpp"
+#include "max_address.hpp"
+
+using namespace c74::min;
+
+/** The j.in external. */
+class j_in : public c74::min::object<j_in> {
+    // State comes before the attributes: Min runs every attribute setter with its default while constructing them.
+    jamoma::Data node_{jamoma::Service::Return};   /**< The node in the namespace: holds the last value. */
+    jamoma::Subscription subscription_;            /**< Its registration. */
+    std::string instance_ = "1";                   /**< The instance (the creation argument). */
+    jamoma_max::Alive alive_;                      /**< Lets deferred calls see that the object is gone. */
+
+public:
+    /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
+    const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
+
+    /** Creates the object. @param args The creation atoms: an optional instance number, then attributes. */
+    explicit j_in(const atoms& args = {})
+    {
+        if (c74::min::dummy()) {
+            return; // the instance Min builds during class setup has no Max object
+        }
+        if (!args.empty() && args[0].type() != message_type::symbol_argument) {
+            instance_ = std::to_string(static_cast<int>(args[0]));
+        }
+        jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { join_model(); });
+    }
+
+    /** Unsubscribes before the members go. */
+    ~j_in() override { subscription_ = jamoma::Subscription(); }
+
+    inlet<> input{this, "(anything) data coming into the model"};      /**< The inlet. */
+    jamoma_max::dump_outlet data_out{this, "(anything) the data"};     /**< Outlet 0. */
+    jamoma_max::dump_outlet dump_out{this, "(anything) dump"};         /**< Outlet 1: the dump outlet. */
+
+    attribute<int> mute{this, "mute", 0};       /**< When on, nothing passes. */
+    attribute<int> bypass{this, "bypass", 0};   /**< Stored only: the link to the j.out of the same instance is not built yet. */
+
+    /** After construction: registers the dump outlet. */
+    message<> setup{this, "setup", MIN_FUNCTION {
+        c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
+        return {};
+    }};
+
+    /** A bang passes. */
+    message<threadsafe::yes> bang{this, "bang", MIN_FUNCTION {
+        pass(jamoma::Value{});
+        return {};
+    }};
+    /** An integer passes. */
+    message<threadsafe::yes> m_int{this, "int", MIN_FUNCTION {
+        pass(jamoma_max::to_value(args));
+        return {};
+    }};
+    /** A float passes. */
+    message<threadsafe::yes> m_float{this, "float", MIN_FUNCTION {
+        pass(jamoma_max::to_value(args));
+        return {};
+    }};
+    /** A list passes. */
+    message<threadsafe::yes> m_list{this, "list", MIN_FUNCTION {
+        pass(jamoma_max::to_value(args));
+        return {};
+    }};
+    /** Any other message passes, or sets an attribute by name (`mute 1`). */
+    message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
+        atoms message = args;
+        if (message.size() >= 2 && static_cast<symbol>(message[0]) == symbol("symbol")) {
+            message.erase(message.begin());
+        }
+        const std::string selector = static_cast<symbol>(message[0]).c_str();
+        if (message.size() >= 2 && (selector == "mute" || selector == "bypass")) {
+            (selector == "mute" ? mute : bypass) = static_cast<int>(message[1]);
+        } else {
+            pass(jamoma_max::to_value(message));
+        }
+        return {};
+    }};
+
+    /** Class setup: nothing to add. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+
+private:
+    /** Registers the node below the model of the patcher (or at the root without one). */
+    void join_model()
+    {
+        const jamoma::Model* model = jamoma_max::find_model(maxobj());
+        const std::string prefix = model != nullptr ? model->address().str() : std::string();
+        subscription_ = jamoma::Subscription();
+        subscription_ = jamoma::Registry::instance().names().subscribe(jamoma::Address::parse(prefix + "/data/in." + instance_), node_);
+    }
+
+    /** Sends a value into the model unless muted. @param in The incoming value. */
+    void pass(const jamoma::Value& in)
+    {
+        if (static_cast<int>(mute) != 0) {
+            return;
+        }
+        jamoma_max::output_value(data_out.max_outlet(), in);
+        if (!in.empty()) {
+            node_.command(in);
+        }
+    }
+};
+
+MIN_EXTERNAL(j_in);
