@@ -16,3 +16,5 @@ tests/max/patchers/in_out.maxtest.maxpat
 tests/max/patchers/late_model.maxtest.maxpat
 tests/max/patchers/nested_model.maxtest.maxpat
 tests/max/patchers/dieze.maxtest.maxpat
+tests/max/patchers/model_presets.maxtest.maxpat
+tests/max/patchers/preset_files.maxtest.maxpat

@@ -281,3 +281,18 @@ TEST_CASE("context map observer may unregister itself and outlive the map")
     }
     REQUIRE_NOTHROW(survivor.reset());
 }
+
+/** The model owns a preset manager for its own address, so everything that knows the model can reach its presets. */
+TEST_CASE("model owns its preset manager")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    w.add("/m/a", 0);
+    w.data[0]->command({2.0});
+    REQUIRE(m.presets().new_preset("one"));
+    REQUIRE(m.presets().presets().at(0).entries.at(0).address.str() == "a");
+    Model second(w.ns, Address::parse("/m")); // becomes /m.1: its manager looks below its own address
+    REQUIRE(second.address() != m.address());
+    REQUIRE(second.presets().new_preset("x"));
+    REQUIRE(second.presets().presets().at(0).entries.empty());
+}

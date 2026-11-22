@@ -18,6 +18,7 @@
 #include "jamoma/address.hpp"
 #include "jamoma/export.hpp"
 #include "jamoma/namespace.hpp"
+#include "jamoma/preset.hpp"
 
 namespace jamoma {
 
@@ -51,6 +52,9 @@ public:
     int priority() const;
     /** @return True after init has finished and until the next init starts. */
     bool initialized() const;
+
+    /** @return The preset manager of the model; it stores and recalls the parameters below the model's address. */
+    PresetManager& presets();
 
     /** @brief Initialises the parameters below the model (see the class description). */
     void init();

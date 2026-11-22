@@ -331,3 +331,24 @@ TEST_CASE("mix of nothing does nothing")
     REQUIRE_FALSE(r.presets.mix({{"nothing", 1.0}}).found);
     REQUIRE(r.number("a") == 9.0);
 }
+
+/** An observer hears every change of the list or of the current preset. */
+TEST_CASE("observer is told of changes")
+{
+    Rig r;
+    r.add("a", 1.0);
+    int calls = 0;
+    auto handle = r.presets.observe([&calls] { ++calls; });
+    r.presets.new_preset("one");
+    REQUIRE(calls == 1);
+    r.presets.recall("one");
+    REQUIRE(calls == 2);
+    r.presets.rename("one", "two");
+    r.presets.clear();
+    REQUIRE(calls == 4);
+    REQUIRE_FALSE(r.presets.remove("nothing"));
+    REQUIRE(calls == 4);
+    handle.reset();
+    r.presets.new_preset("three");
+    REQUIRE(calls == 4);
+}

@@ -14,6 +14,8 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -103,6 +105,12 @@ public:
     bool move(std::string_view name_or_index, std::size_t position);
     /** @brief Removes every preset. */
     void clear();
+    /**
+     * @brief Listens to changes of the list, of a preset's content and of the current preset.
+     * @param callback Called after each change, on the thread that made it (it may drop its own handle).
+     * @return A handle; dropping it unregisters the observer (it may outlive the manager).
+     */
+    std::shared_ptr<void> observe(std::function<void()> callback);
     /** @brief Replaces the whole list (what a file reader does); there is no current preset afterwards. @param presets The new list. */
     void replace_all(std::vector<Preset> presets);
 
@@ -114,6 +122,11 @@ private:
     /** Sends entries to their nodes as commands. @param entries The entries. @param report Where to count and list what was skipped. */
     void apply(const std::vector<PresetEntry>& entries, RecallReport& report);
 
+    /** Tells the observers. */
+    void changed();
+
+    struct Observers;                    /**< The observers, shared with their handles. */
+    std::shared_ptr<Observers> observers_; /**< The observers. */
     Namespace& ns_;                  /**< The namespace. */
     Address model_;                  /**< The model. */
     std::vector<Preset> presets_;    /**< The presets. */

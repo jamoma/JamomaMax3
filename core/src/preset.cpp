@@ -48,7 +48,38 @@ void collect(Node* node, const std::string& prefix, std::vector<Found>& out)
 
 } // namespace
 
-PresetManager::PresetManager(Namespace& ns, Address model) : ns_(ns), model_(std::move(model)) {}
+/** The observers of a manager. */
+struct PresetManager::Observers {
+    unsigned next_id = 1;                                              /**< The id of the next observer. */
+    std::vector<std::pair<unsigned, std::function<void()>>> entries;   /**< The observers. */
+};
+
+PresetManager::PresetManager(Namespace& ns, Address model) : observers_(std::make_shared<Observers>()), ns_(ns), model_(std::move(model)) {}
+
+std::shared_ptr<void> PresetManager::observe(std::function<void()> callback)
+{
+    const unsigned id = observers_->next_id++;
+    observers_->entries.emplace_back(id, std::move(callback));
+    static int token = 0;
+    std::weak_ptr<Observers> weak = observers_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto observers = weak.lock()) {
+            auto& list = observers->entries;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const auto& e) { return e.first == id; }), list.end());
+        }
+    });
+}
+
+void PresetManager::changed()
+{
+    const auto copy = observers_->entries; // an observer may unregister itself
+    for (const auto& entry : copy) {
+        const auto& list = observers_->entries;
+        if (std::any_of(list.begin(), list.end(), [&entry](const auto& e) { return e.first == entry.first; })) {
+            entry.second();
+        }
+    }
+}
 
 std::vector<std::string> PresetManager::names() const
 {
@@ -110,6 +141,7 @@ bool PresetManager::new_preset(std::string_view name, std::optional<std::size_t>
         if (presets_[i].name == name) {
             presets_[i].entries = std::move(entries);
             current_ = i;
+            changed();
             return true;
         }
     }
@@ -119,6 +151,7 @@ bool PresetManager::new_preset(std::string_view name, std::optional<std::size_t>
     const std::size_t at = position.has_value() ? std::min(*position, presets_.size()) : presets_.size();
     presets_.insert(presets_.begin() + static_cast<std::ptrdiff_t>(at), std::move(preset));
     current_ = at;
+    changed();
     return true;
 }
 
@@ -130,6 +163,7 @@ bool PresetManager::update(std::string_view name_or_index)
     }
     presets_[*index].entries = store();
     current_ = *index;
+    changed();
     return true;
 }
 
@@ -152,6 +186,7 @@ RecallReport PresetManager::recall(std::string_view name_or_index)
     }
     report.found = true;
     current_ = *index;
+    changed();
     apply(std::vector<PresetEntry>(presets_[*index].entries), report); // a copy: a command may run observers that change the list
     return report;
 }
@@ -309,6 +344,7 @@ bool PresetManager::remove(std::string_view name_or_index)
             --*current_;
         }
     }
+    changed();
     return true;
 }
 
@@ -324,6 +360,7 @@ bool PresetManager::rename(std::string_view from, std::string_view to)
         }
     }
     presets_[*index].name = std::string(to);
+    changed();
     return true;
 }
 
@@ -345,6 +382,7 @@ bool PresetManager::copy(std::string_view from, std::string_view to, std::option
     if (current_ && *current_ >= at) {
         ++*current_;
     }
+    changed();
     return true;
 }
 
@@ -372,6 +410,7 @@ bool PresetManager::move(std::string_view name_or_index, std::size_t position)
         }
         current_ = c;
     }
+    changed();
     return true;
 }
 
@@ -379,12 +418,14 @@ void PresetManager::clear()
 {
     presets_.clear();
     current_.reset();
+    changed();
 }
 
 void PresetManager::replace_all(std::vector<Preset> presets)
 {
     presets_ = std::move(presets);
     current_.reset();
+    changed();
 }
 
 } // namespace jamoma

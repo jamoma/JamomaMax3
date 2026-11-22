@@ -19,6 +19,7 @@ namespace jamoma {
 struct Model::Impl {
     Namespace* ns = nullptr;                                         /**< The namespace. */
     Subscription subscription;                                       /**< The registration of the model. */
+    std::unique_ptr<PresetManager> presets;                          /**< The presets of the model. */
     std::string description;                                         /**< The description. */
     int priority = 0;                                                /**< The priority. */
     bool initialized = false;                                        /**< Whether init has finished. */
@@ -104,7 +105,10 @@ Model::Model(Namespace& ns, const Address& address) : impl_(std::make_shared<Imp
 {
     impl_->ns = &ns;
     impl_->subscription = ns.subscribe(address, *this);
+    impl_->presets = std::make_unique<PresetManager>(ns, impl_->subscription.address());
 }
+
+PresetManager& Model::presets() { return *impl_->presets; }
 
 Model::~Model() = default;
 
