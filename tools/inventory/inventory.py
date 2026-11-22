@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Reads the old package's maxref.xml reference pages and writes one Markdown inventory page per object.
 
     inventory.py --old ~/Developer/Jamoma/JamomaMax --out docs/inventory

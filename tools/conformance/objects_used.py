@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Lists which j.* objects the conformance patchers use and which of them the new package implements.
 
     objects_used.py --old ~/Developer/Jamoma/JamomaMax --set conformance/set.txt --implemented implemented.txt

@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
 # Runs a smoke patcher in Max 9 headlessly and checks the result it writes.
 #

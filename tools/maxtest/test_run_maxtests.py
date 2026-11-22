@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Tests for the max-test runner's pure parts (driver patcher, result summary, log parsing)."""
 
 import json

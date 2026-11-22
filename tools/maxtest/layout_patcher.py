@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Lays out Max patchers so that they read from top to bottom: every object sits below the objects that feed it.
 
     layout_patcher.py tests/max/patchers/*.maxpat

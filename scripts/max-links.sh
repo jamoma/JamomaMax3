@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
 # Keeps the four links that let Max 9 find this project's packages, so that tests and help patchers open without errors in a Max that you
 # start yourself. The test runners work with these links in place (they leave existing links alone); scripts/max-smoke.sh moves the Jamoma

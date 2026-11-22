@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Opens help patchers in Max 9 and reports every object Max could not create.
 
     open_help.py package/Jamoma/help/j.parameter.maxhelp ...

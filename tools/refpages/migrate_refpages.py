@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Starts the new reference pages from the old ones (same text where the behaviour is unchanged).
 
     migrate_refpages.py --old ~/Developer/Jamoma/JamomaMax --package package/Jamoma --externals externals

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Puts a toggle in front of every test.assert, so that a patcher shows by itself whether its checks passed.
 
     add_toggles.py tests/max/patchers/*.maxpat

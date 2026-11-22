@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Runs max-test patchers (the old Jamoma integration tests) in Max 9 and reports PASS/FAIL/TIMEOUT per test.
 
     run_maxtests.py --list conformance/m1-tests.txt --out build/maxtests

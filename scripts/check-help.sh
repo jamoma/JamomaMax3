@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
 # Opens the help patchers of the package in Max 9 and reports objects Max could not create.
 #   scripts/check-help.sh [help files...]   (default: every .maxhelp of package/Jamoma/help)

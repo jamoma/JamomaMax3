@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
 # Runs the old Jamoma integration tests (max-test patchers) in Max 9. Thin wrapper around tools/maxtest/run_maxtests.py.
 #   scripts/run-maxtests.sh <list file> <out dir> [extra run_maxtests.py options]

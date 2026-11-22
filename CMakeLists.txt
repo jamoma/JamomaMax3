@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 
 cmake_minimum_required(VERSION 3.25)
 project(JamomaMax3 VERSION 0.0.1 LANGUAGES CXX)

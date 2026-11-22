@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
-# SPDX-FileCopyrightText: 2026 Trond Lossius
+# SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Migrates old help patchers: every Jamoma object that this package does not have yet (j.remote, j.ui, j.view,
 j.unit, j.send, ...) becomes a comment box naming it, and the patch cords to it are dropped.
 
