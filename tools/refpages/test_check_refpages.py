@@ -20,8 +20,11 @@ class j_x : public c74::min::object<j_x> {
     c74::min::message<> bang{this, "bang", MIN_FUNCTION { return {}; }};
     c74::min::message<> setup{this, "setup", MIN_FUNCTION { return {}; }};
     if (selector == "+") {}
-    static constexpr const char* ATTRIBUTE_NAMES[2] = {
-        "type", "ramp/drive"};
+    const std::vector<std::string>& attribute_names() {
+        static const std::vector<std::string> names{
+            "type", "ramp/drive"};
+        return names;
+    }
 };
 void ext_main(void*) {
     class_addmethod(c, nullptr, "int", A_LONG, 0);

@@ -8,6 +8,7 @@
 
 #include "jamoma/data.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <mutex>
 #include <optional>
@@ -603,6 +604,94 @@ void Data::set_output(std::function<void(const Value&)> output)
 {
     std::lock_guard<std::mutex> lock(impl_->mutex);
     impl_->output = std::move(output);
+}
+
+const std::vector<std::string>& Data::attribute_names()
+{
+    static const std::vector<std::string> names{"type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active",
+                                                "priority", "description", "tags", "dataspace", "unit", "ramp/drive",
+                                                "ramp/function", "ramp/function/parameters", "ramp/status", "value", "service"};
+    return names;
+}
+
+bool Data::has_attribute(std::string_view name) const
+{
+    const auto& names = attribute_names();
+    return std::find(names.begin(), names.end(), name) != names.end();
+}
+
+namespace {
+
+/** @param a An atom. @return Its text: the symbol itself, or the text form of a number. */
+std::string text_of(const Atom& a) { return a.is_symbol() ? a.as_symbol() : a.to_string(); }
+
+/** @param v A value. @return The text of its first atom, or an empty string. */
+std::string first_text(const Value& v) { return v.empty() ? std::string() : text_of(v[0]); }
+
+} // namespace
+
+std::optional<Value> Data::get_attribute(std::string_view name) const
+{
+    if (name == "type") return Value{Atom(std::string(data_type_name(type())))};
+    if (name == "range") return range();
+    if (name == "clipmode") return Value{Atom(std::string(clip_mode_name(clipmode())))};
+    if (name == "repetitions/filter") return Value{integer(repetitions_filter() ? 1 : 0)};
+    if (name == "default") return default_value();
+    if (name == "stepsize") return Value{flt(stepsize())};
+    if (name == "active") return Value{integer(active() ? 1 : 0)};
+    if (name == "priority") return Value{integer(priority())};
+    if (name == "description") return Value{Atom(description())};
+    if (name == "tags") {
+        Value out;
+        for (const std::string& tag : tags()) {
+            out.emplace_back(tag);
+        }
+        return out;
+    }
+    if (name == "dataspace") return Value{Atom(dataspace().empty() ? std::string("none") : dataspace())};
+    if (name == "unit") return Value{Atom(unit().empty() ? std::string("none") : unit())};
+    if (name == "ramp/drive") return Value{Atom(ramp_drive())};
+    if (name == "ramp/function") return Value{Atom(ramp_function())};
+    if (name == "ramp/function/parameters") return Value{};
+    if (name == "ramp/status") return Value{integer(ramp_running() ? 1 : 0)};
+    if (name == "value") return initialized() ? value() : Value{};
+    if (name == "service") {
+        return Value{Atom(std::string(service() == Service::Parameter ? "parameter" : service() == Service::Message ? "message" : "return"))};
+    }
+    return std::nullopt;
+}
+
+bool Data::set_attribute(std::string_view name, const Value& v)
+{
+    if (!has_attribute(name) || v.empty()) {
+        return false;
+    }
+    if (name == "type") set_type(data_type_from_name(first_text(v)));
+    else if (name == "range") set_range(v);
+    else if (name == "clipmode") set_clipmode(clip_mode_from_name(first_text(v)));
+    else if (name == "repetitions/filter") set_repetitions_filter(v[0].as_int() != 0);
+    else if (name == "default") set_default(v);
+    else if (name == "stepsize") set_stepsize(v[0].as_double());
+    else if (name == "active") set_active(v[0].as_int() != 0);
+    else if (name == "priority") set_priority(static_cast<int>(v[0].as_int()));
+    else if (name == "description") set_description(first_text(v));
+    else if (name == "tags") {
+        std::vector<std::string> list;
+        for (const Atom& atom : v) {
+            list.push_back(text_of(atom));
+        }
+        set_tags(std::move(list));
+    } else if (name == "dataspace") {
+        const std::string text = first_text(v);
+        set_dataspace(text == "none" ? std::string() : text);
+    } else if (name == "unit") {
+        const std::string text = first_text(v);
+        set_unit(text == "none" ? std::string() : text);
+    } else if (name == "ramp/drive") set_ramp_drive(first_text(v));
+    else if (name == "ramp/function") set_ramp_function(first_text(v));
+    else if (name == "value") command(v);
+    else return false; // ramp/status, service, ramp/function/parameters: read only
+    return true;
 }
 
 void Data::command(const Value& input)

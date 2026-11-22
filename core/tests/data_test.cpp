@@ -868,3 +868,90 @@ TEST_CASE("ramp function attributes")
     REQUIRE(d.ramp_function() == "linear");
     REQUIRE_FALSE(d.ramp_running());
 }
+
+/** The attribute table lists the 18 names in the order the Max objects use. */
+TEST_CASE("attribute table lists the names in order")
+{
+    const std::vector<std::string> expected{"type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active",
+                                            "priority", "description", "tags", "dataspace", "unit", "ramp/drive", "ramp/function",
+                                            "ramp/function/parameters", "ramp/status", "value", "service"};
+    REQUIRE(Data::attribute_names() == expected);
+    Data d;
+    for (const std::string& name : expected) {
+        REQUIRE(d.has_attribute(name));
+    }
+    REQUIRE_FALSE(d.has_attribute("nonsense"));
+}
+
+/** Every attribute answers its current value in the form the old objects used. */
+TEST_CASE("get attribute returns each current value")
+{
+    Data d(Service::Parameter);
+    d.set_type(DataType::Decimal);
+    d.set_range(Value{f(0.0), f(10.0)});
+    d.set_clipmode(ClipMode::Both);
+    d.set_repetitions_filter(true);
+    d.set_default(Value{f(3.0)});
+    d.set_stepsize(0.5);
+    d.set_priority(2);
+    d.set_description("a text");
+    d.set_tags({"a", "b"});
+    d.set_dataspace("gain");
+    d.set_unit("db");
+    d.set_ramp_drive("max");
+    d.set_ramp_function("linear");
+    REQUIRE(*d.get_attribute("type") == Value{Atom("decimal")});
+    REQUIRE(*d.get_attribute("range") == Value{f(0.0), f(10.0)});
+    REQUIRE(*d.get_attribute("clipmode") == Value{Atom("both")});
+    REQUIRE(*d.get_attribute("repetitions/filter") == Value{i(1)});
+    REQUIRE(*d.get_attribute("default") == Value{f(3.0)});
+    REQUIRE(*d.get_attribute("stepsize") == Value{f(0.5)});
+    REQUIRE(*d.get_attribute("active") == Value{i(1)});
+    REQUIRE(*d.get_attribute("priority") == Value{i(2)});
+    REQUIRE(*d.get_attribute("description") == Value{Atom("a text")});
+    REQUIRE(*d.get_attribute("tags") == Value{Atom("a"), Atom("b")});
+    REQUIRE(*d.get_attribute("dataspace") == Value{Atom("gain")});
+    REQUIRE(*d.get_attribute("unit") == Value{Atom("db")});
+    REQUIRE(*d.get_attribute("ramp/drive") == Value{Atom("max")});
+    REQUIRE(*d.get_attribute("ramp/function") == Value{Atom("linear")});
+    REQUIRE(*d.get_attribute("ramp/status") == Value{i(0)});
+    REQUIRE(*d.get_attribute("service") == Value{Atom("parameter")});
+    REQUIRE(d.get_attribute("value")->empty()); // nothing until initialised, as the old object
+    d.init();
+    REQUIRE(*d.get_attribute("value") == Value{f(3.0)});
+    Data neutral;
+    REQUIRE(*neutral.get_attribute("dataspace") == Value{Atom("none")});
+    REQUIRE(*neutral.get_attribute("unit") == Value{Atom("none")});
+}
+
+/** Setting through the table is the same as the setters; read-only names are refused. */
+TEST_CASE("set attribute applies and rejects read only")
+{
+    Data d;
+    REQUIRE(d.set_attribute("type", Value{Atom("integer")}));
+    REQUIRE(d.type() == DataType::Integer);
+    REQUIRE(d.set_attribute("range", Value{i(0), i(5)}));
+    REQUIRE(d.range() == Value{i(0), i(5)});
+    REQUIRE(d.set_attribute("clipmode", Value{Atom("low")}));
+    REQUIRE(d.clipmode() == ClipMode::Low);
+    REQUIRE(d.set_attribute("dataspace", Value{Atom("none")}));
+    REQUIRE(d.dataspace().empty());
+    std::vector<Value> outputs;
+    d.set_output([&outputs](const Value& v) { outputs.push_back(v); });
+    REQUIRE(d.set_attribute("value", Value{i(3)})); // a command
+    REQUIRE(outputs.size() == 1);
+    REQUIRE(d.value() == Value{i(3)});
+    const DataType before = d.type();
+    for (const char* name : {"ramp/status", "service", "ramp/function/parameters"}) {
+        REQUIRE_FALSE(d.set_attribute(name, Value{i(1)}));
+    }
+    REQUIRE(d.type() == before);
+}
+
+/** An unknown attribute is reported, not ignored. */
+TEST_CASE("unknown attribute is reported")
+{
+    Data d;
+    REQUIRE_FALSE(d.get_attribute("nonsense").has_value());
+    REQUIRE_FALSE(d.set_attribute("nonsense", Value{i(1)}));
+}

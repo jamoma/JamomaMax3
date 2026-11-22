@@ -21,6 +21,15 @@
 	<objarglist>
 	</objarglist>
 	<methodlist>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Dump all attributes' values out the rightmost outlet			
+			</digest>
+			<description>
+				The <m>dump</m> message outputs all attributes' values out the rightmost outlet
+			</description>
+		</method>
 		<method name="init">
 			<arglist />
 			<digest>

@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -155,6 +156,24 @@ public:
     void inc(const Value& args);
     /** @brief The opposite of inc. @param args The arguments. */
     void dec(const Value& args);
+    /** @return The names of the attributes, in the order the Max objects list them (the table behind get_attribute and set_attribute). */
+    static const std::vector<std::string>& attribute_names();
+    /** @brief Tells whether a name is an attribute. @param name The attribute name. @return True if it is in attribute_names(). */
+    bool has_attribute(std::string_view name) const;
+    /**
+     * @brief Reads an attribute by name, in the form the old objects answered a query.
+     *
+     * Booleans are 0 or 1, an empty dataspace or unit is `none`, `value` is empty until the object is initialised.
+     * @param name The attribute name. @return The value, or nothing for an unknown name.
+     */
+    std::optional<Value> get_attribute(std::string_view name) const;
+    /**
+     * @brief Sets an attribute by name, through the same setters as the typed API (`value` is a command).
+     * @param name The attribute name. @param value The new value (must not be empty).
+     * @return False for an unknown, read-only (`ramp/status`, `service`, `ramp/function/parameters`) or empty-valued request.
+     */
+    bool set_attribute(std::string_view name, const Value& value);
+
     /** @brief Clears initialised and sends the default through command (nothing is sent for the none type or an unusable default). */
     void init();
 

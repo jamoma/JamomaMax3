@@ -228,7 +228,7 @@ private:
     void attribute_message(c74::max::t_symbol* name, const c74::min::atoms& message)
     {
         for (int i = 0; i < static_cast<int>(Attr::Count); ++i) {
-            if (std::string(ATTRIBUTE_NAMES[i]) == name->s_name) {
+            if (attribute_name(static_cast<Attr>(i)) == name->s_name) {
                 if (message.size() == 1) {
                     dump_attribute(static_cast<Attr>(i));
                 } else {
@@ -239,106 +239,27 @@ private:
         }
     }
 
-    /** Every attribute of a data object (the order is the order of ATTRIBUTE_NAMES). */
+    /** Every attribute of a data object (the order is that of `jamoma::Data::attribute_names()`). */
     enum class Attr {
         Type, Range, Clipmode, RepetitionsFilter, Default, Stepsize, Active, Priority, Description, Tags, Dataspace, Unit,
         RampDrive, RampFunction, RampFunctionParameters, RampStatus, Value, Service, Count
     };
 
-    /** The attribute names, as patchers see them. */
-    static constexpr const char* ATTRIBUTE_NAMES[static_cast<int>(Attr::Count)] = {
-        "type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active", "priority", "description", "tags",
-        "dataspace", "unit", "ramp/drive", "ramp/function", "ramp/function/parameters", "ramp/status", "value", "service"};
-
-    /** @param a An atom. @return Its text. */
-    static std::string text_of(const jamoma::Atom& a) { return a.is_symbol() ? a.as_symbol() : a.to_string(); }
-
-    /** @param v A value. @return Its first atom as a string, or an empty string. */
-    static std::string first_text(const jamoma::Value& v) { return v.empty() ? std::string() : text_of(v[0]); }
+    /** @param a Which attribute. @return Its name, as patchers see it (the core's attribute table, in the same order as Attr). */
+    static const std::string& attribute_name(Attr a) { return jamoma::Data::attribute_names()[static_cast<std::size_t>(a)]; }
 
     /** @param a Which attribute. @return Its current value. */
-    jamoma::Value get_attr(Attr a) const
-    {
-        switch (a) {
-        case Attr::Type: return {std::string(jamoma::data_type_name(data_.type()))};
-        case Attr::Range: return data_.range();
-        case Attr::Clipmode: return {std::string(jamoma::clip_mode_name(data_.clipmode()))};
-        case Attr::RepetitionsFilter: return {static_cast<std::int64_t>(data_.repetitions_filter() ? 1 : 0)};
-        case Attr::Default: return data_.default_value();
-        case Attr::Stepsize: return {data_.stepsize()};
-        case Attr::Active: return {static_cast<std::int64_t>(data_.active() ? 1 : 0)};
-        case Attr::Priority: return {static_cast<std::int64_t>(data_.priority())};
-        case Attr::Description: return {data_.description()};
-        case Attr::Tags: {
-            jamoma::Value out;
-            for (const std::string& t : data_.tags()) {
-                out.emplace_back(t);
-            }
-            return out;
-        }
-        case Attr::Dataspace: return {data_.dataspace().empty() ? std::string("none") : data_.dataspace()};
-        case Attr::Unit: return {data_.unit().empty() ? std::string("none") : data_.unit()};
-        case Attr::RampDrive: return {data_.ramp_drive()};
-        case Attr::RampFunction: return {data_.ramp_function()};
-        case Attr::RampFunctionParameters: return jamoma::Value{};
-        case Attr::RampStatus: return {static_cast<std::int64_t>(data_.ramp_running() ? 1 : 0)};
-        case Attr::Value: return data_.initialized() ? data_.value() : jamoma::Value{}; // nothing until initialised, as the old object
-        case Attr::Service: return {std::string(S == jamoma::Service::Parameter ? "parameter" : S == jamoma::Service::Message ? "message" : "return")};
-        case Attr::Count: break;
-        }
-        return jamoma::Value{};
-    }
+    jamoma::Value get_attr(Attr a) const { return data_.get_attribute(attribute_name(a)).value_or(jamoma::Value{}); }
 
-    /** Sets an attribute. @param a Which attribute. @param v The new value (not empty). */
-    void set_attr(Attr a, const jamoma::Value& v)
-    {
-        if (v.empty()) {
-            return; // nothing usable was given (the Max setter drops atoms that are neither numbers nor symbols)
-        }
-        switch (a) {
-        case Attr::Type: data_.set_type(jamoma::data_type_from_name(first_text(v))); break;
-        case Attr::Range: data_.set_range(v); break;
-        case Attr::Clipmode: data_.set_clipmode(jamoma::clip_mode_from_name(first_text(v))); break;
-        case Attr::RepetitionsFilter: data_.set_repetitions_filter(v[0].as_int() != 0); break;
-        case Attr::Default: data_.set_default(v); break;
-        case Attr::Stepsize: data_.set_stepsize(v[0].as_double()); break;
-        case Attr::Active: data_.set_active(v[0].as_int() != 0); break;
-        case Attr::Priority: data_.set_priority(static_cast<int>(v[0].as_int())); break;
-        case Attr::Description: data_.set_description(first_text(v)); break;
-        case Attr::Tags: {
-            std::vector<std::string> list;
-            for (const jamoma::Atom& atom : v) {
-                list.push_back(text_of(atom));
-            }
-            data_.set_tags(std::move(list));
-            break;
-        }
-        case Attr::Dataspace: {
-            const std::string name = first_text(v);
-            data_.set_dataspace(name == "none" ? std::string() : name);
-            break;
-        }
-        case Attr::Unit: {
-            const std::string name = first_text(v);
-            data_.set_unit(name == "none" ? std::string() : name);
-            break;
-        }
-        case Attr::RampDrive: data_.set_ramp_drive(first_text(v)); break;
-        case Attr::RampFunction: data_.set_ramp_function(first_text(v)); break;
-        case Attr::Value: data_.command(v); break;
-        case Attr::RampFunctionParameters:
-        case Attr::RampStatus:
-        case Attr::Service:
-        case Attr::Count: break; // read only
-        }
-    }
+    /** Sets an attribute. @param a Which attribute. @param v The new value (nothing happens if it is empty). */
+    void set_attr(Attr a, const jamoma::Value& v) { data_.set_attribute(attribute_name(a), v); }
 
     /** Answers `<name> <value>` on the dump outlet (the old attribute query). @param a Which attribute. */
     void dump_attribute(Attr a)
     {
         const jamoma::Value v = get_attr(a);
         const c74::min::atoms atoms = to_atoms(v);
-        c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym(ATTRIBUTE_NAMES[static_cast<int>(a)]),
+        c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym(attribute_name(a).c_str()),
                                   static_cast<short>(atoms.size()),
                                   atoms.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&atoms[0])));
     }
@@ -392,7 +313,7 @@ private:
     static void add_attribute(c74::max::t_class* c)
     {
         c74::max::t_object* attr = c74::max::attr_offset_array_new(
-            ATTRIBUTE_NAMES[static_cast<int>(A)], c74::max::gensym("atom"), 256, 0,
+            attribute_name(A).c_str(), c74::max::gensym("atom"), 256, 0,
             reinterpret_cast<c74::max::method>(&attr_getter<A>), reinterpret_cast<c74::max::method>(&attr_setter<A>), 0, 0);
         c74::max::class_addattr(c, attr);
     }
