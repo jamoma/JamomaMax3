@@ -119,4 +119,12 @@ bool Address::operator==(const Address& other) const
     return directory_ == other.directory_ && absolute_ == other.absolute_ && path_ == other.path_ && attribute_ == other.attribute_;
 }
 
+Address resolve_relative(const Address& address, const Address& model)
+{
+    if (address.empty() || address.absolute()) {
+        return address;
+    }
+    return (model.empty() ? Address::parse("/") : model).append(address);
+}
+
 } // namespace jamoma

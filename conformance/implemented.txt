@@ -6,3 +6,4 @@ j.model
 j.init
 j.savebang
 j.pass
+j.receive

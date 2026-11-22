@@ -131,3 +131,15 @@ TEST_CASE("odd input does not throw")
     REQUIRE_NOTHROW(Address::parse(".:./."));
     REQUIRE_NOTHROW(Address::parse(std::string("/a\0b", 4)));
 }
+
+/** An absolute address stays; a relative one is appended to the model's address; an empty one stays empty. */
+TEST_CASE("resolve relative against a model")
+{
+    const Address model = Address::parse("/qmetro");
+    REQUIRE(jamoma::resolve_relative(Address::parse("/other/p"), model).str() == "/other/p");
+    REQUIRE(jamoma::resolve_relative(Address::parse("data/active"), model).str() == "/qmetro/data/active");
+    REQUIRE(jamoma::resolve_relative(Address::parse("p:range"), model).str() == "/qmetro/p:range");
+    REQUIRE(jamoma::resolve_relative(Address::parse("p"), Address::parse("/m.1")).str() == "/m.1/p");
+    REQUIRE(jamoma::resolve_relative(Address(), model).empty());
+    REQUIRE(jamoma::resolve_relative(Address::parse("p"), Address()).str() == "/p"); // no model: from the root
+}
