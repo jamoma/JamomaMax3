@@ -106,6 +106,16 @@ def run_complete(log_text: str) -> bool:
     return "integration tests complete" in log_text
 
 
+def crashed_early(max_alive: bool, complete: bool, seconds_since_launch: float) -> bool:
+    """True if Max is gone although the run did not complete (it has had 10 s to appear): a crash or an early quit."""
+    return (not max_alive) and (not complete) and seconds_since_launch > 10
+
+
+def should_abort(consecutive_crashes: int) -> bool:
+    """True after two batches in a row in which Max disappeared, so a crashing build cannot keep relaunching Max."""
+    return consecutive_crashes >= 2
+
+
 def max_running() -> bool:
     """True while a Max 9 process exists."""
     return subprocess.run(["pgrep", "-f", MAX_PROCESS], capture_output=True).returncode == 0
@@ -170,14 +180,19 @@ class Links:
         self.created = []
 
 
-def run_batch(names, workdir, per_test_timeout) -> dict:
-    """Launches Max once for the given test names; returns {name: (status, detail)}."""
+def run_batch(names, workdir, per_test_timeout) -> tuple:
+    """Launches Max once for the given test names; returns ({name: (status, detail)}, crashed)."""
     before = last_test_id(DB_PATH)
     patch = pathlib.Path(workdir) / "driver.maxpat"
     patch.write_text(json.dumps(make_driver(names)), encoding="utf-8")
     subprocess.run(["open", "-a", MAX_APP, str(patch)], check=True)
-    deadline = time.time() + per_test_timeout * len(names) + 15
+    launched = time.time()
+    deadline = launched + per_test_timeout * len(names) + 15
+    crashed = False
     while time.time() < deadline and not run_complete(read_log()):
+        if crashed_early(max_running(), run_complete(read_log()), time.time() - launched):
+            crashed = True
+            break
         time.sleep(1)
     log = read_log()
     send_quit()
@@ -190,10 +205,13 @@ def run_batch(names, workdir, per_test_timeout) -> dict:
         time.sleep(2)
         clear_recovery()
     results = summarize(DB_PATH, before, names)
+    if crashed:
+        results = {n: (s, d + "; Max exited before the test finished (crash?)") if s != "PASS" else (s, d) for n, (s, d) in results.items()}
+        clear_recovery()
     gaps = missing_objects(log)
     if gaps:
         results = {n: (s, d + ("; missing objects: " + ", ".join(gaps) if s != "PASS" else "")) for n, (s, d) in results.items()}
-    return results
+    return results, crashed
 
 
 def main() -> int:
@@ -217,6 +235,7 @@ def main() -> int:
     clear_recovery()
     links = Links()
     rows = []
+    crashes = 0
     try:
         links.add("Jamoma", args.package)
         links.add("max-test", args.max_test)
@@ -226,9 +245,14 @@ def main() -> int:
         with tempfile.TemporaryDirectory() as work:
             for i in range(0, len(ordered), args.per_launch):
                 batch = ordered[i:i + args.per_launch]
-                for name, (status, detail) in run_batch(batch, work, args.timeout).items():
+                results, crashed = run_batch(batch, work, args.timeout)
+                for name, (status, detail) in results.items():
                     rows.append((names[name], status, detail))
                     print(f"{status:8} {names[name]}  {detail}", flush=True)
+                crashes = crashes + 1 if crashed else 0
+                if should_abort(crashes):
+                    print("ABORT: Max disappeared in two batches in a row; not launching it again. Check the crash reports.", file=sys.stderr)
+                    break
     finally:
         links.remove()
         if max_running():

@@ -32,6 +32,7 @@ function(jamoma_add_external)
         "${JAMOMA_C74_SUPPORT}/msp-includes"
         "${JAMOMA_C74_SUPPORT}/jit-includes"
         "${JAMOMA_MIN_API_DIR}/include")
+    target_include_directories(${target} PRIVATE "${CMAKE_SOURCE_DIR}/externals/common")
     target_compile_definitions(${target} PRIVATE C74_MIN_API)
     target_compile_features(${target} PRIVATE cxx_std_17)
     target_link_libraries(${target} PRIVATE jamoma::core)

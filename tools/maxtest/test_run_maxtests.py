@@ -97,6 +97,24 @@ class LogTests(unittest.TestCase):
         self.assertFalse(rm.run_complete("[x info] [1] startup"))
 
 
+class CrashTests(unittest.TestCase):
+    def test_max_gone_before_completion_is_a_crash(self):
+        self.assertTrue(rm.crashed_early(max_alive=False, complete=False, seconds_since_launch=30))
+
+    def test_max_not_yet_started_is_not_a_crash(self):
+        self.assertFalse(rm.crashed_early(max_alive=False, complete=False, seconds_since_launch=3))
+
+    def test_max_gone_after_completion_is_fine(self):
+        self.assertFalse(rm.crashed_early(max_alive=False, complete=True, seconds_since_launch=30))
+
+    def test_running_max_is_not_a_crash(self):
+        self.assertFalse(rm.crashed_early(max_alive=True, complete=False, seconds_since_launch=300))
+
+    def test_two_crashes_in_a_row_abort_the_run(self):
+        self.assertFalse(rm.should_abort(1))
+        self.assertTrue(rm.should_abort(2))
+
+
 class NameTests(unittest.TestCase):
     def test_test_name_is_the_file_name_without_maxpat(self):
         self.assertEqual(rm.test_name("JamomaIntegrationTests/patchers/tests/Modular/j.parameter/a/x_y.maxtest.maxpat"), "x_y.maxtest")
