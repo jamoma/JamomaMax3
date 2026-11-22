@@ -152,7 +152,12 @@ RecallReport PresetManager::recall(std::string_view name_or_index)
     }
     report.found = true;
     current_ = *index;
-    const std::vector<PresetEntry> entries = presets_[*index].entries; // a copy: a command may run observers that change the list
+    apply(std::vector<PresetEntry>(presets_[*index].entries), report); // a copy: a command may run observers that change the list
+    return report;
+}
+
+void PresetManager::apply(const std::vector<PresetEntry>& entries, RecallReport& report)
+{
     for (const PresetEntry& entry : entries) {
         Node* node = ns_.lookup(model_.append(entry.address));
         auto* data = node != nullptr ? dynamic_cast<Data*>(node->object()) : nullptr;
@@ -163,6 +168,130 @@ RecallReport PresetManager::recall(std::string_view name_or_index)
         data->command(entry.value);
         ++report.applied;
     }
+}
+
+namespace {
+
+/** @param v A value. @return True if it is not empty and every atom is a number. */
+bool all_numbers(const Value& v)
+{
+    return !v.empty() && std::all_of(v.begin(), v.end(), [](const Atom& a) { return a.is_number(); });
+}
+
+/** Finds an entry by address. @param entries The entries. @param address The address. @return The entry or null. */
+const PresetEntry* find_entry(const std::vector<PresetEntry>& entries, const Address& address)
+{
+    for (const PresetEntry& e : entries) {
+        if (e.address == address) {
+            return &e;
+        }
+    }
+    return nullptr;
+}
+
+} // namespace
+
+RecallReport PresetManager::interpolate(std::string_view a, std::string_view b, double position)
+{
+    RecallReport report;
+    const auto ia = find(a);
+    const auto ib = find(b);
+    if (!ia || !ib) {
+        return report;
+    }
+    report.found = true;
+    const double p = std::clamp(position, 0.0, 1.0);
+    const std::vector<PresetEntry> first = presets_[*ia].entries;
+    const std::vector<PresetEntry> second = presets_[*ib].entries;
+    std::vector<PresetEntry> out;
+    for (const PresetEntry& e : first) {
+        const PresetEntry* other = find_entry(second, e.address);
+        if (other == nullptr) {
+            out.push_back(e);
+        } else if (all_numbers(e.value) && all_numbers(other->value) && e.value.size() == other->value.size()) {
+            Value v;
+            for (std::size_t i = 0; i < e.value.size(); ++i) {
+                v.emplace_back(e.value[i].as_double() * (1.0 - p) + other->value[i].as_double() * p);
+            }
+            out.push_back({e.address, std::move(v)});
+        } else {
+            out.push_back(p < 0.5 ? e : *other);
+        }
+    }
+    for (const PresetEntry& e : second) {
+        if (find_entry(first, e.address) == nullptr) {
+            out.push_back(e);
+        }
+    }
+    apply(out, report);
+    return report;
+}
+
+RecallReport PresetManager::mix(const std::vector<std::pair<std::string, double>>& weighted)
+{
+    RecallReport report;
+    std::vector<std::pair<std::size_t, double>> parts;
+    double sum = 0.0;
+    for (const auto& [key, factor] : weighted) {
+        const auto index = find(key);
+        if (!index) {
+            return report;
+        }
+        parts.emplace_back(*index, std::max(0.0, factor));
+        sum += std::max(0.0, factor);
+    }
+    report.found = true;
+    if (parts.empty() || sum <= 0.0) {
+        return report;
+    }
+    std::vector<Address> order;
+    for (const auto& part : parts) {
+        for (const PresetEntry& e : presets_[part.first].entries) {
+            if (std::find(order.begin(), order.end(), e.address) == order.end()) {
+                order.push_back(e.address);
+            }
+        }
+    }
+    std::vector<PresetEntry> out;
+    for (const Address& address : order) {
+        double total = 0.0;
+        double largest = -1.0;
+        const PresetEntry* strongest = nullptr;
+        bool numeric = true;
+        std::size_t size = 0;
+        for (const auto& part : parts) {
+            const PresetEntry* e = find_entry(presets_[part.first].entries, address);
+            if (e == nullptr || part.second <= 0.0) {
+                continue;
+            }
+            total += part.second;
+            if (part.second > largest) {
+                largest = part.second;
+                strongest = e;
+            }
+            numeric = numeric && all_numbers(e->value) && (size == 0 || size == e->value.size());
+            size = e->value.size();
+        }
+        if (strongest == nullptr) {
+            continue;
+        }
+        if (!numeric) {
+            out.push_back(*strongest);
+            continue;
+        }
+        Value v(size, Atom(0.0));
+        for (const auto& part : parts) {
+            const PresetEntry* e = find_entry(presets_[part.first].entries, address);
+            if (e == nullptr || part.second <= 0.0) {
+                continue;
+            }
+            for (std::size_t i = 0; i < size; ++i) {
+                v[i] = Atom(v[i].as_double() + e->value[i].as_double() * part.second / total);
+            }
+        }
+        out.push_back({address, std::move(v)});
+    }
+    apply(out, report);
     return report;
 }
 

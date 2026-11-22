@@ -17,6 +17,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "jamoma/address.hpp"
@@ -80,6 +81,18 @@ public:
     RecallReport recall(std::string_view name_or_index);
     /** @brief Like recall() but only reports: the entries come back in the report and nothing is sent. @param name_or_index The name or 1-based position. @return The report. */
     RecallReport output(std::string_view name_or_index) const;
+    /**
+     * @brief Sends a blend of two presets: numbers and lists of numbers of the same length are interpolated element by element, any other value is taken from the nearer preset (the second at 0.5);
+     *        an entry that only one preset has keeps that preset's value.
+     * @param a The first preset (name or 1-based position). @param b The second. @param position 0 is the first, 1 the second; outside that it is clamped.
+     * @return What happened; `found` is false (and nothing changed) if a preset is unknown.
+     */
+    RecallReport interpolate(std::string_view a, std::string_view b, double position);
+    /**
+     * @brief Sends a weighted mix of presets: numbers are summed with their factors and divided by the sum of the factors of the presets that have the entry; other values come from the first preset with the largest factor.
+     * @param weighted Pairs of a preset (name or 1-based position) and a factor (negative counts as 0). @return What happened; nothing is sent if a preset is unknown or the factors sum to 0.
+     */
+    RecallReport mix(const std::vector<std::pair<std::string, double>>& weighted);
     /** @brief Removes a preset. @param name_or_index Its name or 1-based position. @return False if there is none. */
     bool remove(std::string_view name_or_index);
     /** @brief Renames a preset. @param from Its name or 1-based position. @param to The new name (not taken). @return False if not possible. */
@@ -98,6 +111,8 @@ private:
     std::optional<std::size_t> find(std::string_view key) const;
     /** @return The parameters below the model now, as entries in order of priority, name, instance. */
     std::vector<PresetEntry> store() const;
+    /** Sends entries to their nodes as commands. @param entries The entries. @param report Where to count and list what was skipped. */
+    void apply(const std::vector<PresetEntry>& entries, RecallReport& report);
 
     Namespace& ns_;                  /**< The namespace. */
     Address model_;                  /**< The model. */

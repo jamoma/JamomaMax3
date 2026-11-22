@@ -234,3 +234,100 @@ TEST_CASE("output reports without applying")
     REQUIRE(report.entries.size() == 1);
     REQUIRE(r.number("a") == 7.0);
 }
+
+/** Halfway between two presets, numbers and lists of numbers are averaged element by element. */
+TEST_CASE("interpolate halfway between numbers and lists")
+{
+    Rig r;
+    Data& a = r.add("a", 0.0);
+    Data& list = r.add("v", 0.0);
+    list.set_type(DataType::Array);
+    list.command({0.0, 10.0});
+    r.presets.new_preset("lo");
+    a.command({10.0});
+    list.command({4.0, 20.0});
+    r.presets.new_preset("hi");
+    const auto report = r.presets.interpolate("lo", "hi", 0.5);
+    REQUIRE(report.found);
+    REQUIRE(report.applied == 2);
+    REQUIRE(r.number("a") == 5.0);
+    auto* d = dynamic_cast<Data*>(r.ns.lookup(Address::parse("/m/v"))->object());
+    REQUIRE(d->value().at(0).as_double() == 2.0);
+    REQUIRE(d->value().at(1).as_double() == 15.0);
+}
+
+/** A value that is not a number is taken from the nearer preset. */
+TEST_CASE("interpolate takes the nearer symbol")
+{
+    Rig r;
+    Data& s = r.add("s", 0.0);
+    s.set_type(DataType::String);
+    s.command({"left"});
+    r.presets.new_preset("one");
+    s.command({"right"});
+    r.presets.new_preset("two");
+    r.presets.interpolate("one", "two", 0.25);
+    auto* d = dynamic_cast<Data*>(r.ns.lookup(Address::parse("/m/s"))->object());
+    REQUIRE(d->value().at(0).to_string() == "left");
+    r.presets.interpolate("one", "two", 0.75);
+    REQUIRE(d->value().at(0).to_string() == "right");
+}
+
+/** An entry that only one of the presets has keeps that preset's value. */
+TEST_CASE("entries in one preset only are kept")
+{
+    Rig r;
+    Data& a = r.add("a", 1.0);
+    r.presets.new_preset("one");
+    r.add("b", 8.0);
+    a.command({3.0});
+    r.presets.new_preset("two");
+    r.add("c", 0.0);
+    r.data[1]->command({0.0});
+    r.data[2]->command({0.0});
+    r.presets.interpolate("one", "two", 0.5);
+    REQUIRE(r.number("a") == 2.0);
+    REQUIRE(r.number("b") == 8.0);
+}
+
+/** A position outside 0..1 is clamped, not extrapolated. */
+TEST_CASE("position outside zero to one is clamped")
+{
+    Rig r;
+    Data& a = r.add("a", 0.0);
+    r.presets.new_preset("lo");
+    a.command({10.0});
+    r.presets.new_preset("hi");
+    r.presets.interpolate("lo", "hi", 2.0);
+    REQUIRE(r.number("a") == 10.0);
+    r.presets.interpolate("lo", "hi", -1.0);
+    REQUIRE(r.number("a") == 0.0);
+    REQUIRE_FALSE(r.presets.interpolate("lo", "missing", 0.5).found);
+}
+
+/** The factors are normalised by their sum. */
+TEST_CASE("mix normalises weights")
+{
+    Rig r;
+    Data& a = r.add("a", 0.0);
+    r.presets.new_preset("lo");
+    a.command({10.0});
+    r.presets.new_preset("hi");
+    r.presets.mix({{"lo", 3.0}, {"hi", 1.0}});
+    REQUIRE(r.number("a") == 2.5);
+    r.presets.mix({{"lo", 30.0}, {"hi", 10.0}});
+    REQUIRE(r.number("a") == 2.5);
+}
+
+/** A sum of zero, or no preset, does nothing. */
+TEST_CASE("mix of nothing does nothing")
+{
+    Rig r;
+    Data& a = r.add("a", 4.0);
+    r.presets.new_preset("one");
+    a.command({9.0});
+    REQUIRE(r.presets.mix({}).applied == 0);
+    REQUIRE(r.presets.mix({{"one", 0.0}}).applied == 0);
+    REQUIRE_FALSE(r.presets.mix({{"nothing", 1.0}}).found);
+    REQUIRE(r.number("a") == 9.0);
+}
