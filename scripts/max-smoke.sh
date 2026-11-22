@@ -7,7 +7,7 @@
 #   scripts/max-smoke.sh [--odd-path] [--no-loader] <dir with smoke.maxpat and smoke.js> "<expected line>"
 #
 # It copies package/Jamoma to a staging folder, links it into ~/Documents/Max 9/Packages/Jamoma
-# (this touches the Max folder; the link is removed again), launches Max with the patcher,
+# (this touches the Max folder; an existing Jamoma link, such as the one scripts/max-links.sh makes, is moved aside and put back), launches Max with the patcher,
 # waits for the result file, and requires Max to quit by itself without a crash report
 # (its exit code is not available because it is launched through Launch Services).
 #   --odd-path   stage the package under a path with spaces and a non-ASCII character
@@ -25,11 +25,24 @@ done
 SRC_DIR="${1:?patcher dir}"; EXPECTED="${2:?expected line}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MAX_APP="/Applications/Max 9/Max.app"
-PACKAGES="$HOME/Documents/Max 9/Packages"
+PACKAGES="${MAX_PACKAGES_DIR:-$HOME/Documents/Max 9/Packages}"
 LINK="$PACKAGES/Jamoma"
 
 if pgrep -f "Max 9/Max.app/Contents/MacOS/Max" >/dev/null; then echo "FAIL: Max 9 is already running; quit it first" >&2; exit 2; fi
-if [[ -e "$LINK" || -L "$LINK" ]]; then echo "FAIL: $LINK already exists; not touching it" >&2; exit 2; fi
+# A Jamoma link that is already there (permanent links, scripts/max-links.sh) is taken away for the run and put back afterwards. Anything
+# else under that name (a real folder, an installed package) is never touched.
+SAVED_TARGET=""
+if [[ -L "$LINK" ]]; then
+    SAVED_TARGET="$(readlink "$LINK")"
+    rm "$LINK"
+elif [[ -e "$LINK" ]]; then
+    echo "FAIL: $LINK exists and is not a link; not touching it" >&2; exit 2
+fi
+restore_link() {
+    [[ -L "$LINK" ]] && rm "$LINK"
+    if [[ -n "$SAVED_TARGET" ]]; then ln -s "$SAVED_TARGET" "$LINK"; fi
+}
+trap restore_link EXIT
 
 WORK="$(mktemp -d)"
 if [[ $ODD == 1 ]]; then STAGE="$HOME/Documents/Jamoma smoke Åpen/Packages-target"; else STAGE="$WORK/stage"; fi
@@ -44,7 +57,7 @@ START="$WORK/start-marker"; touch "$START"
 MAXPID=""
 cleanup() {
     [[ -n "$MAXPID" ]] && kill "$MAXPID" 2>/dev/null
-    [[ -L "$LINK" ]] && rm "$LINK"
+    restore_link
     if [[ $ODD == 1 ]]; then rm -rf "$HOME/Documents/Jamoma smoke Åpen"; fi
     rm -rf "$WORK"
 }

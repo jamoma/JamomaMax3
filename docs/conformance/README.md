@@ -47,3 +47,11 @@ Sample of 6 of the 82 milestone 1 tests: **0 of 6 pass**, each because `j.parame
 `test.list.equals`, `j.pass`) does not exist yet. The old `Modular/j.model` folder has no usable test (only `audio_gain`,
 which needs `j.in~`/`j.out~`), so the old-test suite for milestone 1 is the 82 `j.parameter` tests; `j.model`, `j.init`,
 `j.savebang` and `j.pass` are covered by own tests under `docs/conformance/own/`.
+
+
+## Permanent links for working in Max yourself
+
+The runners link what they need into `~/Documents/Max 9/Packages` while they run and remove only what they created. To open the tests and help
+patchers in a Max that you start yourself, keep the four links in place with `scripts/max-links.sh on` (and take them away with `off`;
+`status` shows them). Quit and reopen Max after changing them. The runners leave existing links alone, and `scripts/max-smoke.sh` moves the
+`Jamoma` link aside while it runs and puts it back.
