@@ -4994,16 +4994,21 @@
 											{
 												"box": {
 													"id": "obj-3",
-													"maxclass": "comment",
-													"text": "[j.unit: not in this version yet]",
+													"maxclass": "newobj",
 													"numinlets": 1,
-													"numoutlets": 0,
+													"numoutlets": 2,
+													"outlettype": [
+														"",
+														""
+													],
 													"patching_rect": [
 														118.0,
 														196.0,
-														220.0,
-														20.0
-													]
+														36.0,
+														22.0
+													],
+													"style": "",
+													"text": "j.unit"
 												}
 											},
 											{
@@ -5074,6 +5079,20 @@
 											{
 												"patchline": {
 													"destination": [
+														"obj-3",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-12",
+														0
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
 														"obj-2",
 														0
 													],
@@ -5081,6 +5100,34 @@
 													"hidden": 0,
 													"source": [
 														"obj-16",
+														0
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
+														"obj-16",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-3",
+														1
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
+														"obj-3",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-4",
 														0
 													]
 												}
@@ -5239,16 +5286,21 @@
 											{
 												"box": {
 													"id": "obj-9",
-													"maxclass": "comment",
-													"text": "[j.unit: not in this version yet]",
+													"maxclass": "newobj",
 													"numinlets": 1,
-													"numoutlets": 0,
+													"numoutlets": 2,
+													"outlettype": [
+														"",
+														""
+													],
 													"patching_rect": [
 														50.0,
 														133.0,
-														220.0,
-														20.0
-													]
+														36.0,
+														22.0
+													],
+													"style": "",
+													"text": "j.unit"
 												}
 											},
 											{
@@ -5280,6 +5332,34 @@
 													"source": [
 														"obj-18",
 														0
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
+														"obj-9",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-26",
+														0
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
+														"obj-18",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-9",
+														1
 													]
 												}
 											}

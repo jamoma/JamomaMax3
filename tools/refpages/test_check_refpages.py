@@ -35,6 +35,11 @@ void ext_main(void*) {
 
 
 class CheckRefpages(unittest.TestCase):
+    def test_new_objects_are_checked(self):
+        for name in ("j.send", "j.receive", "j.unit", "j.in", "j.out"):
+            self.assertIn(name, c.OBJECT_SOURCES)
+
+
     def test_parse_reads_names(self):
         attributes, methods = c.parse_refpage(PAGE)
         self.assertEqual(attributes, {"type"})

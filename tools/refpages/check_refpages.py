@@ -33,6 +33,11 @@ OBJECT_SOURCES = {
     "j.init": ["j.init/j.init.cpp"],
     "j.savebang": ["j.savebang/j.savebang.cpp"],
     "j.pass": ["j.pass/j.pass.cpp"],
+    "j.send": ["j.send/j.send.cpp"],
+    "j.receive": ["j.receive/j.receive.cpp"],
+    "j.unit": ["j.unit/j.unit.cpp"],
+    "j.in": ["j.in/j.in.cpp"],
+    "j.out": ["j.out/j.out.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.

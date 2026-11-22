@@ -26,6 +26,23 @@ NEW_ENTRIES = {
 }
 
 
+#: Messages that are new in this version or lacked a page entry: name -> (digest, description).
+NEW_METHODS = {
+    "bang": ("Pass a bang", "A bang is passed on like any other value."),
+    "int": ("Pass an integer", "The integer is passed on like any other value."),
+    "float": ("Pass a decimal number", "The number is passed on like any other value."),
+    "list": ("Pass a list", "The list is passed on like any other value."),
+    "anything": ("Pass a message or set an attribute", "Any other message is passed on, except the names of the attributes, which set the attribute."),
+    "mute": ("Mute", "mute 1 stops values from passing, mute 0 lets them through again (the same as the mute attribute)."),
+    "bypass": ("Bypass", "Sets the bypass attribute. The link to the j.out of the same instance is not built yet, so it has no effect on the data."),
+    "freeze": ("Freeze", "freeze 1 makes the object output its last value again instead of new ones (the same as the freeze attribute)."),
+    "mix": ("Set the mix", "Sets the mix attribute (stored; it has an effect on audio only, which is not built yet)."),
+    "gain": ("Set the gain", "Sets the gain attribute (stored; it has an effect on audio only, which is not built yet)."),
+    "active": ("Set or query the active attribute", "active 0 or 1 sets the attribute; active alone reports it on the dump outlet."),
+    "address": ("Set the address", "Sets the address to listen to. A relative address is taken from the model of the patcher."),
+}
+
+
 def implemented(name, externals):
     """(attributes, messages) the object implements, from its sources."""
     attributes, messages = set(), set()
@@ -63,8 +80,9 @@ def migrate(old_page, attributes, messages):
                 if known:
                     entry.set("type", known[2])
                     entry.set("size", "1")
-            ET.SubElement(entry, "digest").text = known[3] if known else "TODO"
-            ET.SubElement(entry, "description").text = known[4] if known else "TODO"
+            method_text = NEW_METHODS.get(name) if kind == "message" else None
+            ET.SubElement(entry, "digest").text = known[3] if known else (method_text[0] if method_text else "TODO")
+            ET.SubElement(entry, "description").text = known[4] if known else (method_text[1] if method_text else "TODO")
     ET.indent(root, space="\t")
     return old_page, removed
 
