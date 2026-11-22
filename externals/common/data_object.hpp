@@ -27,14 +27,6 @@ namespace jamoma_max {
 // Min's MIN_FUNCTION and MIN_GETTER_FUNCTION macros name `atoms` unqualified.
 using namespace c74::min;
 
-/** An outlet that exposes its Max outlet pointer, so it can be registered as the object's dumpout. */
-class dump_outlet : public c74::min::outlet<> {
-public:
-    using c74::min::outlet<>::outlet;
-    /** @return The Max outlet (null until Min has created the outlets). */
-    c74::max::t_outlet* max_outlet() const { return reinterpret_cast<c74::max::t_outlet*>(m_instance); }
-};
-
 /**
  * @brief A Max object that owns a data object, subscribes it to the namespace and outputs its value.
  * @tparam Derived The external class (Min requires the CRTP).

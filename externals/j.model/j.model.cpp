@@ -62,6 +62,13 @@ public:
         return args;
     }}};
 
+    /** The amenities the model provides (accepted so that patchers that set it load; it has no effect yet). */
+    attribute<symbol> amenities{this, "amenities", "all"};
+
+    inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
+    outlet<> results_out{this, "(anything) results (presets, later milestone)"}; /**< Outlet 0 (unused so far). */
+    jamoma_max::dump_outlet dump_out{this, "(anything) dump"};              /**< Outlet 1: the dump outlet. */
+
     /** Initialises the model: sends the default value through every parameter below it. */
     message<> init{this, "init", MIN_FUNCTION {
         if (model_) {
@@ -72,6 +79,7 @@ public:
 
     /** After construction: creates the model, registers it for its patcher and schedules the first initialisation. */
     message<> setup{this, "setup", MIN_FUNCTION {
+        c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
         patcher_ = jamoma_max::patcher_of(maxobj());
         if (name_.empty()) {
             name_ = patcher_name();

@@ -4,3 +4,4 @@ package/Jamoma/externals/
 package/Jamoma/extensions/
 package/Jamoma/support/
 .DS_Store
+package/Jamoma/docs/*.maxref.xml

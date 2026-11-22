@@ -18,6 +18,14 @@
 
 namespace jamoma_max {
 
+/** An outlet that exposes its Max outlet pointer, so it can be registered as the object's dumpout. */
+class dump_outlet : public c74::min::outlet<> {
+public:
+    using c74::min::outlet<>::outlet;
+    /** @return The Max outlet (null until Min has created the outlets). */
+    c74::max::t_outlet* max_outlet() const { return reinterpret_cast<c74::max::t_outlet*>(m_instance); }
+};
+
 /** A token an object holds; deferred calls keep a weak copy and do nothing once the object is gone. */
 class Alive {
 public:
