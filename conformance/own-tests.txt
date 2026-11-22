@@ -23,3 +23,4 @@ tests/max/patchers/view_late_model.maxtest.maxpat
 tests/max/patchers/remote_basic.maxtest.maxpat
 tests/max/patchers/remote_feedback.maxtest.maxpat
 tests/max/patchers/ui_state.maxtest.maxpat
+tests/max/patchers/node_basic.maxtest.maxpat

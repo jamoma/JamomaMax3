@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
+<c74object name="j.node" module="" category="Jamoma">
+	<digest>
+		Declare a node that holds no value
+	</digest>
+	<description>
+		j.node declares a node below the model of its patcher. It holds no value; its <at>priority</at> orders the initialisation of the parameters below it among the siblings of the node.
+	</description>
+	<metadatalist>
+		<metadata name="author">
+			Jamoma
+		</metadata>
+		<metadata name="tag">
+			model
+		</metadata>
+		<metadata name="tag">
+			Jamoma
+		</metadata>
+	</metadatalist>
+	<objarglist>
+		<objarg name="name" optional="1" type="symbol">
+			<digest>
+				The name of the node
+			</digest>
+			<description>
+				The name of the node, relative to the model.
+			</description>
+		</objarg>
+	</objarglist>
+	<methodlist>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Report the attributes
+			</digest>
+			<description>
+				The <m>dump</m> message answers the attributes out the rightmost outlet.
+			</description>
+		</method>
+	</methodlist>
+	<attributelist>
+		<attribute name="description" get="1" set="1" type="symbol" size="1">
+			<digest>
+				A description of the node
+			</digest>
+			<description>
+				A textual description of the node.
+			</description>
+		</attribute>
+		<attribute name="priority" get="1" set="1" type="int" size="1">
+			<digest>
+				The priority of the node
+			</digest>
+			<description>
+				Orders the initialisation of what is below the node among its siblings.
+			</description>
+		</attribute>
+		<attribute name="tags" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Tags of the node
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+	</attributelist>
+</c74object>

@@ -41,6 +41,7 @@ OBJECT_SOURCES = {
     "j.view": ["j.view/j.view.cpp"],
     "j.remote": ["j.remote/j.remote.cpp"],
     "j.ui": ["j.ui/j.ui.cpp"],
+    "j.node": ["j.node/j.node.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.
