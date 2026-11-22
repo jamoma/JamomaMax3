@@ -23,3 +23,23 @@ The Max package folder must be named `Jamoma`. Link the package folder into Max:
 ```
 ln -s "$PWD/package/Jamoma" "$HOME/Documents/Max 9/Packages/Jamoma"
 ```
+
+## Status: milestone 1 (namespace and data)
+
+Objects: `j.parameter`, `j.message`, `j.return`, `j.model`, `j.init`, `j.savebang`, `j.pass` (plus the start-up
+loader `j.loader`). The core (`core/`, namespace `jamoma`) has no Max includes and has its own unit tests; the Max
+externals (`externals/`) are thin. See `docs/changes.md` for what differs from the old objects and
+`docs/conformance/m1-results.md` for the results of the old integration tests.
+
+Checks (Max 9 must be closed for the ones that start it):
+
+```
+ctest --preset macos                                   # core unit tests
+scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests    # the old integration tests
+scripts/run-maxtests.sh conformance/own-tests.txt build/maxtests   # own Max tests (tests/max)
+scripts/check-help.sh                                  # every help patcher opens without missing objects
+python3 tools/refpages/check_refpages.py --package package/Jamoma --externals externals
+```
+
+Sanitizer builds must not write into the package that Max uses; give them their own folder:
+`cmake -S . -B build/tsan -G Ninja -DCMAKE_CXX_FLAGS=-fsanitize=thread -DJAMOMA_PACKAGE_DIR=$PWD/build/tsan/package`.

@@ -1,21 +1,21 @@
 # Conformance coverage baseline
 
-Patchers read: 95; implemented objects: 1
+Patchers read: 95; implemented objects: 8
 
 ## Objects used by the pass-bar set (patchers that use each)
 
-- `j.parameter`: 90 (missing)
-- `j.savebang`: 16 (missing)
-- `j.model`: 11 (missing)
+- `j.parameter`: 90 (implemented)
+- `j.savebang`: 16 (implemented)
+- `j.model`: 11 (implemented)
 - `j.remote`: 8 (missing)
 - `j.unit`: 8 (missing)
 - `j.receive`: 5 (missing)
 - `j.view`: 5 (missing)
-- `j.return`: 4 (missing)
+- `j.return`: 4 (implemented)
 - `j.map`: 3 (missing)
-- `j.message`: 3 (missing)
+- `j.message`: 3 (implemented)
 - `j.send`: 3 (missing)
-- `j.init`: 2 (missing)
+- `j.init`: 2 (implemented)
 - `j.namespace`: 2 (missing)
 - `j.out`: 2 (missing)
 - `j.out~`: 2 (missing)
@@ -29,98 +29,98 @@ Patchers read: 95; implemented objects: 1
 
 ## Per patcher
 
-- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`, `j.message`, `j.model`, `j.parameter`, `j.remote`, `j.savebang`, `j.send`, `j.unit`
-- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.message`, `j.model`, `j.namespace`, `j.parameter`, `j.receive`, `j.remote`, `j.return`, `j.send`, `j.textslider`
-- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.model`, `j.namespace`, `j.node`, `j.parameter`, `j.remote`, `j.savebang`, `j.unit`
-- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: `j.model`, `j.parameter`, `j.receive`, `j.savebang`, `j.unit`, `j.view`
-- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`, `j.model`, `j.receive`, `j.remote`, `j.return`, `j.savebang`, `j.unit`
-- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: `j.model`, `j.parameter`, `j.savebang`, `j.send`, `j.view`
-- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in`, `j.in~`, `j.message`, `j.model`, `j.out`, `j.out~`, `j.parameter`, `j.remote`, `j.return`, `j.ui`, `j.view`
-- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: `j.model`, `j.parameter`, `j.receive`, `j.remote`, `j.view`
+- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`, `j.remote`, `j.send`, `j.unit`
+- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.namespace`, `j.receive`, `j.remote`, `j.send`, `j.textslider`
+- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.namespace`, `j.node`, `j.remote`, `j.unit`
+- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: `j.receive`, `j.unit`, `j.view`
+- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`, `j.receive`, `j.remote`, `j.unit`
+- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: `j.send`, `j.view`
+- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in`, `j.in~`, `j.out`, `j.out~`, `j.remote`, `j.ui`, `j.view`
+- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: `j.receive`, `j.remote`, `j.view`
 - `Jamoma/patchers/models/data/qmetro/qmetro.model.maxhelp`: 1 objects, missing: `j.unit`
-- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxpat`: 5 objects, missing: `j.model`, `j.out`, `j.parameter`, `j.receive`, `j.return`
+- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxpat`: 5 objects, missing: `j.out`, `j.receive`
 - `Jamoma/patchers/models/data/qmetro/qmetro.module.maxpat`: 0 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.view.maxpat`: 3 objects, missing: `j.remote`, `j.ui`, `j.view`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.model/audio_gain/model_audio_gain_maxtest.maxpat`: 4 objects, missing: `j.init`, `j.model`, `j.out~`, `j.remote`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_both.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_fold.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_high.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_low.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_none.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_aed2xyz.maxtest.maxpat`: 3 objects, missing: `j.parameter`, `j.savebang`, `j.unit`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_xyz2aed.maxtest.maxpat`: 3 objects, missing: `j.parameter`, `j.savebang`, `j.unit`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/messages/j.parameter_type_array_messages.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_and_clipmode.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp_dataspace/j_parameter_type_array_ramp_and_dataspace.maxtest.maxpat`: 3 objects, missing: `j.parameter`, `j.savebang`, `j.unit`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/j.parameter_type_boolean_messages.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_both.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_fold.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_high.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_low.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_none.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_linear2midi.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_midi2db.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/messages/j.parameter_type_decimal_messages.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp/j_parameter_type_decimal_ramp_and_clipmode.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp/j_parameter_type_decimal_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp_dataspace/j_parameter_type_decimal_ramp_and_dataspace.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_both.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_fold.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_high.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_low.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_none.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_linear2midi.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_midi2db.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/messages/j.parameter_type_integer_messages.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp/j_parameter_type_integer_ramp_and_clipmode.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp/j_parameter_type_integer_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp_dataspace/j_parameter_type_integer_ramp_and_dataspace.maxtest.maxpat`: 2 objects, missing: `j.parameter`, `j.savebang`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: `j.parameter`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_value.maxtest.maxpat`: 3 objects, missing: `j.init`, `j.model`, `j.parameter`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.model/audio_gain/model_audio_gain_maxtest.maxpat`: 4 objects, missing: `j.out~`, `j.remote`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_both.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_fold.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_high.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_low.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_none.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_aed2xyz.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_xyz2aed.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/messages/j.parameter_type_array_messages.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_and_clipmode.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp_dataspace/j_parameter_type_array_ramp_and_dataspace.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/default_attr_value/j.parameter_type_boolean_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_boolean/j.parameter_type_boolean_messages.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_both.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_fold.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_high.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_low.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_none.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/clipmode/j_parameter_type_decimal_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_linear2midi.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_midi2db.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/dataspace/j_parameter_type_decimal_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/default_attr_value/j.parameter_type_decimal_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/messages/j.parameter_type_decimal_messages.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp/j_parameter_type_decimal_ramp_and_clipmode.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp/j_parameter_type_decimal_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/ramp_dataspace/j_parameter_type_decimal_ramp_and_dataspace.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_decimal/repetitions/j_parameter_type_decimal_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_generic/default_attr_value/j.parameter_type_generic_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_both.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_fold.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_high.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_low.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_none.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/clipmode/j_parameter_type_integer_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_linear2midi.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_midi2db.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/dataspace/j_parameter_type_integer_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/default_attr_value/j.parameter_type_integer_default_attr_value_value.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/messages/j.parameter_type_integer_messages.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp/j_parameter_type_integer_ramp_and_clipmode.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp/j_parameter_type_integer_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/ramp_dataspace/j_parameter_type_integer_ramp_and_dataspace.maxtest.maxpat`: 2 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_integer/repetitions/j_parameter_type_integer_repetition_receive_symbols.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_range.maxtest.maxpat`: 1 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_value.maxtest.maxpat`: 3 objects, missing: none

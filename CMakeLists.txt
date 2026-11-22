@@ -17,11 +17,15 @@ if(APPLE)
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "YES")
 endif()
 
-# Windows: static C runtime (/MT), as max-sdk-base uses for externals. Each DLL then has its own heap, so no
-# allocation may cross the core API (see docs/decisions/0001-shared-state.md).
+# Windows: dynamic C runtime (/MD) for the core and every external, so they share one heap and standard-library
+# objects (std::string, std::vector) may cross the core API. (max-sdk-base uses /MT for plain externals; ours share state.)
+# UNTESTED on Windows. See docs/decisions/0001-shared-state.md.
 if(WIN32)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
+
+# Where the Max package is assembled (libraries and externals are written there); override for scratch builds such as sanitizer runs.
+set(JAMOMA_PACKAGE_DIR "${CMAKE_SOURCE_DIR}/package/Jamoma" CACHE PATH "Output folder of the Max package")
 
 enable_testing()
 

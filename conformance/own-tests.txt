@@ -1,0 +1,5 @@
+tests/max/patchers/duplicate_names.maxtest.maxpat
+tests/max/patchers/attribute_order.maxtest.maxpat
+tests/max/patchers/free_while_ramping.maxtest.maxpat
+tests/max/patchers/model_init.maxtest.maxpat
+tests/max/patchers/pass.maxtest.maxpat
