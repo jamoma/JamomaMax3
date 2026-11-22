@@ -2,7 +2,7 @@
 
 Run of `conformance/m1-tests.txt` (the 82 old `j.parameter` integration tests) in Max 9 on macOS arm64, with
 `scripts/run-maxtests.sh`. **78 of 82 pass.** Own Max tests (`conformance/own-tests.txt`): 5 of 5 pass.
-Other checks: 177 core unit tests pass (also under ThreadSanitizer and under AddressSanitizer/UndefinedBehaviorSanitizer, no reports);
+Other checks: 179 core unit tests pass (also under ThreadSanitizer and under AddressSanitizer/UndefinedBehaviorSanitizer, no reports);
 all seven help patchers open without missing objects; the reference pages match the implemented attributes and
 messages; Max quits by itself with live models, parameters and running ramps and writes no crash report
 (`scripts/max-smoke.sh tests/smoke/quit_live_objects`).
