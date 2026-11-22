@@ -611,7 +611,7 @@ TEST_CASE("ramp drive defaults by type")
     REQUIRE(d.ramp_drive() == "none");
     d.set_ramp_drive("system");
     REQUIRE(d.ramp_drive() == "system");
-    REQUIRE(d.ramp_function() == "linear");
+    REQUIRE(d.ramp_function() == "none"); // the old default; a ramp with it moves linearly
 }
 
 /** Old test ramp_and_clipmode: range 0..80, `0.` then `100. ramp 100`, per clip mode. */

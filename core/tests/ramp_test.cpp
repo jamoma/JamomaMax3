@@ -59,6 +59,15 @@ TEST_CASE("old timing test sequence")
     REQUIRE(r.firsts() == Values{0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0});
 }
 
+/** Whole-number ramps are exact at every tick, so an integer ramp never truncates to a neighbour (old integer ramp test). */
+TEST_CASE("whole number ramp is exact at every tick")
+{
+    Rig r;
+    r.ramp.start({-20.0}, {0.0}, 200.0, "linear");
+    r.clock.advance(200.0);
+    REQUIRE(r.firsts() == Values{-20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0});
+}
+
 /** The last value is exactly the target, and a duration that is no multiple of the tick still ends on it. */
 TEST_CASE("last value is exactly the target")
 {
@@ -125,6 +134,18 @@ TEST_CASE("unknown function falls back to linear")
     r.clock.advance(100.0);
     REQUIRE(r.firsts() == Values{0.0, 20.0, 40.0, 60.0, 80.0, 100.0});
     r.ramp.start({0.0}, {1.0}, 10.0, "linear");
+    REQUIRE(r.ramp.function_ok());
+}
+
+/** The function name none (the old default) and the empty name behave as linear and are not an error. */
+TEST_CASE("none function is linear and ok")
+{
+    Rig r;
+    r.ramp.start({0.0}, {100.0}, 100.0, "none");
+    REQUIRE(r.ramp.function_ok());
+    r.clock.advance(100.0);
+    REQUIRE(r.firsts() == Values{0.0, 20.0, 40.0, 60.0, 80.0, 100.0});
+    r.ramp.start({0.0}, {1.0}, 10.0, "");
     REQUIRE(r.ramp.function_ok());
 }
 

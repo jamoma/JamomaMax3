@@ -13,7 +13,7 @@ Launch Services, waits for Max's own log to say the run is complete, asks Max to
 
 It temporarily links three packages into ~/Documents/Max 9/Packages (only those that are not already there,
 and it removes only what it created): Jamoma (this repository's package), max-test, and JamomaIntegrationTests
-(which supplies test.list.equals). It refuses to run while a Max 9 process is open.
+(which supplies test.list.equals) and, when it exists, JamomaMax3Tests (this repository's own tests in tests/max). It refuses to run while a Max 9 process is open.
 """
 
 import argparse
@@ -241,6 +241,9 @@ def main() -> int:
         links.add("max-test", args.max_test)
         if (args.old / "JamomaIntegrationTests").is_dir():
             links.add("JamomaIntegrationTests", args.old / "JamomaIntegrationTests")
+        own = pathlib.Path(__file__).resolve().parents[2] / "tests/max"
+        if own.is_dir():
+            links.add("JamomaMax3Tests", own)
         ordered = list(names)
         with tempfile.TemporaryDirectory() as work:
             for i in range(0, len(ordered), args.per_launch):

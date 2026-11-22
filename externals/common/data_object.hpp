@@ -47,7 +47,10 @@ class data_object : public c74::min::object<Derived> {
     jamoma::Subscription subscription_;    /**< The registration in the namespace. */
 
 public:
-    /** The creation arguments: the first is the name (the relative address); the rest are attributes. */
+    /**
+     * Creates the object.
+     * @param args The creation arguments: the first is the name (the relative address); attributes are applied by Max afterwards.
+     */
     explicit data_object(const c74::min::atoms& args = {})
     {
         if (!jamoma::Registry::check_abi(jamoma::kAbiVersion)) {
@@ -177,6 +180,7 @@ public:
         add_attribute<Attr::RampFunctionParameters>(c);
         add_attribute<Attr::RampStatus>(c);
         add_attribute<Attr::Value>(c);
+        add_attribute<Attr::Service>(c);
         return {};
     }};
 
@@ -215,15 +219,15 @@ private:
     /** Every attribute of a data object (the order is the order of ATTRIBUTE_NAMES). */
     enum class Attr {
         Type, Range, Clipmode, RepetitionsFilter, Default, Stepsize, Active, Priority, Description, Tags, Dataspace, Unit,
-        RampDrive, RampFunction, RampFunctionParameters, RampStatus, Value, Count
+        RampDrive, RampFunction, RampFunctionParameters, RampStatus, Value, Service, Count
     };
 
     /** The attribute names, as patchers see them. */
     static constexpr const char* ATTRIBUTE_NAMES[static_cast<int>(Attr::Count)] = {
         "type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active", "priority", "description", "tags",
-        "dataspace", "unit", "ramp/drive", "ramp/function", "ramp/function/parameters", "ramp/status", "value"};
+        "dataspace", "unit", "ramp/drive", "ramp/function", "ramp/function/parameters", "ramp/status", "value", "service"};
 
-    /** @param text A symbol atom. @return Its text, or an empty string for a non-symbol. */
+    /** @param a An atom. @return Its text. */
     static std::string text_of(const jamoma::Atom& a) { return a.is_symbol() ? a.as_symbol() : a.to_string(); }
 
     /** @param v A value. @return Its first atom as a string, or an empty string. */
@@ -255,7 +259,8 @@ private:
         case Attr::RampFunction: return {data_.ramp_function()};
         case Attr::RampFunctionParameters: return jamoma::Value{};
         case Attr::RampStatus: return {static_cast<std::int64_t>(data_.ramp_running() ? 1 : 0)};
-        case Attr::Value: return data_.value();
+        case Attr::Value: return data_.initialized() ? data_.value() : jamoma::Value{}; // nothing until initialised, as the old object
+        case Attr::Service: return {std::string(S == jamoma::Service::Parameter ? "parameter" : S == jamoma::Service::Message ? "message" : "return")};
         case Attr::Count: break;
         }
         return jamoma::Value{};
@@ -297,6 +302,7 @@ private:
         case Attr::Value: data_.command(v); break;
         case Attr::RampFunctionParameters:
         case Attr::RampStatus:
+        case Attr::Service:
         case Attr::Count: break; // read only
         }
     }

@@ -124,7 +124,7 @@ public:
     void set_ramp_drive(std::string drive);
     /** @return The ramp drive name. */
     std::string ramp_drive() const;
-    /** @brief Sets the ramp function; only linear exists, any other name behaves as linear. @param function The function name. */
+    /** @brief Sets the ramp function; only linear exists, none (the default) and any other name behave as linear. @param function The function name. */
     void set_ramp_function(std::string function);
     /** @return The ramp function name. */
     std::string ramp_function() const;

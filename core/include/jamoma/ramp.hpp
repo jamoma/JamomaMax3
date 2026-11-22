@@ -56,7 +56,7 @@ public:
      * @param from The start vector; a vector shorter than `to` is padded with the target's elements (those jump at once).
      * @param to The target vector (its length is the length of every emitted vector).
      * @param duration_ms The duration in milliseconds.
-     * @param function The function name; only `linear` exists, any other name falls back to it (see function_ok()).
+     * @param function The function name; only `linear` exists. `none` (the old default) and the empty name behave as linear; any other name falls back to linear too and is reported by function_ok().
      */
     void start(const std::vector<double>& from, const std::vector<double>& to, double duration_ms, std::string_view function);
     /** @brief Stops the ramp and cancels pending ticks. */

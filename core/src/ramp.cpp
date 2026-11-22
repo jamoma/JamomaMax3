@@ -55,10 +55,10 @@ void tick(const std::shared_ptr<Ramp::State>& state, unsigned long gen)
             value = state->to;
             last = true;
         } else {
-            const double position = elapsed / state->duration;
             value.resize(state->to.size());
             for (std::size_t i = 0; i < value.size(); ++i) {
-                value[i] = state->from[i] + (state->to[i] - state->from[i]) * position;
+                // Multiply before dividing: (to - from) * elapsed is exact for whole numbers, so integer ramps do not truncate to a neighbour.
+                value[i] = state->from[i] + ((state->to[i] - state->from[i]) * elapsed) / state->duration;
             }
         }
     }
@@ -113,7 +113,7 @@ void Ramp::start(const std::vector<double>& from, const std::vector<double>& to,
     bool immediate = false;
     {
         std::lock_guard<std::mutex> lock(s.mutex);
-        s.function_ok = (function == "linear");
+        s.function_ok = (function == "linear" || function == "none" || function.empty());
         s.to = to;
         s.from = from;
         s.from.resize(to.size());

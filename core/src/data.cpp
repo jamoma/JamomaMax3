@@ -78,7 +78,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     Clock* clock = nullptr;                /**< The clock that drives ramps, or null. */
     std::string ramp_drive = "none";       /**< The ramp drive: none, max or system. */
     bool ramp_drive_explicit = false;      /**< Whether the drive was set by the user. */
-    std::string ramp_function = "linear";  /**< The ramp function name. */
+    std::string ramp_function = "none";    /**< The ramp function name (the old default, which behaves as linear). */
     std::unique_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp. */
     std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
 
