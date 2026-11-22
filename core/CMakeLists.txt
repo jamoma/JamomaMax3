@@ -14,6 +14,7 @@ add_library(jamoma_core SHARED
     src/dataspace.cpp
     src/ramp.cpp
     src/model.cpp
+    src/preset.cpp
     src/receiver.cpp
     src/sender.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
@@ -45,6 +46,7 @@ add_executable(jamoma_core_tests
     tests/dataspace_test.cpp
     tests/ramp_test.cpp
     tests/model_test.cpp
+    tests/preset_test.cpp
     tests/receiver_test.cpp
     tests/sender_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
