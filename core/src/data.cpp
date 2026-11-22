@@ -83,6 +83,32 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     std::shared_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp (shared so a command that starts a ramp keeps it alive). */
     std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
 
+    /** One observer of an attribute. */
+    struct Observer {
+        unsigned id;                                  /**< Identifies the observer for removal. */
+        std::string attribute;                        /**< The watched attribute. */
+        std::function<void(const Value&)> callback;   /**< What to call. */
+    };
+    std::vector<Observer> observers;       /**< The observers (guarded by the mutex). */
+    unsigned next_observer = 1;            /**< The id of the next observer. */
+
+    /** Tells the observers of an attribute about its new value; call with no lock held. @param name The attribute. @param v Its new value. */
+    void notify(std::string_view name, const Value& v)
+    {
+        std::vector<std::function<void(const Value&)>> calls;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for (const Observer& o : observers) {
+                if (o.attribute == name) {
+                    calls.push_back(o.callback);
+                }
+            }
+        }
+        for (const auto& call : calls) {
+            call(v);
+        }
+    }
+
     /** A ramp to start once the command has been processed and its lock and guard released. */
     struct RampPlan {
         std::vector<double> from;          /**< The start vector, in the ramp's unit. */
@@ -276,6 +302,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
         if (callback) {
             callback(out);
         }
+        notify("value", out);
     }
 
     /**
@@ -689,9 +716,34 @@ bool Data::set_attribute(std::string_view name, const Value& v)
         set_unit(text == "none" ? std::string() : text);
     } else if (name == "ramp/drive") set_ramp_drive(first_text(v));
     else if (name == "ramp/function") set_ramp_function(first_text(v));
-    else if (name == "value") command(v);
-    else return false; // ramp/status, service, ramp/function/parameters: read only
+    else if (name == "value") {
+        command(v); // notifies the observers of `value` itself
+        return true;
+    } else return false; // ramp/status, service, ramp/function/parameters: read only
+    impl_->notify(name, *get_attribute(name));
     return true;
+}
+
+std::shared_ptr<void> Data::observe(std::string_view attribute, std::function<void(const Value&)> callback)
+{
+    if (!has_attribute(attribute)) {
+        return nullptr;
+    }
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(impl_->mutex);
+        id = impl_->next_observer++;
+        impl_->observers.push_back({id, std::string(attribute), std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<Impl> weak = impl_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto impl = weak.lock()) {
+            std::lock_guard<std::mutex> lock(impl->mutex);
+            auto& list = impl->observers;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const Impl::Observer& o) { return o.id == id; }), list.end());
+        }
+    });
 }
 
 void Data::command(const Value& input)
@@ -723,8 +775,11 @@ void Data::command(const Value& input)
                 ramp = s.ensure_ramp();
             }
         }
-        if (emit && callback) {
-            callback(out);
+        if (emit) {
+            if (callback) {
+                callback(out);
+            }
+            s.notify("value", out);
         }
     } // the guard is released here, so the ramp's first value can pass through it
     if (plan && ramp) {

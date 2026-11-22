@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -134,8 +135,21 @@ public:
      */
     Subscription subscribe(const Address& address, Object& object);
     /**
+     * @brief Watches objects appearing and going at the addresses a pattern matches.
+     *
+     * The callback runs on the thread that subscribes or unsubscribes, after the namespace's lock is released (so it may subscribe, look up
+     * or drop its own handle). It gets the address of the node and, when an object appeared (a new node, or an object attached to a node that
+     * had none), the object and `true`; when the object went, null and `false`. The pattern follows find(): a name of `*` matches any name (and any instance, unless the pattern gives one) and an instance of `*` matches any
+     * instance (including none); directory and attribute are ignored.
+     * @param pattern The address pattern.
+     * @param callback The function to call.
+     * @return A handle that unregisters the observer when dropped; it may outlive the namespace.
+     */
+    std::shared_ptr<void> observe(const Address& pattern, std::function<void(const Address& address, Object* object, bool created)> callback);
+
+    /**
      * @brief Finds nodes by a pattern.
-     * @param pattern An address whose segment instances may be `*` (any instance, including none).
+     * @param pattern An address whose segments may use `*`: as a name it matches any name (and any instance unless one is given), as an instance any instance (including none).
      * @return The matching nodes.
      */
     std::vector<Node*> find(const Address& pattern) const;

@@ -955,3 +955,83 @@ TEST_CASE("unknown attribute is reported")
     REQUIRE_FALSE(d.get_attribute("nonsense").has_value());
     REQUIRE_FALSE(d.set_attribute("nonsense", Value{i(1)}));
 }
+
+/** An observer of `value` hears every output, including every tick of a ramp, ending on the exact target. */
+TEST_CASE("data observer hears value and ramp ticks")
+{
+    ManualClock clock;
+    Data d;
+    d.set_type(DataType::Decimal);
+    d.set_ramp_drive("max");
+    d.set_clock(&clock);
+    std::vector<Value> outputs;
+    d.set_output([&outputs](const Value& v) { outputs.push_back(v); });
+    std::vector<Value> heard;
+    const auto handle = d.observe("value", [&heard](const Value& v) { heard.push_back(v); });
+    REQUIRE(handle != nullptr);
+    d.command(Value{f(100.0), Atom("ramp"), i(100)});
+    clock.advance(1000.0);
+    REQUIRE(heard.size() >= 3);
+    REQUIRE(heard == outputs);
+    REQUIRE(heard.back() == Value{f(100.0)});
+}
+
+/** Other attributes notify when they are set by name. */
+TEST_CASE("data observer hears other attributes")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    std::vector<Value> ranges;
+    std::vector<Value> units;
+    std::vector<Value> actives;
+    const auto r = d.observe("range", [&ranges](const Value& v) { ranges.push_back(v); });
+    const auto u = d.observe("unit", [&units](const Value& v) { units.push_back(v); });
+    const auto a = d.observe("active", [&actives](const Value& v) { actives.push_back(v); });
+    d.set_attribute("range", Value{f(0.0), f(5.0)});
+    d.set_attribute("dataspace", Value{Atom("gain")});
+    d.set_attribute("unit", Value{Atom("db")});
+    d.set_attribute("active", Value{i(0)});
+    REQUIRE(ranges == std::vector<Value>{Value{f(0.0), f(5.0)}});
+    REQUIRE(units == std::vector<Value>{Value{Atom("db")}});
+    REQUIRE(actives == std::vector<Value>{Value{i(0)}});
+}
+
+/** Dropping the handle unregisters; a handle may outlive its data object; an unknown attribute gives an empty handle. */
+TEST_CASE("observer handle unregisters and survives data")
+{
+    int calls = 0;
+    std::shared_ptr<void> survivor;
+    {
+        Data d;
+        d.set_type(DataType::Decimal);
+        {
+            const auto handle = d.observe("value", [&calls](const Value&) { ++calls; });
+            d.command(Value{f(0.5)});
+            REQUIRE(calls == 1);
+        }
+        d.command(Value{f(0.75)});
+        REQUIRE(calls == 1);
+        survivor = d.observe("value", [&calls](const Value&) { ++calls; });
+        REQUIRE(d.observe("nonsense", [](const Value&) {}) == nullptr);
+    }
+    survivor.reset();
+    REQUIRE(calls == 1);
+}
+
+/** An observer may drop its own handle and send a command from inside its callback. */
+TEST_CASE("data observer may unregister and command in its callback")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    int calls = 0;
+    std::shared_ptr<void> handle;
+    handle = d.observe("value", [&](const Value&) {
+        ++calls;
+        handle.reset();
+        d.set_attribute("priority", Value{i(3)});
+    });
+    d.command(Value{f(0.5)});
+    d.command(Value{f(0.6)});
+    REQUIRE(calls == 1);
+    REQUIRE(d.priority() == 3);
+}

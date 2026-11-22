@@ -19,7 +19,63 @@ struct NamespaceState {
     NamespaceState() : root(new Node(this, nullptr, std::string(), std::string())) {}
     mutable std::shared_mutex mutex; /**< Unique for changes, shared for reads. */
     std::unique_ptr<Node> root;      /**< The root node. */
+
+    /** One observer of appearing and disappearing objects. */
+    struct Observer {
+        unsigned id;                                                                       /**< Identifies the observer for removal. */
+        Address pattern;                                                                   /**< The addresses it watches. */
+        std::function<void(const Address&, Object*, bool)> callback;                       /**< What to call. */
+    };
+    std::mutex observer_mutex;       /**< Guards the observers (never held while a callback runs). */
+    std::vector<Observer> observers; /**< The observers. */
+    unsigned next_observer = 1;      /**< The id of the next observer. */
+
+    /** Tells the matching observers; call with the namespace lock released. @param address The node. @param object The object or null. @param created Appeared or went. */
+    void notify(const Address& address, Object* object, bool created);
 };
+
+namespace {
+
+/** @return Whether a pattern segment matches a name and instance: a name of `*` matches any name (and any instance unless the pattern gives one), an instance of `*` any instance. */
+bool segment_matches(const Segment& pattern, const std::string& name, const std::string& instance)
+{
+    const bool any_name = pattern.name == "*";
+    return (any_name || pattern.name == name) && (pattern.instance == "*" || pattern.instance == instance || (any_name && pattern.instance.empty()));
+}
+
+/** @return Whether a concrete address is matched by a pattern (same depth, see segment_matches). */
+bool pattern_matches(const Address& pattern, const Address& address)
+{
+    const auto& p = pattern.path();
+    const auto& a = address.path();
+    if (p.size() != a.size() || p.empty()) {
+        return false;
+    }
+    for (std::size_t i = 0; i < p.size(); ++i) {
+        if (!segment_matches(p[i], a[i].name, a[i].instance)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+} // namespace
+
+void NamespaceState::notify(const Address& address, Object* object, bool created)
+{
+    std::vector<std::function<void(const Address&, Object*, bool)>> calls;
+    {
+        std::lock_guard<std::mutex> lock(observer_mutex);
+        for (const Observer& o : observers) {
+            if (pattern_matches(o.pattern, address)) {
+                calls.push_back(o.callback);
+            }
+        }
+    }
+    for (const auto& call : calls) {
+        call(address, object, created);
+    }
+}
 
 namespace {
 
@@ -129,8 +185,11 @@ void Subscription::release() noexcept
         return;
     }
     if (auto state = state_.lock()) {
+        bool removed = false;
+        {
         std::unique_lock lock(state->mutex);
         if (node_->object_ == object_) {
+            removed = true;
             node_->object_ = nullptr;
             Node* n = node_;
             while (n != state->root.get() && n->kids_.empty() && n->object_ == nullptr) {
@@ -139,6 +198,10 @@ void Subscription::release() noexcept
                 siblings.erase(std::find_if(siblings.begin(), siblings.end(), [n](const std::unique_ptr<Node>& k) { return k.get() == n; }));
                 n = parent;
             }
+        }
+        }
+        if (removed) {
+            state->notify(address_, nullptr, false);
         }
     }
     node_ = nullptr;
@@ -210,7 +273,29 @@ Subscription Namespace::subscribe(const Address& address, Object& object)
         }
         text = part + text;
     }
-    return Subscription(state_, node, &object, created_instance, Address::parse(text));
+    Subscription result(state_, node, &object, created_instance, Address::parse(text));
+    lock.unlock();
+    state_->notify(result.address(), &object, true);
+    return result;
+}
+
+std::shared_ptr<void> Namespace::observe(const Address& pattern, std::function<void(const Address&, Object*, bool)> callback)
+{
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(state_->observer_mutex);
+        id = state_->next_observer++;
+        state_->observers.push_back({id, pattern, std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<NamespaceState> weak = state_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto state = weak.lock()) {
+            std::lock_guard<std::mutex> lock(state->observer_mutex);
+            auto& list = state->observers;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const NamespaceState::Observer& o) { return o.id == id; }), list.end());
+        }
+    });
 }
 
 std::vector<Node*> Namespace::find(const Address& pattern) const
@@ -221,7 +306,7 @@ std::vector<Node*> Namespace::find(const Address& pattern) const
         std::vector<Node*> next;
         for (Node* parent : level) {
             for (const auto& kid : parent->kids_) {
-                if (kid->name() == segment.name && (segment.instance == "*" || kid->instance() == segment.instance)) {
+                if (segment_matches(segment, kid->name(), kid->instance())) {
                     next.push_back(kid.get());
                 }
             }
