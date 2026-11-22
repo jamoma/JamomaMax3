@@ -19,7 +19,10 @@ using namespace c74::min;
 
 /** The j.init external. */
 class j_init : public c74::min::object<j_init> {
-public:
+public:public:
+    /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
+    const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
+
     /** Creates the object and schedules the binding to the model (once the patcher has loaded). @param args Unused. */
     explicit j_init(const atoms& args = {})
     {

@@ -18,7 +18,10 @@
 
 /** The class Min registers so that Max accepts the bundle as an external named j.loader. */
 class j_loader : public c74::min::object<j_loader> {
-public:
+public:public:
+    /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
+    const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
+
     /**
      * Called once when Max sets the class up at launch: attaches to the registry, or reports an
      * ABI mismatch between this loader and the installed core library and attaches nothing.

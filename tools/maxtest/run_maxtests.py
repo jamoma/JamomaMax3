@@ -154,6 +154,14 @@ def clear_recovery() -> None:
         f.unlink()
 
 
+def progress_bar(done: int, total: int, width: int = 30) -> str:
+    """A text progress bar such as '[=====>        ]  12/82' for done of total tests."""
+    total = max(total, 1)
+    filled = min(width, width * done // total)
+    head = ">" if filled < width else "="
+    return "[" + "=" * max(filled - 1, 0) + (head if filled else "") + " " * (width - filled) + f"] {done:>3}/{total}"
+
+
 def read_set(path) -> list:
     """Reads the test list: one path per line, skipping blank lines and # comments."""
     lines = [l.strip() for l in pathlib.Path(path).read_text(encoding="utf-8").splitlines()]
@@ -251,7 +259,7 @@ def main() -> int:
                 results, crashed = run_batch(batch, work, args.timeout)
                 for name, (status, detail) in results.items():
                     rows.append((names[name], status, detail))
-                    print(f"{status:8} {names[name]}  {detail}", flush=True)
+                    print(f"{progress_bar(len(rows), len(ordered))} {status:8} {names[name]}  {detail}", flush=True)
                 crashes = crashes + 1 if crashed else 0
                 if should_abort(crashes):
                     print("ABORT: Max disappeared in two batches in a row; not launching it again. Check the crash reports.", file=sys.stderr)

@@ -8,8 +8,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
 #include <memory>
+#include <thread>
 #include <utility>
+#include <vector>
 
 #include "jamoma/namespace.hpp"
 
@@ -254,4 +257,34 @@ TEST_CASE("subscribe ignores directory and attribute")
     Subscription s = ns.subscribe(Address::parse("app:/m/p:range"), a);
     REQUIRE(s.address().str() == "/m/p");
     REQUIRE(ns.lookup(Address::parse("/m/p"))->object() == &a);
+}
+
+/**
+ * One thread subscribes and unsubscribes (the structure changes on one thread only) while two others look nodes up and search
+ * with a pattern. Meant to be run under the thread sanitizer (nothing should be reported); the checks keep it honest otherwise.
+ */
+TEST_CASE("concurrent use is race free")
+{
+    Namespace ns;
+    std::atomic<bool> stop{false};
+    std::atomic<long> searches{0};
+    auto reader = [&ns, &stop, &searches] {
+        while (!stop.load()) {
+            ns.lookup(Address::parse("/m/a"));
+            searches += static_cast<long>(ns.find(Address::parse("/m/*")).size() >= 0);
+        }
+    };
+    std::thread first(reader);
+    std::thread second(reader);
+    std::vector<std::unique_ptr<Probe>> objects;
+    for (int i = 0; i < 2000; ++i) {
+        objects.push_back(std::make_unique<Probe>());
+        Subscription s = ns.subscribe(Address::parse(i % 2 == 0 ? "/m/a" : "/m/b"), *objects.back());
+        REQUIRE(s.node() != nullptr);
+    }
+    stop = true;
+    first.join();
+    second.join();
+    REQUIRE(searches.load() > 0);
+    REQUIRE(ns.lookup(Address::parse("/m/a")) == nullptr); // every subscription was released again
 }

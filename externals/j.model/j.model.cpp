@@ -24,7 +24,17 @@ using namespace c74::min;
 
 /** The j.model external. */
 class j_model : public c74::min::object<j_model> {
+    // These come before the attributes: Min constructs the attributes in declaration order and calls each setter with its
+    // default, and the setters use model_ (the same trap as in data_object, which crashed Max once).
+    std::string name_;                         /**< The name of the model. */
+    const void* patcher_ = nullptr;            /**< The patcher the model governs. */
+    std::unique_ptr<jamoma::Model> model_;     /**< The model. */
+    jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
+
 public:
+    /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
+    const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
+
     /**
      * Creates the object.
      * @param args The creation atoms: an optional name, then attributes.
@@ -121,10 +131,6 @@ private:
         return text;
     }
 
-    std::string name_;                         /**< The name of the model. */
-    const void* patcher_ = nullptr;            /**< The patcher the model governs. */
-    std::unique_ptr<jamoma::Model> model_;     /**< The model. */
-    jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
 };
 
 MIN_EXTERNAL(j_model);

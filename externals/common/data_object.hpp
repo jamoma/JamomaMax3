@@ -43,6 +43,8 @@ class data_object : public c74::min::object<Derived> {
     Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
 
 public:
+    /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
+    const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
     /**
      * Creates the object.
      * @param args The creation arguments: the first is the name (the relative address); attributes are applied by Max afterwards.

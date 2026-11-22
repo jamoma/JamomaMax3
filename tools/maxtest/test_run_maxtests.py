@@ -124,5 +124,12 @@ class NameTests(unittest.TestCase):
             rm.test_name("Jamoma/help/j.send.maxhelp")
 
 
+class ProgressBarTests(unittest.TestCase):
+    def test_bar_shows_fraction_and_counts(self):
+        self.assertEqual(rm.progress_bar(0, 4, 8), "[        ]   0/4")
+        self.assertEqual(rm.progress_bar(2, 4, 8), "[===>    ]   2/4")
+        self.assertEqual(rm.progress_bar(4, 4, 8), "[========]   4/4")
+
+
 if __name__ == "__main__":
     unittest.main()

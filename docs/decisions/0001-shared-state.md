@@ -52,3 +52,9 @@ The Windows build uses the static C runtime (`/MT`, `MAXAPI_USE_MSCRT`) like the
 3. **ABI entry points are frozen.** `jamoma::abi_version()`, `Registry::check_abi()` and `Registry::try_attach_loader()` are never removed or changed; every external calls the check first in its setup. A symbol the installed library lacks is rejected by the dynamic loader before any Jamoma code runs (a generic dyld or Windows error 127, not the Jamoma ABI message), so the clean refusal only covers "same symbols, different layout or semantics". Giving `jamoma_core` a compatibility version equal to the ABI so older libraries are rejected too is open.
 4. **Warn once per process.** An external that starts without the loader logs the warning only if `Registry::claim_missing_loader_warning()` returns true.
 5. **Duplicate installs.** Two copies of the package in one Max process (for example the Packages folder plus a search path) could load two libraries and split state silently. Optional hardening: publish the registry's address through a process-wide anchor on first `instance()` and report an error if a second copy finds one set.
+
+## Milestone 1 addendum
+
+- The patcher-to-model map (`ContextMap`) lives in the registry with the namespace, so `j.model` and the data objects, which are separate binaries, share it.
+- Sanitizer builds of the core must set `JAMOMA_PACKAGE_DIR` to their own folder: the core library is written to `package/Jamoma/support`, and a ThreadSanitizer build there breaks every external Max loads (found when it did).
+- The quit-with-live-objects check relies on the leaked registry above.
