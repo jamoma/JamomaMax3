@@ -195,3 +195,21 @@ TEST_CASE("garbage does not throw")
     REQUIRE_NOTHROW(jamoma::read_presets_xml("<<<>>>&&&\"\"<!-- <jamoma"));
     REQUIRE_NOTHROW(jamoma::read_presets_text(std::string("\0\xff\xfe - preset \"", 14)));
 }
+
+/** A text file of about ten megabytes is read whole, without a problem and in bounded time (the sanitizer builds are the ones that can fail this). */
+TEST_CASE("ten megabyte text file is read")
+{
+    std::string text = "- preset \"huge\"\n";
+    int n = 0;
+    while (text.size() < 10u * 1024u * 1024u) {
+        text += "parameter" + std::to_string(n) + " " + std::to_string(n) + " 0.25 symbol\n";
+        ++n;
+    }
+    const auto start = std::chrono::steady_clock::now();
+    const ReadResult r = jamoma::read_presets_text(text);
+    const auto seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
+    REQUIRE(r.problems.empty());
+    REQUIRE(r.presets.size() == 1);
+    REQUIRE(r.presets[0].entries.size() == static_cast<std::size_t>(n));
+    REQUIRE(seconds < 120.0);
+}

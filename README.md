@@ -50,3 +50,10 @@ Added: `j.send`, `j.receive`, `j.unit`, and the data `j.in` / `j.out`; the core 
 `Sender`. Differences from the old objects are in `docs/changes.md`; results in `docs/conformance/m2-results.md`.
 The test runner has a quick mode for development, `python3 tools/maxtest/run_maxtests.py --list <list> --out build/x --fast 10` (batches; every test that did not pass is run again alone), and prints a progress bar. Acceptance runs use one test
 per Max launch (`scripts/run-maxtests.sh`).
+
+## Status: milestone 3 (views, presets and the panel)
+
+Added: `j.view`, `j.remote`, `j.ui` (a drawn panel), `j.node`, and the presets of `j.model` (`preset`, `preset:new`, `preset:interpolate`, `preset:read`, `preset:write` and the others; the old text file format, and the XML format in the core).
+Models that appear later, are replaced or go are now followed by `j.send`, `j.receive`, `j.remote` and the data objects, and models nest. The old `qmetro` model, view and module load and work
+(`package/Jamoma/patchers/models/data/qmetro`). The core gained `PresetManager`, `Remote`, `ModelExplorer` and the preset file readers and writers. Differences from the old objects are in `docs/changes.md`;
+results, and what still has to be run on Windows and looked at by eye, are in `docs/conformance/m3-results.md`.

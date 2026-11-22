@@ -1,16 +1,16 @@
 # Conformance coverage baseline
 
-Patchers read: 95; implemented objects: 13
+Patchers read: 95; implemented objects: 17
 
 ## Objects used by the pass-bar set (patchers that use each)
 
 - `j.parameter`: 90 (implemented)
 - `j.savebang`: 16 (implemented)
 - `j.model`: 11 (implemented)
-- `j.remote`: 8 (missing)
+- `j.remote`: 8 (implemented)
 - `j.unit`: 8 (implemented)
 - `j.receive`: 5 (implemented)
-- `j.view`: 5 (missing)
+- `j.view`: 5 (implemented)
 - `j.return`: 4 (implemented)
 - `j.map`: 3 (missing)
 - `j.message`: 3 (implemented)
@@ -19,29 +19,29 @@ Patchers read: 95; implemented objects: 13
 - `j.namespace`: 2 (missing)
 - `j.out`: 2 (implemented)
 - `j.out~`: 2 (missing)
-- `j.ui`: 2 (missing)
+- `j.ui`: 2 (implemented)
 - `j.cue`: 1 (missing)
 - `j.in`: 1 (implemented)
 - `j.in~`: 1 (missing)
 - `j.limiter~`: 1 (missing)
-- `j.node`: 1 (missing)
+- `j.node`: 1 (implemented)
 - `j.textslider`: 1 (missing)
 
 ## Per patcher
 
-- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`, `j.remote`
-- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.namespace`, `j.remote`, `j.textslider`
-- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.namespace`, `j.node`, `j.remote`
-- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: `j.view`
-- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`, `j.remote`
-- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: `j.view`
-- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in~`, `j.out~`, `j.remote`, `j.ui`, `j.view`
-- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: `j.remote`, `j.view`
+- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`
+- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.namespace`, `j.textslider`
+- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.namespace`
+- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: none
+- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`
+- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: none
+- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in~`, `j.out~`
+- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.model.maxhelp`: 1 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.model.maxpat`: 5 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.module.maxpat`: 0 objects, missing: none
-- `Jamoma/patchers/models/data/qmetro/qmetro.view.maxpat`: 3 objects, missing: `j.remote`, `j.ui`, `j.view`
-- `JamomaIntegrationTests/patchers/tests/Modular/j.model/audio_gain/model_audio_gain_maxtest.maxpat`: 4 objects, missing: `j.out~`, `j.remote`
+- `Jamoma/patchers/models/data/qmetro/qmetro.view.maxpat`: 3 objects, missing: none
+- `JamomaIntegrationTests/patchers/tests/Modular/j.model/audio_gain/model_audio_gain_maxtest.maxpat`: 4 objects, missing: `j.out~`
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_both.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_fold.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_high.maxtest.maxpat`: 1 objects, missing: none

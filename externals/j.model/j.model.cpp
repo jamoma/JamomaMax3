@@ -23,6 +23,7 @@
 
 #include "c74_min.h"
 
+#include "jamoma/data.hpp"
 #include "jamoma/model.hpp"
 #include "jamoma/preset_files.hpp"
 #include "jamoma/registry.hpp"
@@ -36,7 +37,10 @@ class j_model : public c74::min::object<j_model> {
     // default, and the setters use model_ (the same trap as in data_object, which crashed Max once).
     std::string name_;                         /**< The name of the model. */
     const void* patcher_ = nullptr;            /**< The patcher the model governs. */
+    jamoma::Data active_data_{jamoma::Service::Parameter}; /**< The parameter `data/active` of the `data` amenity (declared before the model and its subscription, which go first). */
     std::unique_ptr<jamoma::Model> model_;     /**< The model. */
+    jamoma::Subscription active_sub_;          /**< The registration of `data/active` below the model. */
+    std::string amenities_text_ = "all";       /**< The amenities as set (the `data` amenity provides `data/active`). */
     std::string last_file_;                    /**< The presets file used last. */
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
@@ -95,7 +99,13 @@ public:
     attribute<symbol> presets{this, "presets", ""};
 
     /** The amenities the model provides (accepted so that patchers that set it load; it has no effect yet). */
-    attribute<symbol> amenities{this, "amenities", "all"};
+    attribute<symbol> amenities{this, "amenities", "all", setter{MIN_FUNCTION {
+        amenities_text_ = std::string(static_cast<symbol>(args[0]).c_str());
+        if (model_) {
+            make_amenities();
+        }
+        return args;
+    }}};
 
     inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
     outlet<> results_out{this, "(anything) results (presets, later milestone)"}; /**< Outlet 0 (unused so far). */
@@ -450,6 +460,21 @@ private:
         model_->presets().recall("default");
     }
 
+    /** Provides what the amenities promise: the `data` (or `all`) amenity gives the parameter `data/active` (1 = the model is on; presets store it). */
+    void make_amenities()
+    {
+        active_sub_ = jamoma::Subscription();
+        const bool data = amenities_text_.find("all") != std::string::npos || amenities_text_.find("data") != std::string::npos;
+        if (!data || !model_) {
+            return;
+        }
+        active_data_.set_type(jamoma::DataType::Integer);
+        active_data_.set_attribute("range", {0, 1});
+        active_data_.set_attribute("default", {1});
+        active_data_.set_attribute("description", {"Activates or deactivates the model"});
+        active_sub_ = jamoma::Registry::instance().names().subscribe(model_->address().append(jamoma::Address::parse("data/active")), active_data_);
+    }
+
     /** @return The address the model belongs at: below the model of the nearest enclosing patcher, else at the root. */
     std::string wanted_prefix() const
     {
@@ -482,6 +507,7 @@ private:
             kept = model_->presets().presets();
         }
         if (model_) {
+            active_sub_ = jamoma::Subscription();
             jamoma::Registry::instance().contexts().remove(patcher_, model_.get());
             model_.reset();
         }
@@ -492,6 +518,7 @@ private:
         if (!kept.empty()) {
             model_->presets().replace_all(std::move(kept));
         }
+        make_amenities();
         jamoma::Registry::instance().contexts().add(patcher_, model_.get());
         placing_ = false;
     }

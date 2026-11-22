@@ -42,7 +42,8 @@ public:
         }
         if (!args.empty() && args[0].type() == message_type::symbol_argument) {
             const std::string first = static_cast<symbol>(args[0]).c_str();
-            if (!first.empty() && first[0] != '@') {
+            // `j.model` is what the old qmetro view writes where it means "the model of this class": no argument
+            if (!first.empty() && first[0] != '@' && first != "j.model") {
                 argument_ = first;
             }
         }
