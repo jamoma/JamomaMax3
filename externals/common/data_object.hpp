@@ -163,6 +163,14 @@ public:
         return {};
     }};
 
+    /** Answers `<attribute> <value>` on the dump outlet for every attribute, in table order. */
+    c74::min::message<> dump{this, "dump", MIN_FUNCTION {
+        for (int i = 0; i < static_cast<int>(Attr::Count); ++i) {
+            dump_attribute(static_cast<Attr>(i));
+        }
+        return {};
+    }};
+
     /** Sends the default value through the object (the model's init does this for every data object). */
     c74::min::message<> init{this, "init", MIN_FUNCTION {
         data_.init();
@@ -410,6 +418,9 @@ private:
         if (model != nullptr) {
             prefix_ = model->address().str();
             subscribe(name_);
+        } else if (S == jamoma::Service::Parameter && !data_.initialized()) {
+            // As the old object: a parameter that ends up at the root (no model to initialise it) initialises itself.
+            data_.init();
         }
     }
 
