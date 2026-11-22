@@ -7,3 +7,7 @@ tests/max/patchers/standalone_init.maxtest.maxpat
 tests/max/patchers/dump.maxtest.maxpat
 tests/max/patchers/receive_basic.maxtest.maxpat
 tests/max/patchers/receive_relative.maxtest.maxpat
+tests/max/patchers/send_basic.maxtest.maxpat
+tests/max/patchers/send_attribute.maxtest.maxpat
+tests/max/patchers/send_relative.maxtest.maxpat
+tests/max/patchers/receive_feedback.maxtest.maxpat

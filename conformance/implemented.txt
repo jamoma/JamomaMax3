@@ -7,3 +7,4 @@ j.init
 j.savebang
 j.pass
 j.receive
+j.send

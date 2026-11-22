@@ -239,6 +239,24 @@
    },
    {
     "box": {
+     "id": "d3",
+     "maxclass": "newobj",
+     "text": "delay 2000",
+     "numinlets": 2,
+     "numoutlets": 1,
+     "outlettype": [
+      ""
+     ],
+     "patching_rect": [
+      20.0,
+      170.0,
+      200.0,
+      22.0
+     ]
+    }
+   },
+   {
+    "box": {
      "id": "term",
      "maxclass": "newobj",
      "text": "test.terminate",
@@ -248,7 +266,7 @@
       ""
      ],
      "patching_rect": [
-      20.0,
+      250.0,
       170.0,
       200.0,
       22.0
@@ -380,7 +398,19 @@
    {
     "patchline": {
      "source": [
-      "as",
+      "lb",
+      0
+     ],
+     "destination": [
+      "d3",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "d3",
       0
      ],
      "destination": [
