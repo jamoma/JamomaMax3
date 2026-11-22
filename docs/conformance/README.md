@@ -17,7 +17,7 @@ abstraction `test.list.equals` from the old `JamomaIntegrationTests` package.
 
    (Ninja because its pinned max-sdk-base forces a macOS 10.11 target that Xcode rejects; the policy option because its
    CMake files predate CMake 3.5.)
-2. The old checkout is expected at `~/Developer/Jamoma/JamomaMax` (`JAMOMA_OLD` overrides it).
+2. The integration tests are in this repository (`tests/integration`, see its README); the old checkout is not needed to run them. It is still read by the inventory and migration tools and by `conformance/set.txt`.
 
 ## Running
 

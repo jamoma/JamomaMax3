@@ -1,4 +1,4 @@
-# Milestone 1 conformance tests: the old Modular integration tests for j.parameter and j.model (paths relative to the old checkout).
+# Milestone 1 conformance tests: the old Modular integration tests for j.parameter and j.model (paths relative to tests/integration, where the tests are kept).
 # Excluded: j.model/audio_gain (needs j.in~/j.out~, not in milestone 1).
 JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_both.maxtest.maxpat
 JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_fold.maxtest.maxpat

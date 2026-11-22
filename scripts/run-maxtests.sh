@@ -9,4 +9,4 @@
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LIST="${1:?list file}"; OUT="${2:?out dir}"; shift 2
-exec python3 "$ROOT/tools/maxtest/run_maxtests.py" --list "$LIST" --old "${JAMOMA_OLD:-$HOME/Developer/Jamoma/JamomaMax}" --out "$OUT" "$@"
+exec python3 "$ROOT/tools/maxtest/run_maxtests.py" --list "$LIST" --out "$OUT" "$@"

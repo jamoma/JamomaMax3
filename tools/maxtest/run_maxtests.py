@@ -3,9 +3,10 @@
 # SPDX-FileCopyrightText: 2026 Trond Lossius
 """Runs max-test patchers (the old Jamoma integration tests) in Max 9 and reports PASS/FAIL/TIMEOUT per test.
 
-    run_maxtests.py --list conformance/m1-tests.txt --old ~/Developer/Jamoma/JamomaMax --out build/maxtests
+    run_maxtests.py --list conformance/m1-tests.txt --out build/maxtests
 
-The list has one test patcher per line (paths relative to --old; blank lines and # comments are skipped).
+The list has one test patcher per line (paths relative to --tests, which defaults to tests/integration of this repository, where the old
+JamomaIntegrationTests package is kept; blank lines and # comments are skipped).
 For each batch of tests it writes a small driver patcher that sends ``;test.master run <name>.maxtest ...``
 (max-test runs them in sequence and records every assertion in an sqlite database), launches Max 9 through
 Launch Services, waits for Max's own log to say the run is complete, asks Max to quit through a UDP message
@@ -231,7 +232,8 @@ def main() -> int:
     """Command line entry point. Returns 0 if every test passed."""
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--list", required=True, type=pathlib.Path, help="the test list")
-    p.add_argument("--old", required=True, type=pathlib.Path, help="folder the list paths are relative to")
+    p.add_argument("--tests", "--old", dest="tests", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "tests/integration",
+                   help="folder that holds the JamomaIntegrationTests package; the list paths are relative to it (default: tests/integration)")
     p.add_argument("--out", required=True, type=pathlib.Path, help="folder for results.tsv")
     p.add_argument("--max-test", type=pathlib.Path, default=pathlib.Path.home() / "Developer/Jamoma/max-test")
     p.add_argument("--package", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "package/Jamoma")
@@ -255,8 +257,8 @@ def main() -> int:
     try:
         links.add("Jamoma", args.package)
         links.add("max-test", args.max_test)
-        if (args.old / "JamomaIntegrationTests").is_dir():
-            links.add("JamomaIntegrationTests", args.old / "JamomaIntegrationTests")
+        if (args.tests / "JamomaIntegrationTests").is_dir():
+            links.add("JamomaIntegrationTests", args.tests / "JamomaIntegrationTests")
         own = pathlib.Path(__file__).resolve().parents[2] / "tests/max"
         if own.is_dir():
             links.add("JamomaMax3Tests", own)
