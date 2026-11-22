@@ -116,4 +116,30 @@ inline jamoma::Model* find_model(c74::max::t_object* box)
     return nullptr;
 }
 
+/**
+ * @brief Calls a function whenever a model is registered for a patcher or removed again (anywhere), so that an object can find its model
+ *        again when it appears later, is replaced or goes.
+ *
+ * The function runs on the thread that registers the model (the main thread, for Max objects), after the registry's lock is released.
+ * It is not called for the object's own start-up: the object binds once itself and then watches.
+ */
+class ContextWatch {
+public:
+    /**
+     * Starts watching.
+     * @param changed What to do on every change (it must be safe to call while the watch exists only).
+     */
+    void start(std::function<void()> changed)
+    {
+        handle_ = jamoma::Registry::instance().contexts().observe(
+            [changed = std::move(changed)](const void*, jamoma::Model*, bool) { changed(); });
+    }
+
+    /** Stops watching (also done by the destructor). */
+    void stop() { handle_.reset(); }
+
+private:
+    std::shared_ptr<void> handle_; /**< The observer registration. */
+};
+
 } // namespace jamoma_max

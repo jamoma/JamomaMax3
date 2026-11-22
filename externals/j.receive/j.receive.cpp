@@ -27,6 +27,7 @@ class j_receive : public c74::min::object<j_receive> {
     std::string text_;                           /**< The address as written. */
     bool ready_ = false;                         /**< True once the patcher has loaded and the address may be resolved. */
     jamoma_max::Alive alive_;                    /**< Lets deferred calls see that the object is gone. */
+    jamoma_max::ContextWatch watch_;             /**< Binds again when the model of the patcher appears, is replaced or goes. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -50,11 +51,16 @@ public:
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             ready_ = true;
             rebind();
+            watch_.start([this] { rebind(); });
         });
     }
 
     /** Unbinds before the outlets are destroyed. */
-    ~j_receive() override { receiver_.reset(); }
+    ~j_receive() override
+    {
+        watch_.stop();
+        receiver_.reset();
+    }
 
     inlet<> input{this, "(anything) set the address"};                              /**< The inlet. */
     jamoma_max::dump_outlet value_out{this, "(anything) the value"};                /**< Outlet 0. */

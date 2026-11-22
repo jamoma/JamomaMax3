@@ -142,19 +142,77 @@ std::shared_ptr<void> Model::on_init_changed(std::function<void(bool)> callback)
     return handle;
 }
 
+/** The observers of a context map. */
+struct ContextMap::Observers {
+    /** One observer. */
+    struct Entry {
+        unsigned id;                                                         /**< Identifies the observer for removal. */
+        std::function<void(const void*, Model*, bool)> callback;             /**< What to call. */
+    };
+    std::mutex mutex;                 /**< Guards the entries (never held while a callback runs). */
+    std::vector<Entry> entries;       /**< The observers. */
+    unsigned next_id = 1;             /**< The id of the next observer. */
+
+    /** Tells every observer. @param patcher The patcher. @param model The model. @param added Added or removed. */
+    void notify(const void* patcher, Model* model, bool added)
+    {
+        std::vector<std::function<void(const void*, Model*, bool)>> calls;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for (const Entry& e : entries) {
+                calls.push_back(e.callback);
+            }
+        }
+        for (const auto& call : calls) {
+            call(patcher, model, added);
+        }
+    }
+};
+
+ContextMap::ContextMap() : observers_(std::make_shared<Observers>()) {}
+
 void ContextMap::add(const void* patcher, Model* model)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    entries_.emplace_back(patcher, model);
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        entries_.emplace_back(patcher, model);
+    }
+    observers_->notify(patcher, model, true);
 }
 
 void ContextMap::remove(const void* patcher, Model* model)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    const auto it = std::find(entries_.begin(), entries_.end(), std::make_pair(patcher, model));
-    if (it != entries_.end()) {
-        entries_.erase(it);
+    bool removed = false;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        const auto it = std::find(entries_.begin(), entries_.end(), std::make_pair(patcher, model));
+        if (it != entries_.end()) {
+            entries_.erase(it);
+            removed = true;
+        }
     }
+    if (removed) {
+        observers_->notify(patcher, model, false);
+    }
+}
+
+std::shared_ptr<void> ContextMap::observe(std::function<void(const void*, Model*, bool)> callback)
+{
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(observers_->mutex);
+        id = observers_->next_id++;
+        observers_->entries.push_back({id, std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<Observers> weak = observers_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto observers = weak.lock()) {
+            std::lock_guard<std::mutex> lock(observers->mutex);
+            auto& list = observers->entries;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const Observers::Entry& e) { return e.id == id; }), list.end());
+        }
+    });
 }
 
 Model* ContextMap::find(const void* patcher) const

@@ -41,6 +41,8 @@ class data_object : public c74::min::object<Derived> {
     std::string name_;                     /**< The name (relative address). */
     std::string prefix_;                   /**< The address of the model this object lives in, or empty (then it is at the root). */
     Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
+    ContextWatch watch_;                   /**< Finds the model again when it appears later, is replaced or goes. */
+    bool joined_ = false;                  /**< True once the patcher has loaded and the model has been looked for. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -81,6 +83,7 @@ public:
      */
     ~data_object() override
     {
+        watch_.stop();
         subscription_ = jamoma::Subscription();
         data_.set_output(nullptr);
         data_.set_clock(nullptr);
@@ -336,10 +339,16 @@ private:
     void join_model()
     {
         const jamoma::Model* model = find_model(this->maxobj());
-        if (model != nullptr) {
-            prefix_ = model->address().str();
+        const std::string prefix = model != nullptr ? model->address().str() : std::string();
+        if (!joined_) {
+            joined_ = true;
+            watch_.start([this] { join_model(); });
+        }
+        if (prefix != prefix_) {
+            prefix_ = prefix;
             subscribe(name_);
-        } else if (S == jamoma::Service::Parameter && !data_.initialized()) {
+        }
+        if (model == nullptr && S == jamoma::Service::Parameter && !data_.initialized()) {
             // As the old object: a parameter that ends up at the root (no model to initialise it) initialises itself.
             data_.init();
         }

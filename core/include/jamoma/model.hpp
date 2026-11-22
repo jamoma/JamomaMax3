@@ -78,16 +78,29 @@ private:
  */
 class JAMOMA_API ContextMap {
 public:
+    ContextMap();
+
     /** @brief Registers a model for a patcher (the earliest registered one wins in find()). @param patcher The patcher. @param model The model. */
     void add(const void* patcher, Model* model);
     /** @brief Removes a registration; nothing happens if it is not there. @param patcher The patcher. @param model The model. */
     void remove(const void* patcher, Model* model);
+    /**
+     * @brief Watches models being registered for patchers and removed again.
+     *
+     * The callback runs on the thread that calls add() or remove(), after the map's lock is released, so it may drop its own handle or call
+     * the map. It gets the patcher, the model and true for an add, false for a removal (a remove() that finds nothing is silent).
+     * @param callback The function to call.
+     * @return A handle that unregisters the observer when dropped; it may outlive the map.
+     */
+    std::shared_ptr<void> observe(std::function<void(const void* patcher, Model* model, bool added)> callback);
     /** @brief Finds the model of a patcher. @param patcher The patcher. @return The earliest registered model, or null. */
     Model* find(const void* patcher) const;
 
 private:
+    struct Observers;                                       /**< The observers, shared with their handles so that a handle may outlive the map. */
     mutable std::mutex mutex_;                              /**< Guards the entries. */
     std::vector<std::pair<const void*, Model*>> entries_;   /**< The registrations in order. */
+    std::shared_ptr<Observers> observers_;                  /**< The observers of add and remove. */
 };
 
 } // namespace jamoma

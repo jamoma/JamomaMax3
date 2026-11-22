@@ -28,6 +28,7 @@ class j_send : public c74::min::object<j_send> {
     std::string text_;                       /**< The address as written. */
     bool ready_ = false;                     /**< True once the patcher has loaded and the address may be resolved. */
     jamoma_max::Alive alive_;                /**< Lets deferred calls see that the object is gone. */
+    jamoma_max::ContextWatch watch_;         /**< Binds again when the model of the patcher appears, is replaced or goes. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -49,11 +50,16 @@ public:
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             ready_ = true;
             rebind();
+            watch_.start([this] { rebind(); });
         });
     }
 
     /** Nothing to release before the members go. */
-    ~j_send() override { sender_.reset(); }
+    ~j_send() override
+    {
+        watch_.stop();
+        sender_.reset();
+    }
 
     inlet<> input{this, "(anything) value or message to forward"};                  /**< The inlet. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump and the target address"}; /**< Outlet 0: the dump outlet. */

@@ -29,7 +29,10 @@ class j_model : public c74::min::object<j_model> {
     std::string name_;                         /**< The name of the model. */
     const void* patcher_ = nullptr;            /**< The patcher the model governs. */
     std::unique_ptr<jamoma::Model> model_;     /**< The model. */
+    bool placing_ = false;                     /**< True while place() runs. */
+    std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
+    jamoma_max::ContextWatch watch_;           /**< Moves the model below its parent model when that one appears later, is replaced or goes. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -51,6 +54,7 @@ public:
 
     ~j_model() override
     {
+        watch_.stop();
         if (model_) {
             jamoma::Registry::instance().contexts().remove(patcher_, model_.get());
         }
@@ -106,10 +110,7 @@ public:
         if (name_.empty()) {
             name_ = patcher_name();
         }
-        model_ = std::make_unique<jamoma::Model>(jamoma::Registry::instance().names(), jamoma::Address::parse("/" + name_));
-        model_->set_description(std::string(static_cast<symbol>(description.get()).c_str()));
-        model_->set_priority(static_cast<int>(priority.get()));
-        jamoma::Registry::instance().contexts().add(patcher_, model_.get());
+        place();
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
                 if (model_) {
@@ -117,10 +118,50 @@ public:
                 }
             });
         });
+        watch_.start([this] { place(); });
         return {};
     }};
 
 private:
+    /** @return The address the model belongs at: below the model of the nearest enclosing patcher, else at the root. */
+    std::string wanted_prefix() const
+    {
+        for (const void* p = jamoma_max::parent_patcher(patcher_); p != nullptr; p = jamoma_max::parent_patcher(p)) {
+            if (const jamoma::Model* parent = jamoma::Registry::instance().contexts().find(p)) {
+                return parent->address().str();
+            }
+        }
+        return {};
+    }
+
+    /**
+     * Creates the model, or makes it again if the model it should sit below has appeared, been replaced or gone. The data objects of
+     * the patcher find the new model through the context map's observers.
+     */
+    void place()
+    {
+        if (placing_) {
+            return; // our own add and remove call back through the watch
+        }
+        const std::string prefix = wanted_prefix();
+        if (model_ && prefix == prefix_) {
+            return;
+        }
+        placing_ = true;
+        std::string description = model_ ? model_->description() : std::string(static_cast<symbol>(this->description.get()).c_str());
+        int priority_value = model_ ? model_->priority() : static_cast<int>(this->priority.get());
+        if (model_) {
+            jamoma::Registry::instance().contexts().remove(patcher_, model_.get());
+            model_.reset();
+        }
+        prefix_ = prefix;
+        model_ = std::make_unique<jamoma::Model>(jamoma::Registry::instance().names(), jamoma::Address::parse(prefix + "/" + name_));
+        model_->set_description(description);
+        model_->set_priority(priority_value);
+        jamoma::Registry::instance().contexts().add(patcher_, model_.get());
+        placing_ = false;
+    }
+
     /** @return A name taken from the patcher's file name, without extensions, with dots replaced. */
     std::string patcher_name() const
     {

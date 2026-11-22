@@ -143,3 +143,16 @@ TEST_CASE("resolve relative against a model")
     REQUIRE(jamoma::resolve_relative(Address(), model).empty());
     REQUIRE(jamoma::resolve_relative(Address::parse("p"), Address()).str() == "/p"); // no model: from the root
 }
+
+/** `#0` is the unique id of the instance, `#1`.. the arguments; an argument that is not there is left as written. */
+TEST_CASE("substitute arguments replaces dieze arguments")
+{
+    using jamoma::substitute_arguments;
+    REQUIRE(substitute_arguments("/m#0/#1/#2", {"a"}, "7") == "/m7/a/#2");
+    REQUIRE(substitute_arguments("no dieze here", {"a"}, "7") == "no dieze here");
+    REQUIRE(substitute_arguments("#1#2", {"x", "y"}, "0") == "xy");
+    REQUIRE(substitute_arguments("#", {"x"}, "0") == "#");
+    REQUIRE(substitute_arguments("#x #", {"x"}, "0") == "#x #");
+    REQUIRE(substitute_arguments("#10", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "ten"}, "0") == "ten");
+    REQUIRE(substitute_arguments("", {}, "0").empty());
+}

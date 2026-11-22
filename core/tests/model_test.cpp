@@ -238,3 +238,46 @@ TEST_CASE("context map finds the model of a patcher")
     map.remove(&patcher_one, &b);
     REQUIRE(map.find(&patcher_one) == nullptr);
 }
+
+/** The context map tells observers when a model is registered for a patcher or removed; the handle stops it. */
+TEST_CASE("context map observer hears add and remove")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    jamoma::ContextMap map;
+    int patcher = 0;
+    std::vector<std::string> events;
+    auto handle = map.observe([&events, &patcher, &a](const void* p, Model* m, bool added) {
+        events.push_back(std::string(p == &patcher ? "patcher " : "other ") + (m == &a ? "a " : "?") + (added ? "added" : "removed"));
+    });
+    map.add(&patcher, &a);
+    map.remove(&patcher, &a);
+    map.remove(&patcher, &a); // nothing there: no event
+    REQUIRE(events == std::vector<std::string>{"patcher a added", "patcher a removed"});
+    handle.reset();
+    map.add(&patcher, &a);
+    REQUIRE(events.size() == 2);
+}
+
+/** An observer of the context map may drop its own handle, and the handle may outlive the map. */
+TEST_CASE("context map observer may unregister itself and outlive the map")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    int patcher = 0;
+    int calls = 0;
+    std::shared_ptr<void> survivor;
+    {
+        jamoma::ContextMap map;
+        std::shared_ptr<void> handle;
+        handle = map.observe([&](const void*, Model*, bool) {
+            ++calls;
+            handle.reset();
+        });
+        map.add(&patcher, &a);
+        map.add(&patcher, &a);
+        REQUIRE(calls == 1);
+        survivor = map.observe([](const void*, Model*, bool) {});
+    }
+    REQUIRE_NOTHROW(survivor.reset());
+}
