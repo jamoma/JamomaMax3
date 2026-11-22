@@ -72,6 +72,8 @@ public:
     attribute<numbers> headercolor{this, "headercolor", {0.26, 0.28, 0.32, 1.0}, title{"Header Color"}, style::color};
     /** The colour of the text. */
     attribute<numbers> textcolor{this, "textcolor", {0.92, 0.93, 0.95, 1.0}, title{"Text Color"}, style::color};
+    /** The tags of the object (accepted so that old patchers load; no effect). */
+    attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
     attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color};
 

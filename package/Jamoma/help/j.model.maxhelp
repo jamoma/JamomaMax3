@@ -1820,17 +1820,30 @@
 							},
 							{
 								"box": {
+									"color": [
+										0.952941,
+										0.564706,
+										0.098039,
+										1.0
+									],
 									"id": "obj-7",
-									"maxclass": "comment",
-									"text": "[j.remote: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 4,
+									"outlettype": [
+										"",
+										"",
+										"",
+										""
+									],
 									"patching_rect": [
 										904.0,
 										419.0,
-										220.0,
-										20.0
-									]
+										156.0,
+										22.0
+									],
+									"style": "",
+									"text": "j.remote /metronome/active"
 								}
 							},
 							{
@@ -2400,6 +2413,20 @@
 							{
 								"patchline": {
 									"destination": [
+										"obj-7",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-12",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
 										"obj-6",
 										0
 									],
@@ -2407,6 +2434,30 @@
 									"hidden": 0,
 									"source": [
 										"obj-16",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-12",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"midpoints": [
+										913.5,
+										451.0,
+										891.5,
+										451.0,
+										891.5,
+										375.5,
+										913.5,
+										375.5
+									],
+									"source": [
+										"obj-7",
 										0
 									]
 								}

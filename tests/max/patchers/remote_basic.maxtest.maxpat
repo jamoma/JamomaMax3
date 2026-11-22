@@ -60,8 +60,9 @@
      "maxclass": "newobj",
      "text": "j.remote x",
      "numinlets": 1,
-     "numoutlets": 3,
+     "numoutlets": 4,
      "outlettype": [
+      "",
       "",
       "",
       ""
@@ -630,7 +631,7 @@
     "patchline": {
      "source": [
       "rm",
-      0
+      1
      ],
      "destination": [
       "r7s",
@@ -666,7 +667,7 @@
     "patchline": {
      "source": [
       "rm",
-      0
+      1
      ],
      "destination": [
       "r9s",

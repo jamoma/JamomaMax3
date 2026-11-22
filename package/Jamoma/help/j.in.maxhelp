@@ -829,31 +829,45 @@
 							{
 								"box": {
 									"id": "obj-31",
-									"maxclass": "comment",
-									"text": "[j.remote: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 4,
+									"outlettype": [
+										"",
+										"",
+										"",
+										""
+									],
 									"patching_rect": [
 										847.0,
 										495.0,
 										233.0,
-										20.0
-									]
+										22.0
+									],
+									"style": "",
+									"text": "j.remote /jin/without_amenities/data/active"
 								}
 							},
 							{
 								"box": {
 									"id": "obj-30",
-									"maxclass": "comment",
-									"text": "[j.remote: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 4,
+									"outlettype": [
+										"",
+										"",
+										"",
+										""
+									],
 									"patching_rect": [
 										847.0,
 										613.0,
 										240.0,
-										20.0
-									]
+										22.0
+									],
+									"style": "",
+									"text": "j.remote /jin/without_amenities/data/bypass"
 								}
 							},
 							{
@@ -1514,6 +1528,82 @@
 									"hidden": 0,
 									"source": [
 										"obj-14",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-30",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-2",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-2",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"midpoints": [
+										856.5,
+										655.0,
+										840.5,
+										655.0,
+										840.5,
+										577.5,
+										856.5,
+										577.5
+									],
+									"source": [
+										"obj-30",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-4",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"midpoints": [
+										856.5,
+										537.0,
+										835.5,
+										537.0,
+										835.5,
+										461.5,
+										856.5,
+										461.5
+									],
+									"source": [
+										"obj-31",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-31",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-4",
 										0
 									]
 								}
@@ -3881,31 +3971,47 @@
 							{
 								"box": {
 									"id": "obj-31",
-									"maxclass": "comment",
-									"text": "[j.remote: not in this version yet]",
+									"linecount": 2,
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 4,
+									"outlettype": [
+										"",
+										"",
+										"",
+										""
+									],
 									"patching_rect": [
 										844.0,
 										259.0,
-										220.0,
-										20.0
-									]
+										141.0,
+										35.0
+									],
+									"style": "",
+									"text": "j.remote /jin/myModel/data/active"
 								}
 							},
 							{
 								"box": {
 									"id": "obj-30",
-									"maxclass": "comment",
-									"text": "[j.remote: not in this version yet]",
+									"linecount": 2,
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 4,
+									"outlettype": [
+										"",
+										"",
+										"",
+										""
+									],
 									"patching_rect": [
 										844.0,
 										376.0,
-										220.0,
-										20.0
-									]
+										148.0,
+										35.0
+									],
+									"style": "",
+									"text": "j.remote /jin/myModel/data/bypass"
 								}
 							},
 							{
@@ -4101,6 +4207,82 @@
 									"hidden": 0,
 									"source": [
 										"obj-14",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-30",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-2",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-31",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-3",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-2",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"midpoints": [
+										853.5,
+										418.0,
+										837.5,
+										418.0,
+										837.5,
+										340.5,
+										853.5,
+										340.5
+									],
+									"source": [
+										"obj-30",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-3",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"midpoints": [
+										853.5,
+										300.0,
+										832.5,
+										300.0,
+										832.5,
+										224.5,
+										853.5,
+										224.5
+									],
+									"source": [
+										"obj-31",
 										0
 									]
 								}

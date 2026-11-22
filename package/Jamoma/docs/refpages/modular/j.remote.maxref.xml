@@ -5,7 +5,7 @@
 		Link a UI object to a node
 	</digest>
 	<description>
-		j.remote keeps a UI object and a node (a parameter, message or return) showing the same value. What comes in is sent to the node as a command in the unit of the <at>unit</at> attribute; changes of the node come out of the left outlet as values and out of the middle outlet as <m>set</m> messages for UI objects that understand them. The node's answer to the remote's own command is not shown again, and dragging a UI object while a ramp runs stops the ramp.
+		j.remote keeps a UI object and a node (a parameter, message or return) showing the same value. What comes in is sent to the node as a command in the unit of the <at>unit</at> attribute; changes of the node come out of the left outlet as <m>set</m> messages for UI objects that understand them and out of the second outlet as values; the third outlet is reserved. The node's answer to the remote's own command is not shown again, and dragging a UI object while a ramp runs stops the ramp.
 	</description>
 	<metadatalist>
 		<metadata name="author">

@@ -5,9 +5,9 @@
  * @file j.remote.cpp
  * @brief j.remote: keeps a UI object and a node (parameter, message or return) showing the same value.
  *
- * What comes in (a number, a list, a message) is sent to the node as a command, in the unit the `unit` attribute names. Changes of the node
- * come out of the left outlet as values and out of the middle outlet as `set <value>` (connect the one the UI object understands: `set` lets
- * it show the value without sending it back). The node's answer to the remote's own command is not shown again, and a UI object that is
+ * What comes in (a number, a list, a message) is sent to the node as a command, in the unit the `unit` attribute names. The outlets are those of the
+ * old object: changes of the node come out of the left outlet as `set <value>` (a UI object shows the value without sending it back) and out of the
+ * second outlet as values; the third outlet is reserved (the old object used it to select a UI object) and the last is the dump outlet. The node's answer to the remote's own command is not shown again, and a UI object that is
  * dragged while a ramp runs stops the ramp. The message `set <value>` shows a value in the UI without sending it to the node.
  * `highlight` is accepted and has no effect.
  */
@@ -66,9 +66,10 @@ public:
     }
 
     inlet<> input{this, "(anything) value from the UI object"};                          /**< The inlet. */
-    jamoma_max::dump_outlet value_out{this, "(anything) the value of the node"};          /**< Outlet 0: the value. */
-    jamoma_max::dump_outlet set_out{this, "(set <value>) the value of the node, for a UI object"}; /**< Outlet 1: `set <value>`. */
-    jamoma_max::dump_outlet dump_out{this, "(anything) dump"};                            /**< Outlet 2: the dump outlet. */
+    jamoma_max::dump_outlet set_out{this, "(set <value>) the value of the node, for a UI object"}; /**< Outlet 0: `set <value>`. */
+    jamoma_max::dump_outlet value_out{this, "(anything) the value of the node"};          /**< Outlet 1: the value. */
+    jamoma_max::dump_outlet attach_out{this, "(anything) reserved: selects a UI object in the old object"}; /**< Outlet 2: unused, kept so that old patchers connect to the right outlets. */
+    jamoma_max::dump_outlet dump_out{this, "(anything) dump"};                            /**< Outlet 3: the dump outlet. */
 
     /** The address of the node, relative to the model or view of the patcher, or absolute. */
     attribute<symbol> address{this, "address", "", setter{MIN_FUNCTION {

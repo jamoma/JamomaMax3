@@ -17,9 +17,6 @@ namespace jamoma {
 
 namespace {
 
-/** The remote that is sending to its node on this thread (the node's synchronous answer is not shown to the UI). */
-thread_local const Remote* g_sending = nullptr;
-
 /** @param v A value. @return True if it is not empty and every atom is a number. */
 bool all_numbers(const Value& v)
 {
@@ -77,10 +74,7 @@ void Remote::from_ui(const Value& value)
     if (!unit.empty() && all_numbers(value)) {
         command.emplace_back(unit);
     }
-    const Remote* previous = g_sending;
-    g_sending = this;
     sender_.send(command);
-    g_sending = previous;
 }
 
 void Remote::set_without_echo(const Value& value)
@@ -131,9 +125,6 @@ void Remote::node_changed(const Value& value)
 {
     if (!active_ || value.empty()) {
         return;
-    }
-    if (g_sending == this) {
-        return; // the node's answer to our own command: the UI object already shows it
     }
     const Value shown = to_ui_unit(value);
     {

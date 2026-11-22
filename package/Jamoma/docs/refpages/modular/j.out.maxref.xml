@@ -180,6 +180,14 @@ When <at>
 				<attribute name="style" get="1" set="1" type="symbol" size="1" value="onoff" />
 			</attributelist>
 		</attribute>
+		<attribute name="tags" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Tags of the object
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
 	</attributelist>
 	<examplelist>
 		<example caption="" img="" />

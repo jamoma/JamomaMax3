@@ -49,15 +49,16 @@ struct Rig {
 
 } // namespace
 
-/** A value from the UI reaches the node, and the answer of the node is not shown to the UI again. */
-TEST_CASE("ui value reaches the node without echo")
+/** A value from the UI reaches the node, and the answer of the node is shown (the old j.remote test reads it). */
+TEST_CASE("ui value reaches the node and the answer is shown")
 {
     Rig r;
     r.remote.set_address(Address::parse("/m/x"));
     r.shown.clear();
     r.remote.from_ui({4.0});
     REQUIRE(r.value() == 4.0);
-    REQUIRE(r.shown.empty());
+    REQUIRE(r.shown.size() == 1);
+    REQUIRE(r.shown[0].at(0).as_double() == 4.0);
 }
 
 /** A change of the node shows in the UI's unit: a linear gain of 0.5 is about -6 dB. */
@@ -99,7 +100,7 @@ TEST_CASE("dragging wins over a running ramp")
     r.shown.clear();
     r.clock.advance(2000.0);
     REQUIRE(r.value() == 7.0);
-    REQUIRE(r.shown.empty());
+    REQUIRE(r.shown.empty()); // no tick of the stopped ramp arrives afterwards
 }
 
 /** Freeze stops what goes to the UI; the node still follows the UI. */

@@ -5,9 +5,10 @@
  * @file remote.hpp
  * @brief The remote: keeps a UI object and a node showing the same value (the core of `j.remote`).
  *
- * Rules (docs/inventory/j.remote.md): a value from the UI goes to the node as a command, in the unit the UI works in, and the answer the node
- * gives to that command is not shown to the UI again; a change of the node (a ramp tick, a preset, another UI object) is shown to the UI in the
- * UI's unit unless the remote is frozen; an inactive remote does neither; the first value after binding is shown. Any command to the node stops a
+ * Rules (docs/inventory/j.remote.md and the old j.remote test): a value from the UI goes to the node as a command, in the unit the UI works in;
+ * every change of the node, the answer to that command included (the old test reads it), is shown to the UI in the UI's unit unless the remote
+ * is frozen (the UI object takes it as `set`, which shows a value without sending it, so there is no loop; a UI object that does send
+ * is stopped by the sender's own guard against re-entering); an inactive remote does neither; the first value after binding is shown. Any command to the node stops a
  * ramp that is running, so a UI object that is dragged wins over a ramp.
  */
 

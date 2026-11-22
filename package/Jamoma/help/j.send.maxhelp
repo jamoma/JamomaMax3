@@ -2973,20 +2973,53 @@
 											{
 												"box": {
 													"id": "obj-1",
-													"maxclass": "comment",
-													"text": "[j.view: not in this version yet]",
+													"maxclass": "newobj",
 													"numinlets": 1,
-													"numoutlets": 0,
+													"numoutlets": 2,
+													"outlettype": [
+														"",
+														""
+													],
 													"patching_rect": [
 														58.0,
 														157.0,
-														220.0,
-														20.0
-													]
+														41.0,
+														22.0
+													],
+													"style": "",
+													"text": "j.view"
 												}
 											}
 										],
 										"lines": [
+											{
+												"patchline": {
+													"destination": [
+														"obj-3",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-1",
+														0
+													]
+												}
+											},
+											{
+												"patchline": {
+													"destination": [
+														"obj-1",
+														0
+													],
+													"disabled": 0,
+													"hidden": 0,
+													"source": [
+														"obj-2",
+														0
+													]
+												}
+											},
 											{
 												"patchline": {
 													"destination": [
