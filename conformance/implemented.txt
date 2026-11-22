@@ -2,3 +2,7 @@ j.loader
 j.parameter
 j.message
 j.return
+j.model
+j.init
+j.savebang
+j.pass

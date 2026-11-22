@@ -20,6 +20,7 @@
 #include "jamoma/version.hpp"
 #include "max_atoms.hpp"
 #include "max_clock.hpp"
+#include "max_context.hpp"
 
 namespace jamoma_max {
 
@@ -45,6 +46,9 @@ class data_object : public c74::min::object<Derived> {
     MaxClock clock_;                       /**< The ramp clock. */
     jamoma::Data data_{S};                 /**< The data object. */
     jamoma::Subscription subscription_;    /**< The registration in the namespace. */
+    std::string name_;                     /**< The name (relative address). */
+    std::string prefix_;                   /**< The address of the model this object lives in, or empty (then it is at the root). */
+    Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
 
 public:
     /**
@@ -68,7 +72,10 @@ public:
         }
         data_.set_clock(&clock_);
         data_.set_output([this](const jamoma::Value& v) { output_value(v); });
+        name_ = name;
         subscribe(name);
+        // Once the whole patcher exists, move under the model of the patcher (if there is one).
+        defer_call(this->maxobj(), alive_.weak(), [this] { join_model(); });
     }
 
     c74::min::inlet<> input{this, "(anything) value or message"};         /**< The inlet. */
@@ -380,8 +387,19 @@ private:
     /** Subscribes (or re-subscribes) the data object to the namespace at the root. @param name The relative address. */
     void subscribe(const std::string& name)
     {
+        name_ = name;
         subscription_ = jamoma::Subscription();
-        subscription_ = jamoma::Registry::instance().names().subscribe(jamoma::Address::parse("/" + name), data_);
+        subscription_ = jamoma::Registry::instance().names().subscribe(jamoma::Address::parse(prefix_ + "/" + name), data_);
+    }
+
+    /** Finds the model of the patcher (or of an enclosing one) and subscribes below it. */
+    void join_model()
+    {
+        const jamoma::Model* model = find_model(this->maxobj());
+        if (model != nullptr) {
+            prefix_ = model->address().str();
+            subscribe(name_);
+        }
     }
 
     /** Sends a value out of the data outlet. @param v The value. */

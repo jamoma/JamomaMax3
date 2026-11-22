@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "jamoma/export.hpp"
+#include "jamoma/model.hpp"
 #include "jamoma/namespace.hpp"
 
 namespace jamoma {
@@ -36,6 +37,9 @@ public:
 
     /** @return The process-wide namespace tree. */
     Namespace& names() noexcept { return names_; }
+
+    /** @return The map from patchers to the models in them. */
+    ContextMap& contexts() noexcept { return contexts_; }
 
     /**
      * @brief Identifies this load of the library in this process.
@@ -84,6 +88,7 @@ private:
     Registry() noexcept;
 
     Namespace names_;                        /**< The process-wide namespace tree. */
+    ContextMap contexts_;                    /**< The patcher-to-model map. */
     std::uint64_t id_;                       /**< The instance id. */
     std::atomic<bool> loader_attached_{false}; /**< Whether the start-up loader attached. */
     std::atomic<bool> missing_loader_warned_{false}; /**< Whether a caller has claimed the missing-loader warning. */
