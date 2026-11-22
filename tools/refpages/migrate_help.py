@@ -15,7 +15,28 @@ import json
 import pathlib
 import sys
 
-HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass"]
+HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out"]
+
+
+#: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.
+KNOWN_DATASPACES = {"gain", "time", "position", "temperature"}
+#: Objects from other packages that the help patchers use and that are not part of this package.
+OTHER_PACKAGE_OBJECTS = {"ambimonitor"}
+
+
+def unavailable_name(box):
+    """The name to show for a box that cannot work in this package, or '' if it can (other-package objects, unknown j.unit dataspaces)."""
+    if box.get("maxclass") in OTHER_PACKAGE_OBJECTS:
+        return box["maxclass"]
+    text = box.get("text", "") if box.get("maxclass") == "newobj" else ""
+    words = text.split()
+    if words and words[0] in OTHER_PACKAGE_OBJECTS:
+        return words[0]
+    if words and words[0] == "j.unit" and "@dataspace" in words:
+        index = words.index("@dataspace")
+        if index + 1 < len(words) and words[index + 1] not in KNOWN_DATASPACES:
+            return f"j.unit @dataspace {words[index + 1]}"
+    return ""
 
 
 def object_name(box):
@@ -50,8 +71,8 @@ def migrate_patcher(patcher, implemented, replaced):
     boxes = []
     for entry in patcher.get("boxes", []):
         box = entry["box"]
-        name = object_name(box)
-        if name and name not in implemented:
+        name = unavailable_name(box) or object_name(box)
+        if name and (name not in implemented or unavailable_name(box)):
             gone.add(box["id"])
             replaced.append(name)
             boxes.append(comment_for(box, name))

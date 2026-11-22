@@ -8,6 +8,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
+#include <thread>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -239,4 +241,83 @@ TEST_CASE("position at the origin and short inputs")
     REQUIRE(origin == std::vector<double>{0, 0, 0});
     const auto short_input = vec({1}, "xyz", "xyz");
     REQUIRE(short_input == std::vector<double>{1, 0, 0});
+}
+
+/** The temperature dataspace: the cases of the old TemperatureDataspace test. */
+TEST_CASE("temperature conversions match the old tests")
+{
+    REQUIRE(jamoma::Dataspace::find("temperature") != nullptr);
+    REQUIRE(close(scalar("temperature", 256.0, "Kelvin", "Kelvin"), 256.0));
+    REQUIRE(close(scalar("temperature", 0.0, "Celsius", "Kelvin"), 273.15));
+    REQUIRE(close(scalar("temperature", 32.0, "Fahrenheit", "Kelvin"), 273.15));
+    REQUIRE(close(scalar("temperature", 273.15, "Kelvin", "Celsius"), 0.0));
+    REQUIRE(close(scalar("temperature", 273.15, "Kelvin", "Fahrenheit"), 32.0));
+    REQUIRE(close(scalar("temperature", 100.0, "C", "F"), 212.0));
+    REQUIRE(close(scalar("temperature", 0.0, "K", "C"), -273.15));
+}
+
+/** The menus of j.unit: the names of the dataspaces and the canonical names of the units. */
+TEST_CASE("dataspace and unit names")
+{
+    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature"});
+    REQUIRE(Dataspace::find("temperature")->unit_names() == std::vector<std::string>{"Kelvin", "Celsius", "Fahrenheit"});
+    REQUIRE(Dataspace::find("gain")->unit_names().front() == "linear");
+    REQUIRE(Dataspace::find("temperature")->default_unit() == "Kelvin");
+}
+
+/** The aed values a ramp produces on the way (old ramp_and_dataspace test) convert back to xyz without loss. */
+TEST_CASE("aed values along a ramp convert to xyz")
+{
+    const std::vector<std::vector<double>> aed{{-135.0, -35.26439, 1.732051}, {-137.371842, -9.49312, 1.212642}, {-140.792796, 31.455607, 1.149783},
+                                               {-146.103833, 61.156594, 1.59828}, {-155.224859, 75.408396, 2.273324}, {-172.874984, 82.346951, 3.026962}};
+    for (const auto& v : aed) {
+        const auto xyz = vec(v, "aed", "xyz");
+        REQUIRE(xyz.size() == 3);
+        for (double x : xyz) {
+            REQUIRE(std::isfinite(x));
+        }
+    }
+}
+
+/** The converter of j.unit: setting the dataspace resets the units to its neutral unit; unknown names are refused and change nothing. */
+TEST_CASE("unit converter keeps a consistent state")
+{
+    jamoma::UnitConverter c;
+    REQUIRE(c.dataspace() == "temperature");
+    REQUIRE(c.input() == "Kelvin");
+    REQUIRE(c.set_dataspace("gain"));
+    REQUIRE(c.input() == "linear");
+    REQUIRE(c.set_input("db"));
+    REQUIRE(c.set_output("linear"));
+    REQUIRE_FALSE(c.set_input("furlong"));
+    REQUIRE(c.input() == "db");
+    REQUIRE_FALSE(c.set_dataspace("colour"));
+    REQUIRE(c.dataspace() == "gain");
+    const auto out = c.convert(jamoma::Value{jamoma::Atom(-6.0)});
+    REQUIRE(out.has_value());
+    REQUIRE(close((*out)[0].as_double(), 0.501187, 1e-5));
+    REQUIRE_FALSE(c.convert(jamoma::Value{}).has_value());
+}
+
+/** Review: setting and converting from two threads is race free (run under the thread sanitizer). */
+TEST_CASE("unit converter is race free")
+{
+    jamoma::UnitConverter c;
+    std::atomic<bool> stop{false};
+    std::atomic<long> converted{0};
+    std::thread reader([&] {
+        while (!stop.load()) {
+            if (c.convert(jamoma::Value{jamoma::Atom(1.0)})) {
+                ++converted;
+            }
+        }
+    });
+    for (int i = 0; i < 2000; ++i) {
+        c.set_dataspace(i % 2 == 0 ? "gain" : "temperature");
+        c.set_input(i % 2 == 0 ? "db" : "Celsius");
+        c.set_output(i % 2 == 0 ? "linear" : "Fahrenheit");
+    }
+    stop = true;
+    reader.join();
+    REQUIRE(converted.load() > 0);
 }

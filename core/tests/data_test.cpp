@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "jamoma/data.hpp"
+#include "jamoma/dataspace.hpp"
 #include "manual_clock.hpp"
 
 using jamoma::Atom;
@@ -867,4 +868,205 @@ TEST_CASE("ramp function attributes")
     d.set_ramp_function("linear");
     REQUIRE(d.ramp_function() == "linear");
     REQUIRE_FALSE(d.ramp_running());
+}
+
+/** The attribute table lists the 18 names in the order the Max objects use. */
+TEST_CASE("attribute table lists the names in order")
+{
+    const std::vector<std::string> expected{"type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active",
+                                            "priority", "description", "tags", "dataspace", "unit", "ramp/drive", "ramp/function",
+                                            "ramp/function/parameters", "ramp/status", "value", "service"};
+    REQUIRE(Data::attribute_names() == expected);
+    Data d;
+    for (const std::string& name : expected) {
+        REQUIRE(d.has_attribute(name));
+    }
+    REQUIRE_FALSE(d.has_attribute("nonsense"));
+}
+
+/** Every attribute answers its current value in the form the old objects used. */
+TEST_CASE("get attribute returns each current value")
+{
+    Data d(Service::Parameter);
+    d.set_type(DataType::Decimal);
+    d.set_range(Value{f(0.0), f(10.0)});
+    d.set_clipmode(ClipMode::Both);
+    d.set_repetitions_filter(true);
+    d.set_default(Value{f(3.0)});
+    d.set_stepsize(0.5);
+    d.set_priority(2);
+    d.set_description("a text");
+    d.set_tags({"a", "b"});
+    d.set_dataspace("gain");
+    d.set_unit("db");
+    d.set_ramp_drive("max");
+    d.set_ramp_function("linear");
+    REQUIRE(*d.get_attribute("type") == Value{Atom("decimal")});
+    REQUIRE(*d.get_attribute("range") == Value{f(0.0), f(10.0)});
+    REQUIRE(*d.get_attribute("clipmode") == Value{Atom("both")});
+    REQUIRE(*d.get_attribute("repetitions/filter") == Value{i(1)});
+    REQUIRE(*d.get_attribute("default") == Value{f(3.0)});
+    REQUIRE(*d.get_attribute("stepsize") == Value{f(0.5)});
+    REQUIRE(*d.get_attribute("active") == Value{i(1)});
+    REQUIRE(*d.get_attribute("priority") == Value{i(2)});
+    REQUIRE(*d.get_attribute("description") == Value{Atom("a text")});
+    REQUIRE(*d.get_attribute("tags") == Value{Atom("a"), Atom("b")});
+    REQUIRE(*d.get_attribute("dataspace") == Value{Atom("gain")});
+    REQUIRE(*d.get_attribute("unit") == Value{Atom("db")});
+    REQUIRE(*d.get_attribute("ramp/drive") == Value{Atom("max")});
+    REQUIRE(*d.get_attribute("ramp/function") == Value{Atom("linear")});
+    REQUIRE(*d.get_attribute("ramp/status") == Value{i(0)});
+    REQUIRE(*d.get_attribute("service") == Value{Atom("parameter")});
+    REQUIRE(d.get_attribute("value")->empty()); // nothing until initialised, as the old object
+    d.init();
+    REQUIRE(*d.get_attribute("value") == Value{f(3.0)});
+    Data neutral;
+    REQUIRE(*neutral.get_attribute("dataspace") == Value{Atom("none")});
+    REQUIRE(*neutral.get_attribute("unit") == Value{Atom("none")});
+}
+
+/** Setting through the table is the same as the setters; read-only names are refused. */
+TEST_CASE("set attribute applies and rejects read only")
+{
+    Data d;
+    REQUIRE(d.set_attribute("type", Value{Atom("integer")}));
+    REQUIRE(d.type() == DataType::Integer);
+    REQUIRE(d.set_attribute("range", Value{i(0), i(5)}));
+    REQUIRE(d.range() == Value{i(0), i(5)});
+    REQUIRE(d.set_attribute("clipmode", Value{Atom("low")}));
+    REQUIRE(d.clipmode() == ClipMode::Low);
+    REQUIRE(d.set_attribute("dataspace", Value{Atom("none")}));
+    REQUIRE(d.dataspace().empty());
+    std::vector<Value> outputs;
+    d.set_output([&outputs](const Value& v) { outputs.push_back(v); });
+    REQUIRE(d.set_attribute("value", Value{i(3)})); // a command
+    REQUIRE(outputs.size() == 1);
+    REQUIRE(d.value() == Value{i(3)});
+    const DataType before = d.type();
+    for (const char* name : {"ramp/status", "service", "ramp/function/parameters"}) {
+        REQUIRE_FALSE(d.set_attribute(name, Value{i(1)}));
+    }
+    REQUIRE(d.type() == before);
+}
+
+/** An unknown attribute is reported, not ignored. */
+TEST_CASE("unknown attribute is reported")
+{
+    Data d;
+    REQUIRE_FALSE(d.get_attribute("nonsense").has_value());
+    REQUIRE_FALSE(d.set_attribute("nonsense", Value{i(1)}));
+}
+
+/** An observer of `value` hears every output, including every tick of a ramp, ending on the exact target. */
+TEST_CASE("data observer hears value and ramp ticks")
+{
+    ManualClock clock;
+    Data d;
+    d.set_type(DataType::Decimal);
+    d.set_ramp_drive("max");
+    d.set_clock(&clock);
+    std::vector<Value> outputs;
+    d.set_output([&outputs](const Value& v) { outputs.push_back(v); });
+    std::vector<Value> heard;
+    const auto handle = d.observe("value", [&heard](const Value& v) { heard.push_back(v); });
+    REQUIRE(handle != nullptr);
+    d.command(Value{f(100.0), Atom("ramp"), i(100)});
+    clock.advance(1000.0);
+    REQUIRE(heard.size() >= 3);
+    REQUIRE(heard == outputs);
+    REQUIRE(heard.back() == Value{f(100.0)});
+}
+
+/** Other attributes notify when they are set by name. */
+TEST_CASE("data observer hears other attributes")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    std::vector<Value> ranges;
+    std::vector<Value> units;
+    std::vector<Value> actives;
+    const auto r = d.observe("range", [&ranges](const Value& v) { ranges.push_back(v); });
+    const auto u = d.observe("unit", [&units](const Value& v) { units.push_back(v); });
+    const auto a = d.observe("active", [&actives](const Value& v) { actives.push_back(v); });
+    d.set_attribute("range", Value{f(0.0), f(5.0)});
+    d.set_attribute("dataspace", Value{Atom("gain")});
+    d.set_attribute("unit", Value{Atom("db")});
+    d.set_attribute("active", Value{i(0)});
+    REQUIRE(ranges == std::vector<Value>{Value{f(0.0), f(5.0)}});
+    REQUIRE(units == std::vector<Value>{Value{Atom("db")}});
+    REQUIRE(actives == std::vector<Value>{Value{i(0)}});
+}
+
+/** Dropping the handle unregisters; a handle may outlive its data object; an unknown attribute gives an empty handle. */
+TEST_CASE("observer handle unregisters and survives data")
+{
+    int calls = 0;
+    std::shared_ptr<void> survivor;
+    {
+        Data d;
+        d.set_type(DataType::Decimal);
+        {
+            const auto handle = d.observe("value", [&calls](const Value&) { ++calls; });
+            d.command(Value{f(0.5)});
+            REQUIRE(calls == 1);
+        }
+        d.command(Value{f(0.75)});
+        REQUIRE(calls == 1);
+        survivor = d.observe("value", [&calls](const Value&) { ++calls; });
+        REQUIRE(d.observe("nonsense", [](const Value&) {}) == nullptr);
+    }
+    survivor.reset();
+    REQUIRE(calls == 1);
+}
+
+/** An observer may drop its own handle and send a command from inside its callback. */
+TEST_CASE("data observer may unregister and command in its callback")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    int calls = 0;
+    std::shared_ptr<void> handle;
+    handle = d.observe("value", [&](const Value&) {
+        ++calls;
+        handle.reset();
+        d.set_attribute("priority", Value{i(3)});
+    });
+    d.command(Value{f(0.5)});
+    d.command(Value{f(0.6)});
+    REQUIRE(calls == 1);
+    REQUIRE(d.priority() == 3);
+}
+
+/** A ramp whose command names a unit other than the parameter's, converted back, follows the same path as a parameter in that unit (old ramp_and_dataspace test). */
+TEST_CASE("ramp in another unit matches a parameter in that unit")
+{
+    ManualClock clock_aed, clock_xyz;
+    Data aed, xyz;
+    for (Data* d : {&aed, &xyz}) {
+        d->set_type(DataType::Array);
+        d->set_dataspace("position");
+        d->set_ramp_drive("max");
+        d->set_ramp_function("linear");
+    }
+    aed.set_unit("aed");
+    xyz.set_unit("xyz");
+    aed.set_clock(&clock_aed);
+    xyz.set_clock(&clock_xyz);
+    std::vector<Value> from_aed, from_xyz;
+    aed.set_output([&](const Value& v) { from_aed.push_back(*jamoma::Dataspace::find("position")->convert(v, "aed", "xyz")); });
+    xyz.set_output([&](const Value& v) { from_xyz.push_back(v); });
+    aed.command(Value{f(-1.0), f(-1.0), f(-1.0), Atom("xyz")});
+    aed.command(Value{f(0.9), f(0.2), f(7.0), Atom("xyz"), Atom("ramp"), i(200)});
+    xyz.command(Value{f(-1.0), f(-1.0), f(-1.0)});
+    xyz.command(Value{f(0.9), f(0.2), f(7.0), Atom("ramp"), i(200)});
+    clock_aed.advance(1000.0);
+    clock_xyz.advance(1000.0);
+    REQUIRE(from_aed.size() == from_xyz.size());
+    REQUIRE(from_aed.size() >= 4);
+    for (std::size_t n = 0; n < from_aed.size(); ++n) {
+        REQUIRE(from_aed[n].size() == 3);
+        for (std::size_t k = 0; k < 3; ++k) {
+            REQUIRE(std::fabs(from_aed[n][k].as_double() - from_xyz[n][k].as_double()) < 1e-6);
+        }
+    }
 }

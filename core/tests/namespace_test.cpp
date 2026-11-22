@@ -271,7 +271,8 @@ TEST_CASE("concurrent use is race free")
     auto reader = [&ns, &stop, &searches] {
         while (!stop.load()) {
             ns.lookup(Address::parse("/m/a"));
-            searches += static_cast<long>(ns.find(Address::parse("/m/*")).size() >= 0);
+            ns.find(Address::parse("/m/*"));
+            ++searches;
         }
     };
     std::thread first(reader);
@@ -287,4 +288,116 @@ TEST_CASE("concurrent use is race free")
     second.join();
     REQUIRE(searches.load() > 0);
     REQUIRE(ns.lookup(Address::parse("/m/a")) == nullptr); // every subscription was released again
+}
+
+/** Observers hear an object appear (new node or attached to an existing empty node) and go. */
+TEST_CASE("namespace observer hears created and destroyed")
+{
+    Namespace ns;
+    struct Event {
+        std::string address; /**< The address of the node. */
+        bool created;        /**< Whether the object appeared. */
+        bool has_object;     /**< Whether an object was passed. */
+    };
+    std::vector<Event> events;
+    const auto handle = ns.observe(Address::parse("/m/a"), [&events](const Address& a, Object* o, bool created) {
+        events.push_back({a.str(), created, o != nullptr});
+    });
+    Probe parent;
+    Subscription holder = ns.subscribe(Address::parse("/m"), parent); // a node that is not /m/a: no event
+    Probe a;
+    {
+        Subscription s = ns.subscribe(Address::parse("/m/a"), a);
+        REQUIRE(events.size() == 1);
+    }
+    REQUIRE(events.size() == 2);
+    REQUIRE(events[0].created);
+    REQUIRE(events[0].has_object);
+    REQUIRE(events[0].address == "/m/a");
+    REQUIRE_FALSE(events[1].created);
+    REQUIRE_FALSE(events[1].has_object);
+    // An object attached to a node that already exists without one counts as created.
+    Probe child;
+    Subscription kid = ns.subscribe(Address::parse("/m/a/x"), child); // creates /m/a without an object
+    REQUIRE(events.size() == 2);
+    Subscription late = ns.subscribe(Address::parse("/m/a"), a);
+    REQUIRE(events.size() == 3);
+    REQUIRE(events[2].created);
+}
+
+/** A pattern with an instance of `*` sees every instance. */
+TEST_CASE("namespace observer wildcard")
+{
+    Namespace ns;
+    std::vector<std::string> seen;
+    const auto handle = ns.observe(Address::parse("/m/*"), [&seen](const Address& a, Object*, bool created) {
+        if (created) {
+            seen.push_back(a.str());
+        }
+    });
+    Probe a, b, c, other;
+    Subscription sa = ns.subscribe(Address::parse("/m/a"), a);
+    Subscription sb = ns.subscribe(Address::parse("/m/b"), b);
+    Subscription sc = ns.subscribe(Address::parse("/m/b"), c); // /m/b.1
+    Subscription so = ns.subscribe(Address::parse("/n/a"), other);
+    REQUIRE(seen == std::vector<std::string>{"/m/a", "/m/b", "/m/b.1"});
+}
+
+/** An observer may unregister itself and subscribe in its callback; dropping the handle stops the events. */
+TEST_CASE("observer may unsubscribe itself in its callback")
+{
+    Namespace ns;
+    int calls = 0;
+    std::shared_ptr<void> handle;
+    Probe a, b, c;
+    Subscription inner;
+    handle = ns.observe(Address::parse("/m/*"), [&](const Address&, Object*, bool created) {
+        ++calls;
+        if (created && calls == 1) {
+            handle.reset();
+            inner = ns.subscribe(Address::parse("/m/inner"), c); // subscribing inside a callback must not deadlock
+        }
+    });
+    Subscription sa = ns.subscribe(Address::parse("/m/a"), a);
+    Subscription sb = ns.subscribe(Address::parse("/m/b"), b);
+    REQUIRE(calls == 1);
+}
+
+/** The thread sanitizer sees no race between changes, lookups and observers. */
+TEST_CASE("concurrent observers are race free")
+{
+    Namespace ns;
+    std::atomic<bool> stop{false};
+    std::atomic<long> rounds{0};
+    std::thread watcher([&] {
+        while (!stop.load()) {
+            const auto handle = ns.observe(Address::parse("/m/*"), [](const Address&, Object*, bool) {});
+            ns.lookup(Address::parse("/m/a"));
+            ++rounds;
+        }
+    });
+    std::vector<std::unique_ptr<Probe>> objects;
+    for (int n = 0; n < 1000; ++n) {
+        objects.push_back(std::make_unique<Probe>());
+        Subscription s = ns.subscribe(Address::parse(n % 2 == 0 ? "/m/a" : "/m/b"), *objects.back());
+        REQUIRE(s.node() != nullptr);
+    }
+    stop = true;
+    watcher.join();
+    REQUIRE(rounds.load() > 0);
+}
+
+/** A name of a star matches every child, whatever its instance, and works on any level of the path. */
+TEST_CASE("find with wildcard name")
+{
+    Namespace ns;
+    Probe a, b, c, d;
+    Subscription sa = ns.subscribe(Address::parse("/m/a"), a);
+    Subscription sb = ns.subscribe(Address::parse("/m/b"), b);
+    Subscription sc = ns.subscribe(Address::parse("/m/b"), c); // /m/b.1
+    Subscription sd = ns.subscribe(Address::parse("/n/a"), d);
+    REQUIRE(ns.find(Address::parse("/m/*")).size() == 3);
+    REQUIRE(ns.find(Address::parse("/*/a")).size() == 2);
+    REQUIRE(ns.find(Address::parse("/m/b.1")).size() == 1);
+    REQUIRE(ns.find(Address::parse("/x/*")).empty());
 }

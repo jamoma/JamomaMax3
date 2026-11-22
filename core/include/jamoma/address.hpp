@@ -89,4 +89,15 @@ private:
     std::string attribute_;        /**< The attribute part. */
 };
 
+/**
+ * @brief Resolves an address written in a patcher against the model the patcher belongs to.
+ *
+ * An absolute address stays as it is; a relative one is appended to the model's address (to the root if there is no model); the empty
+ * address stays empty. This is the rule of the old `j.send` and `j.receive`. `.` and `..` segments are not interpreted.
+ * @param address The address as written.
+ * @param model The address of the model, or the empty address if there is none.
+ * @return The address to bind to.
+ */
+JAMOMA_API Address resolve_relative(const Address& address, const Address& model);
+
 } // namespace jamoma

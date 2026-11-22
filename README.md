@@ -35,7 +35,7 @@ Checks (Max 9 must be closed for the ones that start it):
 
 ```
 ctest --preset macos                                   # core unit tests
-scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests    # the old integration tests
+scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests    # the integration tests of the old package (copied into tests/integration)
 scripts/run-maxtests.sh conformance/own-tests.txt build/maxtests   # own Max tests (tests/max)
 scripts/check-help.sh                                  # every help patcher opens without missing objects
 python3 tools/refpages/check_refpages.py --package package/Jamoma --externals externals
@@ -43,3 +43,10 @@ python3 tools/refpages/check_refpages.py --package package/Jamoma --externals ex
 
 Sanitizer builds must not write into the package that Max uses; give them their own folder:
 `cmake -S . -B build/tsan -G Ninja -DCMAKE_CXX_FLAGS=-fsanitize=thread -DJAMOMA_PACKAGE_DIR=$PWD/build/tsan/package`.
+
+## Status: milestone 2 (the OSC-addressed bus)
+
+Added: `j.send`, `j.receive`, `j.unit`, and the data `j.in` / `j.out`; the core gained attribute observers, namespace observers, `Receiver` and
+`Sender`. Differences from the old objects are in `docs/changes.md`; results in `docs/conformance/m2-results.md`.
+The test runner has a quick mode for development, `python3 tools/maxtest/run_maxtests.py --list <list> --out build/x --fast 10` (batches; every test that did not pass is run again alone), and prints a progress bar. Acceptance runs use one test
+per Max launch (`scripts/run-maxtests.sh`).

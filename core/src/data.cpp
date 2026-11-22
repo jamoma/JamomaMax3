@@ -8,6 +8,7 @@
 
 #include "jamoma/data.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <mutex>
 #include <optional>
@@ -81,6 +82,32 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     std::string ramp_function = "none";    /**< The ramp function name (the old default, which behaves as linear). */
     std::shared_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp (shared so a command that starts a ramp keeps it alive). */
     std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
+
+    /** One observer of an attribute. */
+    struct Observer {
+        unsigned id;                                  /**< Identifies the observer for removal. */
+        std::string attribute;                        /**< The watched attribute. */
+        std::function<void(const Value&)> callback;   /**< What to call. */
+    };
+    std::vector<Observer> observers;       /**< The observers (guarded by the mutex). */
+    unsigned next_observer = 1;            /**< The id of the next observer. */
+
+    /** Tells the observers of an attribute about its new value; call with no lock held. @param name The attribute. @param v Its new value. */
+    void notify(std::string_view name, const Value& v)
+    {
+        std::vector<std::function<void(const Value&)>> calls;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for (const Observer& o : observers) {
+                if (o.attribute == name) {
+                    calls.push_back(o.callback);
+                }
+            }
+        }
+        for (const auto& call : calls) {
+            call(v);
+        }
+    }
 
     /** A ramp to start once the command has been processed and its lock and guard released. */
     struct RampPlan {
@@ -275,6 +302,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
         if (callback) {
             callback(out);
         }
+        notify("value", out);
     }
 
     /**
@@ -605,6 +633,119 @@ void Data::set_output(std::function<void(const Value&)> output)
     impl_->output = std::move(output);
 }
 
+const std::vector<std::string>& Data::attribute_names()
+{
+    static const std::vector<std::string> names{"type", "range", "clipmode", "repetitions/filter", "default", "stepsize", "active",
+                                                "priority", "description", "tags", "dataspace", "unit", "ramp/drive",
+                                                "ramp/function", "ramp/function/parameters", "ramp/status", "value", "service"};
+    return names;
+}
+
+bool Data::has_attribute(std::string_view name) const
+{
+    const auto& names = attribute_names();
+    return std::find(names.begin(), names.end(), name) != names.end();
+}
+
+namespace {
+
+/** @param a An atom. @return Its text: the symbol itself, or the text form of a number. */
+std::string text_of(const Atom& a) { return a.is_symbol() ? a.as_symbol() : a.to_string(); }
+
+/** @param v A value. @return The text of its first atom, or an empty string. */
+std::string first_text(const Value& v) { return v.empty() ? std::string() : text_of(v[0]); }
+
+} // namespace
+
+std::optional<Value> Data::get_attribute(std::string_view name) const
+{
+    if (name == "type") return Value{Atom(std::string(data_type_name(type())))};
+    if (name == "range") return range();
+    if (name == "clipmode") return Value{Atom(std::string(clip_mode_name(clipmode())))};
+    if (name == "repetitions/filter") return Value{integer(repetitions_filter() ? 1 : 0)};
+    if (name == "default") return default_value();
+    if (name == "stepsize") return Value{flt(stepsize())};
+    if (name == "active") return Value{integer(active() ? 1 : 0)};
+    if (name == "priority") return Value{integer(priority())};
+    if (name == "description") return Value{Atom(description())};
+    if (name == "tags") {
+        Value out;
+        for (const std::string& tag : tags()) {
+            out.emplace_back(tag);
+        }
+        return out;
+    }
+    if (name == "dataspace") return Value{Atom(dataspace().empty() ? std::string("none") : dataspace())};
+    if (name == "unit") return Value{Atom(unit().empty() ? std::string("none") : unit())};
+    if (name == "ramp/drive") return Value{Atom(ramp_drive())};
+    if (name == "ramp/function") return Value{Atom(ramp_function())};
+    if (name == "ramp/function/parameters") return Value{};
+    if (name == "ramp/status") return Value{integer(ramp_running() ? 1 : 0)};
+    if (name == "value") return initialized() ? value() : Value{};
+    if (name == "service") {
+        return Value{Atom(std::string(service() == Service::Parameter ? "parameter" : service() == Service::Message ? "message" : "return"))};
+    }
+    return std::nullopt;
+}
+
+bool Data::set_attribute(std::string_view name, const Value& v)
+{
+    if (!has_attribute(name) || v.empty()) {
+        return false;
+    }
+    if (name == "type") set_type(data_type_from_name(first_text(v)));
+    else if (name == "range") set_range(v);
+    else if (name == "clipmode") set_clipmode(clip_mode_from_name(first_text(v)));
+    else if (name == "repetitions/filter") set_repetitions_filter(v[0].as_int() != 0);
+    else if (name == "default") set_default(v);
+    else if (name == "stepsize") set_stepsize(v[0].as_double());
+    else if (name == "active") set_active(v[0].as_int() != 0);
+    else if (name == "priority") set_priority(static_cast<int>(v[0].as_int()));
+    else if (name == "description") set_description(first_text(v));
+    else if (name == "tags") {
+        std::vector<std::string> list;
+        for (const Atom& atom : v) {
+            list.push_back(text_of(atom));
+        }
+        set_tags(std::move(list));
+    } else if (name == "dataspace") {
+        const std::string text = first_text(v);
+        set_dataspace(text == "none" ? std::string() : text);
+    } else if (name == "unit") {
+        const std::string text = first_text(v);
+        set_unit(text == "none" ? std::string() : text);
+    } else if (name == "ramp/drive") set_ramp_drive(first_text(v));
+    else if (name == "ramp/function") set_ramp_function(first_text(v));
+    else if (name == "value") {
+        command(v); // notifies the observers of `value` itself
+        return true;
+    } else return false; // ramp/status, service, ramp/function/parameters: read only
+    impl_->notify(name, *get_attribute(name));
+    return true;
+}
+
+std::shared_ptr<void> Data::observe(std::string_view attribute, std::function<void(const Value&)> callback)
+{
+    if (!has_attribute(attribute)) {
+        return nullptr;
+    }
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(impl_->mutex);
+        id = impl_->next_observer++;
+        impl_->observers.push_back({id, std::string(attribute), std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<Impl> weak = impl_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto impl = weak.lock()) {
+            std::lock_guard<std::mutex> lock(impl->mutex);
+            auto& list = impl->observers;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const Impl::Observer& o) { return o.id == id; }), list.end());
+        }
+    });
+}
+
 void Data::command(const Value& input)
 {
     const std::shared_ptr<Impl> keep = impl_; // the output callback may free the owner of this object
@@ -634,8 +775,11 @@ void Data::command(const Value& input)
                 ramp = s.ensure_ramp();
             }
         }
-        if (emit && callback) {
-            callback(out);
+        if (emit) {
+            if (callback) {
+                callback(out);
+            }
+            s.notify("value", out);
         }
     } // the guard is released here, so the ramp's first value can pass through it
     if (plan && ramp) {

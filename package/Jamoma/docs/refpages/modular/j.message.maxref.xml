@@ -139,6 +139,15 @@
 				The <m>dec</m> message decrements the current value by the amount defined using the <at>@stepsize</at> attribute. An optional integer argument to the message specifies how many steps to decrease the value by (default <m>1</m>)
 			</description>
 		</method>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Dump all attribute settings to rightmost outlet
+			</digest>
+			<description>
+				The message <m>dump</m> outputs all attribute settings to rightmost outlet
+			</description>
+		</method>
 		<method name="inc">
 			<arglist>
 				<arg name="number of steps" optional="1" type="int" />

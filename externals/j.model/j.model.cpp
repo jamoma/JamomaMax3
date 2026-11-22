@@ -87,6 +87,18 @@ public:
         return {};
     }};
 
+    /** Answers `<attribute> <value>` on the dump outlet for the model's attributes. */
+    message<> dump{this, "dump", MIN_FUNCTION {
+        const auto answer = [this](const char* name, const atoms& values) {
+            c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym(name), static_cast<short>(values.size()),
+                                      values.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&values[0])));
+        };
+        answer("description", atoms{description.get()});
+        answer("priority", atoms{priority.get()});
+        answer("amenities", atoms{amenities.get()});
+        return {};
+    }};
+
     /** After construction: creates the model, registers it for its patcher and schedules the first initialisation. */
     message<> setup{this, "setup", MIN_FUNCTION {
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));

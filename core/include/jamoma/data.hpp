@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -155,6 +156,38 @@ public:
     void inc(const Value& args);
     /** @brief The opposite of inc. @param args The arguments. */
     void dec(const Value& args);
+    /**
+     * @brief Watches an attribute.
+     *
+     * The callback gets the new value of the attribute each time it changes: for `value` every time a value is output (so every tick of a
+     * ramp too), for the other attributes when they are set by name (`set_attribute`; the typed setters are construction-time conveniences
+     * and do not notify). It runs on the thread that made the change, after the object's lock and its sending guard's work is done, so it
+     * may set attributes and drop its own handle; a command it sends to this same object while the object is still outputting is dropped.
+     * A callback may run once more after the handle is dropped if a change is in flight on another thread.
+     * @param attribute An attribute name (see attribute_names()).
+     * @param callback The function to call.
+     * @return A handle that unregisters the observer when dropped (it may outlive the object), or an empty pointer for an unknown attribute.
+     */
+    std::shared_ptr<void> observe(std::string_view attribute, std::function<void(const Value&)> callback);
+
+    /** @return The names of the attributes, in the order the Max objects list them (the table behind get_attribute and set_attribute). */
+    static const std::vector<std::string>& attribute_names();
+    /** @brief Tells whether a name is an attribute. @param name The attribute name. @return True if it is in attribute_names(). */
+    bool has_attribute(std::string_view name) const;
+    /**
+     * @brief Reads an attribute by name, in the form the old objects answered a query.
+     *
+     * Booleans are 0 or 1, an empty dataspace or unit is `none`, `value` is empty until the object is initialised.
+     * @param name The attribute name. @return The value, or nothing for an unknown name.
+     */
+    std::optional<Value> get_attribute(std::string_view name) const;
+    /**
+     * @brief Sets an attribute by name, through the same setters as the typed API (`value` is a command).
+     * @param name The attribute name. @param value The new value (must not be empty).
+     * @return False for an unknown, read-only (`ramp/status`, `service`, `ramp/function/parameters`) or empty-valued request.
+     */
+    bool set_attribute(std::string_view name, const Value& value);
+
     /** @brief Clears initialised and sends the default through command (nothing is sent for the none type or an unusable default). */
     void init();
 

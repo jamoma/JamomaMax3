@@ -10,7 +10,7 @@ What an object implements is read from its C++ sources (and the shared data_obje
 j.message and j.return), not from a running Max: Min-API's own generated pages only list what Min registers,
 not the raw attributes of data objects, and a source scan runs anywhere, including CI without Max.
 Recognised in the sources: Min ``attribute<T> name{this, "attr"``, ``message<> name{this, "msg"`` (not
-``setup`` or ``maxclass_setup``), the strings of the ``ATTRIBUTE_NAMES`` table, ``class_addmethod(... "msg", A_x``
+``setup`` or ``maxclass_setup``), the strings of the table in ``Data::attribute_names()``, ``class_addmethod(... "msg", A_x``
 (not A_CANT, which are internal) and ``attr_offset_new("attr"``, and the literal ``selector == "+"`` tests
 of the anything handler. Exit status is non-zero if there is any difference.
 """
@@ -22,16 +22,22 @@ import sys
 import xml.etree.ElementTree as ET
 
 COMMON = "common/data_object.hpp"
+CORE_DATA = "../core/src/data.cpp"  # the attribute table of the data objects
 
 #: The sources of each object, relative to the externals folder.
 OBJECT_SOURCES = {
-    "j.parameter": [COMMON, "j.parameter/j.parameter.cpp"],
-    "j.message": [COMMON, "j.message/j.message.cpp"],
-    "j.return": [COMMON, "j.return/j.return.cpp"],
+    "j.parameter": [COMMON, CORE_DATA, "j.parameter/j.parameter.cpp"],
+    "j.message": [COMMON, CORE_DATA, "j.message/j.message.cpp"],
+    "j.return": [COMMON, CORE_DATA, "j.return/j.return.cpp"],
     "j.model": ["j.model/j.model.cpp"],
     "j.init": ["j.init/j.init.cpp"],
     "j.savebang": ["j.savebang/j.savebang.cpp"],
     "j.pass": ["j.pass/j.pass.cpp"],
+    "j.send": ["j.send/j.send.cpp"],
+    "j.receive": ["j.receive/j.receive.cpp"],
+    "j.unit": ["j.unit/j.unit.cpp"],
+    "j.in": ["j.in/j.in.cpp"],
+    "j.out": ["j.out/j.out.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.
@@ -62,7 +68,7 @@ def scan_source(text):
     """Returns (attributes, messages) that C++ source text implements (see the module description)."""
     attributes = set(re.findall(r'attribute<[^>]*>\s+\w+\s*\{\s*this\s*,\s*"([^"]+)"', text))
     attributes |= set(re.findall(r'attr_offset_new\(\s*"([^"]+)"', text))
-    table = re.search(r"ATTRIBUTE_NAMES\[[^\]]*\]\s*=\s*\{(.*?)\};", text, re.S)
+    table = re.search(r"attribute_names\(\)\s*\{.*?names\s*\{(.*?)\};", text, re.S)
     if table:
         attributes |= set(re.findall(r'"([^"]+)"', table.group(1)))
     messages = set(re.findall(r'message<[^>]*>\s+\w+\s*\{\s*this\s*,\s*"([^"]+)"', text)) - INFRASTRUCTURE

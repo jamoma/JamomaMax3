@@ -75,16 +75,16 @@
 			</description>
 		</method>
 		<method name="float">
-			<digest>TODO</digest>
-			<description>TODO</description>
+			<digest>Pass a decimal number</digest>
+			<description>The number is passed on like any other value.</description>
 		</method>
 		<method name="int">
-			<digest>TODO</digest>
-			<description>TODO</description>
+			<digest>Pass an integer</digest>
+			<description>The integer is passed on like any other value.</description>
 		</method>
 		<method name="list">
-			<digest>TODO</digest>
-			<description>TODO</description>
+			<digest>Pass a list</digest>
+			<description>The list is passed on like any other value.</description>
 		</method>
 	</methodlist>
 	<attributelist>
