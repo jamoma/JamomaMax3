@@ -13,7 +13,7 @@
    60.0,
    60.0,
    1097.8,
-   530.0
+   594.0
   ],
   "boxes": [
    {
@@ -178,7 +178,7 @@
      ],
      "patching_rect": [
       366.2,
-      350.0,
+      414.0,
       332.2,
       22.0
      ]
@@ -215,7 +215,7 @@
       ""
      ],
      "patching_rect": [
-      722.4,
+      623.2,
       350.0,
       81.4,
       22.0
@@ -252,7 +252,7 @@
      ],
      "patching_rect": [
       722.4,
-      478.0,
+      542.0,
       345.4,
       22.0
      ]
@@ -366,6 +366,42 @@
       22.0
      ]
     }
+   },
+   {
+    "box": {
+     "id": "tg_as",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      366.2,
+      350.0,
+      24.0,
+      24.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_aa",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      722.4,
+      478.0,
+      24.0,
+      24.0
+     ]
+    }
    }
   ],
   "lines": [
@@ -436,7 +472,7 @@
       0
      ],
      "destination": [
-      "as",
+      "tg_as",
       0
      ]
     }
@@ -484,7 +520,7 @@
       0
      ],
      "destination": [
-      "aa",
+      "tg_aa",
       0
      ]
     }
@@ -545,6 +581,30 @@
      ],
      "destination": [
       "term",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_as",
+      0
+     ],
+     "destination": [
+      "as",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_aa",
+      0
+     ],
+     "destination": [
+      "aa",
       0
      ]
     }

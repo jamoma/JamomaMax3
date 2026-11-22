@@ -10,6 +10,7 @@ Rewrites the files in place. Rules:
 * a box's row is one below the lowest box that feeds it (cords that would point upwards, feedback, are ignored for this);
 * inside a row, boxes are placed under the boxes that feed them with their left edges aligned (a chain is a straight vertical line), and the targets of a left outlet are left of the targets of a right outlet
   (Max sends from the right outlet first, but patchers are read from the left);
+* a toggle in front of another box (a check) sits directly above it;
 * boxes in a row never overlap; boxes without cords go in the first row;
 * subpatchers (boxes with a patcher inside) are laid out the same way; the window is made big enough.
 
@@ -140,12 +141,20 @@ def layout(patcher) -> None:
             down(r)
         for r in range(last - 1, 0, -1):
             up(r)
-    for r in range(1, last + 1):  # the last word is the downward sweep: a child lines up with its parent
+    for r in range(1, last + 1):  # the downward sweep: a child lines up with its parent
         down(r)
+    # A toggle in front of a check (see add_toggles.py) sits directly above it, even when the row of the check is crowded: the toggle moves.
+    for r in range(last - 1, -1, -1):
+        members = [i for i in rows[r] if boxes[i].get("maxclass") == "toggle" and len(children[i]) == 1]
+        if members and r > 0:
+            targets = {i: left[i] for i in rows[r]}
+            for i in members:
+                targets[i] = left[children[i][0][0]]
+            place(rows[r], targets)
     shift = MARGIN - min(left)
     right = bottom = 0.0
     for i, b in enumerate(boxes):
-        h = HEIGHT if b.get("maxclass") != "comment" else 20.0
+        h = {"comment": 20.0, "toggle": 24.0, "button": 24.0}.get(b.get("maxclass"), HEIGHT)
         x = round(left[i] + shift, 1)
         y = round(MARGIN + row[i] * ROW, 1)
         b["patching_rect"] = [x, y, round(width[i], 1), h]

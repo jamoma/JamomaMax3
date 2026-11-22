@@ -97,6 +97,21 @@ class LayoutTests(unittest.TestCase):
         lp.layout(p)
         self.assertLess(rect(inner, "i")[1], rect(inner, "o")[1])
 
+    def test_a_toggle_gets_its_own_square_size(self):
+        p = patcher([box("a"), box("tg", "", maxclass="toggle"), box("b")], [line("a", 0, "tg"), line("tg", 0, "b")])
+        lp.layout(p)
+        self.assertEqual(rect(p, "tg")[2:], [24.0, 24.0])
+
+    def test_a_toggle_sits_directly_above_its_target_even_in_a_crowded_row(self):
+        boxes = [box("src", "source", outlets=3), box("t1", "", maxclass="toggle"), box("t2", "", maxclass="toggle"),
+                 box("a1", "test.assert a very long assertion name number one"), box("a2", "test.assert a very long assertion name number two")]
+        lines = [line("src", 0, "t1"), line("src", 1, "t2"), line("t1", 0, "a1"), line("t2", 0, "a2")]
+        p = patcher(boxes, lines)
+        lp.layout(p)
+        for toggle, target in (("t1", "a1"), ("t2", "a2")):
+            self.assertEqual(rect(p, toggle)[0], rect(p, target)[0], toggle)
+            self.assertLess(rect(p, toggle)[1], rect(p, target)[1])
+
     def test_the_window_is_big_enough(self):
         p = patcher([box("a", "a fairly long text for an object box"), box("b")], [line("a", 0, "b")])
         lp.layout(p)

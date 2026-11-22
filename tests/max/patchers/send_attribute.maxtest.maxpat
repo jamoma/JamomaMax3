@@ -13,7 +13,7 @@
    60.0,
    60.0,
    926.0,
-   402.0
+   466.0
   ],
   "boxes": [
    {
@@ -176,7 +176,7 @@
      ],
      "patching_rect": [
       142.0,
-      350.0,
+      414.0,
       464.2,
       22.0
      ]
@@ -326,6 +326,24 @@
       22.0
      ]
     }
+   },
+   {
+    "box": {
+     "id": "tg_as",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      142.0,
+      350.0,
+      24.0,
+      24.0
+     ]
+    }
    }
   ],
   "lines": [
@@ -396,7 +414,7 @@
       0
      ],
      "destination": [
-      "as",
+      "tg_as",
       0
      ]
     }
@@ -493,6 +511,18 @@
      ],
      "destination": [
       "term",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_as",
+      0
+     ],
+     "destination": [
+      "as",
       0
      ]
     }

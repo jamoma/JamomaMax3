@@ -12,8 +12,8 @@
   "rect": [
    60.0,
    60.0,
-   1269.6,
-   594.0
+   1507.2,
+   658.0
   ],
   "boxes": [
    {
@@ -138,8 +138,8 @@
       ""
      ],
      "patching_rect": [
-      881.0,
-      414.0,
+      1118.6,
+      478.0,
       358.6,
       22.0
      ]
@@ -211,8 +211,8 @@
       ""
      ],
      "patching_rect": [
-      399.4,
-      414.0,
+      637.0,
+      478.0,
       457.6,
       22.0
      ]
@@ -324,7 +324,7 @@
      ],
      "patching_rect": [
       30.0,
-      542.0,
+      606.0,
       371.8,
       22.0
      ]
@@ -363,6 +363,60 @@
       158.0,
       114.4,
       22.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a1",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      1118.6,
+      414.0,
+      24.0,
+      24.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a2",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      637.0,
+      414.0,
+      24.0,
+      24.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a3",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      30.0,
+      542.0,
+      24.0,
+      24.0
      ]
     }
    }
@@ -483,7 +537,7 @@
       0
      ],
      "destination": [
-      "a1",
+      "tg_a1",
       0
      ]
     }
@@ -519,7 +573,7 @@
       0
      ],
      "destination": [
-      "a2",
+      "tg_a2",
       0
      ]
     }
@@ -588,6 +642,42 @@
     "patchline": {
      "source": [
       "c3",
+      0
+     ],
+     "destination": [
+      "tg_a3",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a1",
+      0
+     ],
+     "destination": [
+      "a1",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a2",
+      0
+     ],
+     "destination": [
+      "a2",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a3",
       0
      ],
      "destination": [

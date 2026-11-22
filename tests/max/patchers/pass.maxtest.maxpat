@@ -13,7 +13,7 @@
    60.0,
    60.0,
    1229.6,
-   466.0
+   530.0
   ],
   "boxes": [
    {
@@ -251,7 +251,7 @@
      ],
      "patching_rect": [
       234.2,
-      414.0,
+      478.0,
       365.2,
       22.0
      ]
@@ -269,7 +269,7 @@
      ],
      "patching_rect": [
       940.0,
-      414.0,
+      478.0,
       259.6,
       22.0
      ]
@@ -287,7 +287,7 @@
      ],
      "patching_rect": [
       623.4,
-      414.0,
+      478.0,
       292.6,
       22.0
      ]
@@ -326,6 +326,60 @@
       222.0,
       114.4,
       22.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a1",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      234.2,
+      414.0,
+      24.0,
+      24.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a2",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      940.0,
+      414.0,
+      24.0,
+      24.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "tg_a3",
+     "maxclass": "toggle",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      "int"
+     ],
+     "parameter_enable": 0,
+     "patching_rect": [
+      623.4,
+      414.0,
+      24.0,
+      24.0
      ]
     }
    }
@@ -518,7 +572,7 @@
       0
      ],
      "destination": [
-      "a1",
+      "tg_a1",
       0
      ]
     }
@@ -530,7 +584,7 @@
       0
      ],
      "destination": [
-      "a2",
+      "tg_a2",
       0
      ]
     }
@@ -539,6 +593,42 @@
     "patchline": {
      "source": [
       "e3",
+      0
+     ],
+     "destination": [
+      "tg_a3",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a1",
+      0
+     ],
+     "destination": [
+      "a1",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a2",
+      0
+     ],
+     "destination": [
+      "a2",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "tg_a3",
       0
      ],
      "destination": [
