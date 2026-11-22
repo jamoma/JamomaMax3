@@ -21,9 +21,10 @@ using namespace c74::min;
 class j_init : public c74::min::object<j_init> {
 public:
     /** Creates the object and schedules the binding to the model (once the patcher has loaded). @param args Unused. */
-    explicit j_init(const atoms& = {})
+    explicit j_init(const atoms& args = {})
     {
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { bind(); });
+        (void)args;
     }
 
     inlet<> input{this, "(anything) unused"};                     /**< The inlet. */
