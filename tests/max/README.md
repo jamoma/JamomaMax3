@@ -3,7 +3,7 @@
 The patchers in `patchers/` are this project's own Max tests (the package `JamomaMax3Tests`); the lists that run them are
 `conformance/own-tests.txt`. The integration tests copied from the old package are in `tests/integration`.
 
-Patchers are laid out to read from top to bottom: every object sits below the objects that feed it, and the targets of a left outlet are left of
+Patchers are laid out to read from top to bottom: every object sits below the objects that feed it, with its left edge lined up with theirs where the row allows (a chain is a straight vertical line), and the targets of a left outlet are left of
 the targets of a right outlet. After writing or changing a patcher, lay it out with
 
 ```

@@ -8,7 +8,7 @@
 Rewrites the files in place. Rules:
 
 * a box's row is one below the lowest box that feeds it (cords that would point upwards, feedback, are ignored for this);
-* inside a row, boxes are placed under the boxes that feed them, and the targets of a left outlet are left of the targets of a right outlet
+* inside a row, boxes are placed under the boxes that feed them with their left edges aligned (a chain is a straight vertical line), and the targets of a left outlet are left of the targets of a right outlet
   (Max sends from the right outlet first, but patchers are read from the left);
 * boxes in a row never overlap; boxes without cords go in the first row;
 * subpatchers (boxes with a patcher inside) are laid out the same way; the window is made big enough.
@@ -105,46 +105,48 @@ def layout(patcher) -> None:
     for i in range(count):
         rows.setdefault(row[i], []).append(i)
     width = [box_width(b) for b in boxes]
-    centre = [0.0] * count
+    left = [0.0] * count
 
     def place(members, targets):
-        """Puts a row left to right in the order of its targets (centres to aim for), without overlaps."""
-        ordered = sorted(members, key=lambda i: (targets[i], i))
+        """Puts a row left to right in the order of its targets (left edges to aim for), without overlaps."""
         x = 0.0
-        for i in ordered:
-            left = max(x, targets[i] - width[i] / 2.0)
-            centre[i] = left + width[i] / 2.0
-            x = left + width[i] + GAP
+        for i in sorted(members, key=lambda k: (targets[k], k)):
+            left[i] = max(x, targets[i])
+            x = left[i] + width[i] + GAP
 
-    first = rows[0]
+    def down(r):
+        """Row r under its parents: each box aims at the left edge of the box that feeds it (the mean of them if there are several)."""
+        targets = {}
+        for i in rows[r]:
+            aims = [left[p] + o * 0.001 for p, o in parents[i]]
+            targets[i] = sum(aims) / len(aims) if aims else left[i]
+        place(rows[r], targets)
+
+    def up(r):
+        """Row r over its children: each box aims at the left edge of its leftmost child, so that a chain is a straight line."""
+        targets = {}
+        for i in rows[r]:
+            aims = [left[c] for c, _ in children[i]]
+            targets[i] = min(aims) if aims else left[i]
+        place(rows[r], targets)
+
     x = 0.0  # the first row keeps the file order, spaced by width
-    for i in first:
-        centre[i] = x + width[i] / 2.0
+    for i in rows[0]:
+        left[i] = x
         x += width[i] + GAP
+    last = max(rows)
     for _ in range(3):
-        for r in sorted(rows):
-            if r == 0:
-                continue
-            targets = {}
-            for i in rows[r]:
-                aims = [centre[p] + o * 0.001 for p, o in parents[i]]
-                targets[i] = sum(aims) / len(aims) if aims else centre[i]
-            place(rows[r], targets)
-        for r in sorted(rows, reverse=True):
-            if r == max(rows):
-                continue
-            targets = {}
-            for i in rows[r]:
-                aims = [centre[c] - o * 0.001 for c, o in children[i]]
-                targets[i] = sum(aims) / len(aims) if aims else centre[i]
-            moved = sorted(rows[r], key=lambda i: (targets[i], i))
-            if r > 0:
-                place(moved, targets)
-    shift = MARGIN - min(centre[i] - width[i] / 2.0 for i in range(count))
+        for r in range(1, last + 1):
+            down(r)
+        for r in range(last - 1, 0, -1):
+            up(r)
+    for r in range(1, last + 1):  # the last word is the downward sweep: a child lines up with its parent
+        down(r)
+    shift = MARGIN - min(left)
     right = bottom = 0.0
     for i, b in enumerate(boxes):
         h = HEIGHT if b.get("maxclass") != "comment" else 20.0
-        x = round(centre[i] - width[i] / 2.0 + shift, 1)
+        x = round(left[i] + shift, 1)
         y = round(MARGIN + row[i] * ROW, 1)
         b["patching_rect"] = [x, y, round(width[i], 1), h]
         right = max(right, x + width[i])

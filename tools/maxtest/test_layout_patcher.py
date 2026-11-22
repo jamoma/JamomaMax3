@@ -50,6 +50,29 @@ class LayoutTests(unittest.TestCase):
         lp.layout(p)
         self.assertLess(rect(p, "left")[0], rect(p, "right")[0])
 
+    def test_a_chain_is_left_aligned(self):
+        p = patcher([box("a", "short"), box("b", "a much longer object text"), box("c", "mid size")],
+                    [line("a", 0, "b"), line("b", 0, "c")])
+        lp.layout(p)
+        self.assertEqual(rect(p, "a")[0], rect(p, "b")[0])
+        self.assertEqual(rect(p, "b")[0], rect(p, "c")[0])
+
+    def test_the_first_child_is_under_its_parent_and_the_others_to_the_right(self):
+        p = patcher([box("t", outlets=3), box("a"), box("b"), box("c")],
+                    [line("t", 0, "a"), line("t", 1, "b"), line("t", 2, "c")])
+        lp.layout(p)
+        self.assertEqual(rect(p, "t")[0], rect(p, "a")[0])
+        self.assertLess(rect(p, "a")[0], rect(p, "b")[0])
+        self.assertLess(rect(p, "b")[0], rect(p, "c")[0])
+
+    def test_a_box_with_two_parents_does_not_break_the_chains(self):
+        p = patcher([box("a"), box("b"), box("c"), box("d")],
+                    [line("a", 0, "c"), line("b", 0, "c", 1), line("c", 0, "d")])
+        lp.layout(p)
+        self.assertEqual(rect(p, "c")[0], rect(p, "d")[0])
+        self.assertLess(rect(p, "a")[1], rect(p, "c")[1])
+        self.assertLess(rect(p, "b")[1], rect(p, "c")[1])
+
     def test_boxes_in_one_row_do_not_overlap(self):
         p = patcher([box("t", outlets=3), box("a", "a long object text here"), box("b", "another long object text"), box("c", "third")],
                     [line("t", 0, "a"), line("t", 1, "b"), line("t", 2, "c")])
