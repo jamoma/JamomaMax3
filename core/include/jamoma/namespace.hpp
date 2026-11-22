@@ -148,6 +148,18 @@ public:
     std::shared_ptr<void> observe(const Address& pattern, std::function<void(const Address& address, Object* object, bool created)> callback);
 
     /**
+     * @brief Visits every node below the node at an address, with the namespace's read lock held, so that nodes may come and go on other threads meanwhile.
+     *
+     * The visit is depth first in creation order. The function sees each node's address relative to `root` (names joined with `/`, an instance as `.n`), its
+     * name and instance, and its object (null if it has none; the object is alive for the duration of the call). It must not subscribe, unsubscribe or call
+     * any other function of the namespace.
+     * @param root The address of the node whose descendants are visited.
+     * @param visit What to call for every descendant.
+     * @return False if there is no node at `root`.
+     */
+    bool visit_below(const Address& root, const std::function<void(const std::string& relative, const std::string& name, const std::string& instance, Object* object)>& visit) const;
+
+    /**
      * @brief Finds nodes by a pattern.
      * @param pattern An address whose segments may use `*`: as a name it matches any name (and any instance unless one is given), as an instance any instance (including none).
      * @return The matching nodes.

@@ -61,6 +61,8 @@ public:
      */
     PresetManager(Namespace& ns, Address model);
 
+    /** @brief Changes the model whose parameters are stored (used by the model once it knows its final address). @param model The address. */
+    void set_model(Address model) { model_ = std::move(model); }
     /** @return The presets in order. */
     const std::vector<Preset>& presets() const noexcept { return presets_; }
     /** @return The names of the presets in order. */

@@ -104,8 +104,9 @@ void init_children(Namespace& ns, const Address& parent, const Model* self)
 Model::Model(Namespace& ns, const Address& address) : impl_(std::make_shared<Impl>())
 {
     impl_->ns = &ns;
+    impl_->presets = std::make_unique<PresetManager>(ns, address); // before the subscription: an observer of the namespace may ask for it at once
     impl_->subscription = ns.subscribe(address, *this);
-    impl_->presets = std::make_unique<PresetManager>(ns, impl_->subscription.address());
+    impl_->presets->set_model(impl_->subscription.address());
 }
 
 PresetManager& Model::presets() { return *impl_->presets; }
