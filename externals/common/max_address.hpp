@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "c74_min.h"
@@ -27,8 +28,21 @@ namespace jamoma_max {
  */
 inline jamoma::Address resolve_in_patcher(c74::max::t_object* box, const std::string& text)
 {
-    const jamoma::Model* model = find_model(box);
-    return jamoma::resolve_relative(jamoma::Address::parse(text), model != nullptr ? model->address() : jamoma::Address());
+    const jamoma::Address written = jamoma::Address::parse(text);
+    // The nearest enclosing patcher that holds a view (the model it is bound to) or a model decides what a relative address is relative to.
+    for (const void* p = patcher_of(box); p != nullptr; p = parent_patcher(p)) {
+        if (jamoma::Registry::instance().views().find(p)) {
+            const std::optional<std::string> bound = view_model_address(p);
+            if (!bound) {
+                return written.absolute() ? written : jamoma::Address(); // the view is waiting for its model: nothing to bind to yet
+            }
+            return jamoma::resolve_relative(written, jamoma::Address::parse(*bound));
+        }
+        if (const jamoma::Model* model = jamoma::Registry::instance().contexts().find(p)) {
+            return jamoma::resolve_relative(written, model->address());
+        }
+    }
+    return jamoma::resolve_relative(written, jamoma::Address());
 }
 
 /**
