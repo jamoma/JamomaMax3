@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
+<c74object name="j.ui" module="" category="Jamoma">
+	<digest>
+		The panel of a model
+	</digest>
+	<description>
+		j.ui shows the address of the model of its patcher (or of the model a <o>j.view</o> in it is bound to), a menu of what is below the model, and its presets. A click on the address opens the menu of parameters, messages and returns; the menu arrow opens the utilities and presets menu. While there is no model it says that it is waiting for one.
+	</description>
+	<metadatalist>
+		<metadata name="author">
+			Jamoma
+		</metadata>
+		<metadata name="tag">
+			model
+		</metadata>
+		<metadata name="tag">
+			Jamoma
+		</metadata>
+	</metadatalist>
+	<objarglist>
+	</objarglist>
+	<methodlist>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Report the state
+			</digest>
+			<description>
+				The <m>dump</m> message answers <m>model:address</m> and the address (or <m>model:waiting</m>), <m>preset:count</m> and the number of presets, <m>presets</m> and their names and <m>preset:current</m> and the current preset, out the outlet.
+			</description>
+		</method>
+		<method name="paint">
+			<arglist />
+			<digest>
+				Draw the panel
+			</digest>
+			<description>
+				Sent by Max when the panel is drawn.
+			</description>
+		</method>
+		<method name="mouseup">
+			<arglist />
+			<digest>
+				Open a menu
+			</digest>
+			<description>
+				A click on the header opens the menu of nodes (on the address) or the utilities and presets menu (on the arrow).
+			</description>
+		</method>
+	</methodlist>
+	<attributelist>
+		<attribute name="bgcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Background color
+			</digest>
+			<description>
+				The color of the background.
+			</description>
+		</attribute>
+		<attribute name="bordercolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Border color
+			</digest>
+			<description>
+				The color of the border.
+			</description>
+		</attribute>
+		<attribute name="headercolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Header color
+			</digest>
+			<description>
+				The color of the header.
+			</description>
+		</attribute>
+		<attribute name="textcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Text color
+			</digest>
+			<description>
+				The color of the text.
+			</description>
+		</attribute>
+		<attribute name="highlightcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Highlight color
+			</digest>
+			<description>
+				The color of the highlights.
+			</description>
+		</attribute>
+	</attributelist>
+</c74object>

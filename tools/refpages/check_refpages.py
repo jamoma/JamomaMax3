@@ -40,6 +40,7 @@ OBJECT_SOURCES = {
     "j.out": ["j.out/j.out.cpp"],
     "j.view": ["j.view/j.view.cpp"],
     "j.remote": ["j.remote/j.remote.cpp"],
+    "j.ui": ["j.ui/j.ui.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.

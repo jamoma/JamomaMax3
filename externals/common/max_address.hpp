@@ -46,6 +46,24 @@ inline jamoma::Address resolve_in_patcher(c74::max::t_object* box, const std::st
 }
 
 /**
+ * @brief The address of the model a box belongs to: the model of the nearest enclosing patcher, or the model a view in it is bound to.
+ * @param box The box object.
+ * @return The address, or nothing if there is no model (yet).
+ */
+inline std::optional<std::string> bound_model_address(c74::max::t_object* box)
+{
+    for (const void* p = patcher_of(box); p != nullptr; p = parent_patcher(p)) {
+        if (jamoma::Registry::instance().views().find(p)) {
+            return view_model_address(p);
+        }
+        if (const jamoma::Model* model = jamoma::Registry::instance().contexts().find(p)) {
+            return model->address().str();
+        }
+    }
+    return std::nullopt;
+}
+
+/**
  * @brief Sends a value out of an outlet as the old objects did: nothing is a bang, one integer or float is a number, a list that starts
  *        with a symbol is a message, anything else is a list.
  * @param outlet The Max outlet.
