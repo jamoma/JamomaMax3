@@ -13,7 +13,7 @@
    60.0,
    60.0,
    900.0,
-   320.0
+   400.0
   ],
   "boxes": [
    {
@@ -217,6 +217,81 @@
       22.0
      ]
     }
+   },
+   {
+    "box": {
+     "id": "c",
+     "maxclass": "newobj",
+     "text": "j.parameter c @type decimal @ramp/drive max @ramp/function linear",
+     "numinlets": 1,
+     "numoutlets": 2,
+     "outlettype": [
+      "",
+      ""
+     ],
+     "patching_rect": [
+      20,
+      300,
+      260.0,
+      22.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "rc",
+     "maxclass": "newobj",
+     "text": "j.receive c",
+     "numinlets": 1,
+     "numoutlets": 3,
+     "outlettype": [
+      "",
+      "",
+      ""
+     ],
+     "patching_rect": [
+      320,
+      300,
+      260.0,
+      22.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "sc",
+     "maxclass": "newobj",
+     "text": "j.send c",
+     "numinlets": 1,
+     "numoutlets": 1,
+     "outlettype": [
+      ""
+     ],
+     "patching_rect": [
+      620,
+      300,
+      260.0,
+      22.0
+     ]
+    }
+   },
+   {
+    "box": {
+     "id": "rm",
+     "maxclass": "message",
+     "text": "0., 1. ramp 60000",
+     "numinlets": 2,
+     "numoutlets": 1,
+     "outlettype": [
+      ""
+     ],
+     "patching_rect": [
+      20,
+      260,
+      260.0,
+      22.0
+     ]
+    }
    }
   ],
   "lines": [
@@ -312,6 +387,42 @@
      ],
      "destination": [
       "p2",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "rm",
+      0
+     ],
+     "destination": [
+      "c",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "rc",
+      0
+     ],
+     "destination": [
+      "sc",
+      0
+     ]
+    }
+   },
+   {
+    "patchline": {
+     "source": [
+      "t",
+      2
+     ],
+     "destination": [
+      "rm",
       0
      ]
     }

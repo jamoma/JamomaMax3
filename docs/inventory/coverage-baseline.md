@@ -1,6 +1,6 @@
 # Conformance coverage baseline
 
-Patchers read: 95; implemented objects: 8
+Patchers read: 95; implemented objects: 13
 
 ## Objects used by the pass-bar set (patchers that use each)
 
@@ -8,20 +8,20 @@ Patchers read: 95; implemented objects: 8
 - `j.savebang`: 16 (implemented)
 - `j.model`: 11 (implemented)
 - `j.remote`: 8 (missing)
-- `j.unit`: 8 (missing)
-- `j.receive`: 5 (missing)
+- `j.unit`: 8 (implemented)
+- `j.receive`: 5 (implemented)
 - `j.view`: 5 (missing)
 - `j.return`: 4 (implemented)
 - `j.map`: 3 (missing)
 - `j.message`: 3 (implemented)
-- `j.send`: 3 (missing)
+- `j.send`: 3 (implemented)
 - `j.init`: 2 (implemented)
 - `j.namespace`: 2 (missing)
-- `j.out`: 2 (missing)
+- `j.out`: 2 (implemented)
 - `j.out~`: 2 (missing)
 - `j.ui`: 2 (missing)
 - `j.cue`: 1 (missing)
-- `j.in`: 1 (missing)
+- `j.in`: 1 (implemented)
 - `j.in~`: 1 (missing)
 - `j.limiter~`: 1 (missing)
 - `j.node`: 1 (missing)
@@ -29,16 +29,16 @@ Patchers read: 95; implemented objects: 8
 
 ## Per patcher
 
-- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`, `j.remote`, `j.send`, `j.unit`
-- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.namespace`, `j.receive`, `j.remote`, `j.send`, `j.textslider`
-- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.namespace`, `j.node`, `j.remote`, `j.unit`
-- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: `j.receive`, `j.unit`, `j.view`
-- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`, `j.receive`, `j.remote`, `j.unit`
-- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: `j.send`, `j.view`
-- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in`, `j.in~`, `j.out`, `j.out~`, `j.remote`, `j.ui`, `j.view`
-- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: `j.receive`, `j.remote`, `j.view`
-- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxhelp`: 1 objects, missing: `j.unit`
-- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxpat`: 5 objects, missing: `j.out`, `j.receive`
+- `Jamoma/help/j.message.maxhelp`: 9 objects, missing: `j.limiter~`, `j.map`, `j.remote`
+- `Jamoma/help/j.model.maxhelp`: 10 objects, missing: `j.cue`, `j.namespace`, `j.remote`, `j.textslider`
+- `Jamoma/help/j.parameter.maxhelp`: 8 objects, missing: `j.map`, `j.namespace`, `j.node`, `j.remote`
+- `Jamoma/help/j.receive.maxhelp`: 6 objects, missing: `j.view`
+- `Jamoma/help/j.return.maxhelp`: 7 objects, missing: `j.map`, `j.remote`
+- `Jamoma/help/j.send.maxhelp`: 5 objects, missing: `j.view`
+- `Jamoma/help/j.ui.maxhelp`: 11 objects, missing: `j.in~`, `j.out~`, `j.remote`, `j.ui`, `j.view`
+- `Jamoma/help/j.view.maxhelp`: 5 objects, missing: `j.remote`, `j.view`
+- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxhelp`: 1 objects, missing: none
+- `Jamoma/patchers/models/data/qmetro/qmetro.model.maxpat`: 5 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.module.maxpat`: 0 objects, missing: none
 - `Jamoma/patchers/models/data/qmetro/qmetro.view.maxpat`: 3 objects, missing: `j.remote`, `j.ui`, `j.view`
 - `JamomaIntegrationTests/patchers/tests/Modular/j.model/audio_gain/model_audio_gain_maxtest.maxpat`: 4 objects, missing: `j.out~`, `j.remote`
@@ -48,9 +48,9 @@ Patchers read: 95; implemented objects: 8
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_low.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_none.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/clipmode/j_parameter_type_array_clipmode_wrap.maxtest.maxpat`: 1 objects, missing: none
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_aed2xyz.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_aed2xyz.maxtest.maxpat`: 3 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_no_unit.maxtest.maxpat`: 1 objects, missing: none
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_xyz2aed.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_xyz2aed.maxtest.maxpat`: 3 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_dataspace.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_others.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/default_attr_value/j.parameter_type_array_default_attr_value_ramp.maxtest.maxpat`: 1 objects, missing: none
@@ -59,7 +59,7 @@ Patchers read: 95; implemented objects: 8
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/messages/j.parameter_type_array_messages.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_and_clipmode.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp/j_parameter_type_array_ramp_correct_value_and_timing.maxtest.maxpat`: 2 objects, missing: none
-- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp_dataspace/j_parameter_type_array_ramp_and_dataspace.maxtest.maxpat`: 3 objects, missing: `j.unit`
+- `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp_dataspace/j_parameter_type_array_ramp_and_dataspace.maxtest.maxpat`: 3 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_decimals.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_integers.maxtest.maxpat`: 1 objects, missing: none
 - `JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/repetitions/j_parameter_type_array_repetition_receive_lists.maxtest.maxpat`: 1 objects, missing: none

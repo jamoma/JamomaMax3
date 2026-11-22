@@ -58,3 +58,9 @@ The Windows build now uses the dynamic C runtime (`/MD`) for the core and every 
 - The patcher-to-model map (`ContextMap`) lives in the registry with the namespace, so `j.model` and the data objects, which are separate binaries, share it.
 - Sanitizer builds of the core must set `JAMOMA_PACKAGE_DIR` to their own folder: the core library is written to `package/Jamoma/support`, and a ThreadSanitizer build there breaks every external Max loads (found when it did).
 - The quit-with-live-objects check relies on the leaked registry above.
+
+## Milestone 2 addendum
+
+- **Observers** (`Data::observe`, `Namespace::observe`) call back on the thread that made the change, after every lock is released. A callback may drop its own handle, set attributes and subscribe. A callback may run once more after its handle is dropped if the change was already in flight on another thread: the Max externals therefore guard every callback with an "alive" token and defer output to the main thread when they are called from another one.
+- **Threads and Min:** the value-carrying messages of the externals are declared `message<threadsafe::yes>`; Min's default defers a call from a non-main thread and loses most of a ramp. Outlets are written with the Max API, which is safe from the scheduler thread.
+- `Receiver::bang`/`grab` and `Sender::send` are for the main thread (nodes are created and removed there); everything else in them is safe from any thread.
