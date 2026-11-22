@@ -1,0 +1,5 @@
+# Milestone 2 conformance tests: the old integration tests that need j.unit (paths relative to the old checkout).
+# The old suite has no integration tests for j.send, j.receive, j.in or j.out; those are covered by own tests (tests/max).
+JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_aed2xyz.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/dataspace/j_parameter_type_array_dataspace_xyz2aed.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.parameter/type_array/ramp_dataspace/j_parameter_type_array_ramp_and_dataspace.maxtest.maxpat
