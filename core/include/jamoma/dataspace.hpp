@@ -10,6 +10,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 #include <string_view>
 
 #include "jamoma/atom.hpp"
@@ -36,6 +37,10 @@ public:
      */
     static const Dataspace* find(std::string_view name);
 
+    /** @return The names of the dataspaces that exist, in a fixed order (gain, time, position, temperature). */
+    static std::vector<std::string> names();
+    /** @return The canonical name of every unit of this dataspace (the first of each unit's names), in the order they were defined. */
+    std::vector<std::string> unit_names() const;
     /** @return The name of the dataspace. */
     const std::string& name() const;
     /** @return The name of the neutral unit, which is the default unit. */

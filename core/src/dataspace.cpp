@@ -122,6 +122,17 @@ Dataspace::Impl make_gain()
 }
 
 /** @return The time dataspace tables. */
+Dataspace::Impl make_temperature()
+{
+    Dataspace::Impl d;
+    d.name = "temperature";
+    d.neutral = "Kelvin";
+    d.units.push_back(scalar_unit({"Kelvin", "K"}, [](double x) { return x; }, [](double x) { return x; }));
+    d.units.push_back(scalar_unit({"Celsius", "C"}, [](double x) { return x + 273.15; }, [](double x) { return x - 273.15; }));
+    d.units.push_back(scalar_unit({"Fahrenheit", "F"}, [](double x) { return (x + 459.67) / 1.8; }, [](double x) { return x * 1.8 - 459.67; }));
+    return d;
+}
+
 Dataspace::Impl make_time()
 {
     Dataspace::Impl d;
@@ -222,12 +233,15 @@ struct DataspaceTables {
         static const Dataspace::Impl gain_impl = make_gain();
         static const Dataspace::Impl time_impl = make_time();
         static const Dataspace::Impl position_impl = make_position();
+        static const Dataspace::Impl temperature_impl = make_temperature();
         static const Dataspace gain(&gain_impl);
         static const Dataspace time(&time_impl);
         static const Dataspace position(&position_impl);
+        static const Dataspace temperature(&temperature_impl);
         if (name == "gain") return &gain;
         if (name == "time") return &time;
         if (name == "position") return &position;
+        if (name == "temperature") return &temperature;
         return nullptr;
     }
 };
@@ -245,6 +259,17 @@ const std::string& Dataspace::name() const
 std::string Dataspace::default_unit() const
 {
     return impl_->neutral;
+}
+
+std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature"}; }
+
+std::vector<std::string> Dataspace::unit_names() const
+{
+    std::vector<std::string> out;
+    for (const UnitDefinition& u : impl_->units) {
+        out.push_back(u.names.front());
+    }
+    return out;
 }
 
 bool Dataspace::has_unit(std::string_view unit) const

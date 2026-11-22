@@ -130,7 +130,7 @@
     "box": {
      "id": "d",
      "maxclass": "newobj",
-     "text": "delay 1200",
+     "text": "delay 4000",
      "numinlets": 2,
      "numoutlets": 1,
      "outlettype": [

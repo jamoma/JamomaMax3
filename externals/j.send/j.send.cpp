@@ -72,25 +72,25 @@ public:
     }};
 
     /** A bang is forwarded. */
-    message<> bang{this, "bang", MIN_FUNCTION {
+    message<threadsafe::yes> bang{this, "bang", MIN_FUNCTION {
         forward(jamoma::Value{});
         return {};
     }};
 
     /** An integer is forwarded. */
-    message<> m_int{this, "int", MIN_FUNCTION {
+    message<threadsafe::yes> m_int{this, "int", MIN_FUNCTION {
         forward(jamoma_max::to_value(args));
         return {};
     }};
 
     /** A float is forwarded. */
-    message<> m_float{this, "float", MIN_FUNCTION {
+    message<threadsafe::yes> m_float{this, "float", MIN_FUNCTION {
         forward(jamoma_max::to_value(args));
         return {};
     }};
 
     /** A list is forwarded. */
-    message<> m_list{this, "list", MIN_FUNCTION {
+    message<threadsafe::yes> m_list{this, "list", MIN_FUNCTION {
         forward(jamoma_max::to_value(args));
         return {};
     }};
@@ -107,7 +107,7 @@ public:
      * Any other message: `address <symbol>` sets the target; a symbol (`symbol <name>`) is forwarded as a symbol; with no address
      * of its own, a message whose selector is an absolute address sets the target and sends the rest; any other message is forwarded whole.
      */
-    message<> m_anything{this, "anything", MIN_FUNCTION {
+    message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
         atoms message = args;
         bool is_symbol = false;
         if (message.size() >= 2 && static_cast<symbol>(message[0]) == symbol("symbol")) {

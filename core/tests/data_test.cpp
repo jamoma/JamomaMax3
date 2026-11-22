@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "jamoma/data.hpp"
+#include "jamoma/dataspace.hpp"
 #include "manual_clock.hpp"
 
 using jamoma::Atom;
@@ -1034,4 +1035,38 @@ TEST_CASE("data observer may unregister and command in its callback")
     d.command(Value{f(0.6)});
     REQUIRE(calls == 1);
     REQUIRE(d.priority() == 3);
+}
+
+/** A ramp whose command names a unit other than the parameter's, converted back, follows the same path as a parameter in that unit (old ramp_and_dataspace test). */
+TEST_CASE("ramp in another unit matches a parameter in that unit")
+{
+    ManualClock clock_aed, clock_xyz;
+    Data aed, xyz;
+    for (Data* d : {&aed, &xyz}) {
+        d->set_type(DataType::Array);
+        d->set_dataspace("position");
+        d->set_ramp_drive("max");
+        d->set_ramp_function("linear");
+    }
+    aed.set_unit("aed");
+    xyz.set_unit("xyz");
+    aed.set_clock(&clock_aed);
+    xyz.set_clock(&clock_xyz);
+    std::vector<Value> from_aed, from_xyz;
+    aed.set_output([&](const Value& v) { from_aed.push_back(*jamoma::Dataspace::find("position")->convert(v, "aed", "xyz")); });
+    xyz.set_output([&](const Value& v) { from_xyz.push_back(v); });
+    aed.command(Value{f(-1.0), f(-1.0), f(-1.0), Atom("xyz")});
+    aed.command(Value{f(0.9), f(0.2), f(7.0), Atom("xyz"), Atom("ramp"), i(200)});
+    xyz.command(Value{f(-1.0), f(-1.0), f(-1.0)});
+    xyz.command(Value{f(0.9), f(0.2), f(7.0), Atom("ramp"), i(200)});
+    clock_aed.advance(1000.0);
+    clock_xyz.advance(1000.0);
+    REQUIRE(from_aed.size() == from_xyz.size());
+    REQUIRE(from_aed.size() >= 4);
+    for (std::size_t n = 0; n < from_aed.size(); ++n) {
+        REQUIRE(from_aed[n].size() == 3);
+        for (std::size_t k = 0; k < 3; ++k) {
+            REQUIRE(std::fabs(from_aed[n][k].as_double() - from_xyz[n][k].as_double()) < 1e-6);
+        }
+    }
 }

@@ -97,25 +97,25 @@ public:
     }};
 
     /** A bang outputs the current value. */
-    c74::min::message<> bang{this, "bang", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> bang{this, "bang", MIN_FUNCTION {
         data_.command(jamoma::Value{});
         return {};
     }};
 
     /** An integer is a command. */
-    c74::min::message<> m_int{this, "int", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> m_int{this, "int", MIN_FUNCTION {
         data_.command(to_value(args));
         return {};
     }};
 
     /** A float is a command. */
-    c74::min::message<> m_float{this, "float", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> m_float{this, "float", MIN_FUNCTION {
         data_.command(to_value(args));
         return {};
     }};
 
     /** A list is a command. */
-    c74::min::message<> m_list{this, "list", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> m_list{this, "list", MIN_FUNCTION {
         data_.command(to_value(args));
         return {};
     }};
@@ -124,7 +124,7 @@ public:
      * Any other message. A symbol arrives as `symbol <name>` and is treated as the message `<name>`. The plus and minus symbols
      * step the value; a message named like an attribute is an attribute message (see attribute_message()); anything else is a command.
      */
-    c74::min::message<> m_anything{this, "anything", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
         c74::min::atoms message = args;
         if (message.size() >= 2 && static_cast<c74::min::symbol>(message[0]) == c74::min::symbol("symbol")) {
             message.erase(message.begin());
@@ -144,13 +144,13 @@ public:
     }};
 
     /** Increases the value by the step size (times the argument). */
-    c74::min::message<> inc{this, "inc", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> inc{this, "inc", MIN_FUNCTION {
         data_.inc(to_value(args));
         return {};
     }};
 
     /** Decreases the value by the step size (times the argument). */
-    c74::min::message<> dec{this, "dec", MIN_FUNCTION {
+    c74::min::message<threadsafe::yes> dec{this, "dec", MIN_FUNCTION {
         data_.dec(to_value(args));
         return {};
     }};

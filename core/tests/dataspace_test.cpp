@@ -240,3 +240,39 @@ TEST_CASE("position at the origin and short inputs")
     const auto short_input = vec({1}, "xyz", "xyz");
     REQUIRE(short_input == std::vector<double>{1, 0, 0});
 }
+
+/** The temperature dataspace: the cases of the old TemperatureDataspace test. */
+TEST_CASE("temperature conversions match the old tests")
+{
+    REQUIRE(jamoma::Dataspace::find("temperature") != nullptr);
+    REQUIRE(close(scalar("temperature", 256.0, "Kelvin", "Kelvin"), 256.0));
+    REQUIRE(close(scalar("temperature", 0.0, "Celsius", "Kelvin"), 273.15));
+    REQUIRE(close(scalar("temperature", 32.0, "Fahrenheit", "Kelvin"), 273.15));
+    REQUIRE(close(scalar("temperature", 273.15, "Kelvin", "Celsius"), 0.0));
+    REQUIRE(close(scalar("temperature", 273.15, "Kelvin", "Fahrenheit"), 32.0));
+    REQUIRE(close(scalar("temperature", 100.0, "C", "F"), 212.0));
+    REQUIRE(close(scalar("temperature", 0.0, "K", "C"), -273.15));
+}
+
+/** The menus of j.unit: the names of the dataspaces and the canonical names of the units. */
+TEST_CASE("dataspace and unit names")
+{
+    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature"});
+    REQUIRE(Dataspace::find("temperature")->unit_names() == std::vector<std::string>{"Kelvin", "Celsius", "Fahrenheit"});
+    REQUIRE(Dataspace::find("gain")->unit_names().front() == "linear");
+    REQUIRE(Dataspace::find("temperature")->default_unit() == "Kelvin");
+}
+
+/** The aed values a ramp produces on the way (old ramp_and_dataspace test) convert back to xyz without loss. */
+TEST_CASE("aed values along a ramp convert to xyz")
+{
+    const std::vector<std::vector<double>> aed{{-135.0, -35.26439, 1.732051}, {-137.371842, -9.49312, 1.212642}, {-140.792796, 31.455607, 1.149783},
+                                               {-146.103833, 61.156594, 1.59828}, {-155.224859, 75.408396, 2.273324}, {-172.874984, 82.346951, 3.026962}};
+    for (const auto& v : aed) {
+        const auto xyz = vec(v, "aed", "xyz");
+        REQUIRE(xyz.size() == 3);
+        for (double x : xyz) {
+            REQUIRE(std::isfinite(x));
+        }
+    }
+}

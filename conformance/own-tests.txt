@@ -11,3 +11,4 @@ tests/max/patchers/send_basic.maxtest.maxpat
 tests/max/patchers/send_attribute.maxtest.maxpat
 tests/max/patchers/send_relative.maxtest.maxpat
 tests/max/patchers/receive_feedback.maxtest.maxpat
+tests/max/patchers/unit_basic.maxtest.maxpat

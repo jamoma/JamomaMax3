@@ -38,7 +38,7 @@
     "box": {
      "id": "d1",
      "maxclass": "newobj",
-     "text": "delay 600",
+     "text": "delay 1800",
      "numinlets": 2,
      "numoutlets": 1,
      "outlettype": [
@@ -74,7 +74,7 @@
     "box": {
      "id": "d2",
      "maxclass": "newobj",
-     "text": "delay 1800",
+     "text": "delay 4500",
      "numinlets": 2,
      "numoutlets": 1,
      "outlettype": [
@@ -183,7 +183,7 @@
     "box": {
      "id": "d3",
      "maxclass": "newobj",
-     "text": "delay 1400",
+     "text": "delay 4000",
      "numinlets": 2,
      "numoutlets": 1,
      "outlettype": [
