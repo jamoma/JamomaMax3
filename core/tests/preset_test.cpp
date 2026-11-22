@@ -213,7 +213,7 @@ TEST_CASE("preset may be recalled while a ramp runs")
 {
     Rig r;
     Data& d = r.add("a", 0.0);
-    d.set_attribute("ramp/drive", {"scheduler"});
+    d.set_attribute("ramp/drive", {"system"});
     r.presets.new_preset("zero");
     d.command({"100", "ramp", "1000"});
     r.clock.advance(100.0);

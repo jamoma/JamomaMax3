@@ -16,6 +16,7 @@ add_library(jamoma_core SHARED
     src/model.cpp
     src/preset.cpp
     src/preset_files.cpp
+    src/remote.cpp
     src/receiver.cpp
     src/sender.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
@@ -49,6 +50,7 @@ add_executable(jamoma_core_tests
     tests/model_test.cpp
     tests/preset_test.cpp
     tests/preset_files_test.cpp
+    tests/remote_test.cpp
     tests/receiver_test.cpp
     tests/sender_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
