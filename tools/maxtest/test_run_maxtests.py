@@ -124,6 +124,12 @@ class NameTests(unittest.TestCase):
             rm.test_name("Jamoma/help/j.send.maxhelp")
 
 
+class FastModeTests(unittest.TestCase):
+    def test_only_tests_that_did_not_pass_are_rerun(self):
+        results = {"a": ("PASS", "1"), "b": ("FAIL", "x"), "c": ("TIMEOUT", "y")}
+        self.assertEqual(rm.needs_isolated_rerun(results), ["b", "c"])
+
+
 class ProgressBarTests(unittest.TestCase):
     def test_bar_shows_fraction_and_counts(self):
         self.assertEqual(rm.progress_bar(0, 4, 8), "[        ]   0/4")

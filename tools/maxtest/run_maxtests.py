@@ -162,6 +162,11 @@ def progress_bar(done: int, total: int, width: int = 30) -> str:
     return "[" + "=" * max(filled - 1, 0) + (head if filled else "") + " " * (width - filled) + f"] {done:>3}/{total}"
 
 
+def needs_isolated_rerun(results: dict) -> list:
+    """The names of the tests that did not pass in a batch run; each is run again alone, and that result counts."""
+    return [name for name, (status, _detail) in results.items() if status != "PASS"]
+
+
 def read_set(path) -> list:
     """Reads the test list: one path per line, skipping blank lines and # comments."""
     lines = [l.strip() for l in pathlib.Path(path).read_text(encoding="utf-8").splitlines()]
@@ -231,6 +236,9 @@ def main() -> int:
     p.add_argument("--max-test", type=pathlib.Path, default=pathlib.Path.home() / "Developer/Jamoma/max-test")
     p.add_argument("--package", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "package/Jamoma")
     p.add_argument("--per-launch", type=int, default=1, help="tests per Max launch (1 isolates crashes)")
+    p.add_argument("--fast", type=int, metavar="N", help="quick mode: N tests per Max launch, then every test that did not pass is run again alone "
+                   "in a fresh Max and that result counts. Faster, with the same verdict for failures; run without --fast before a merge, "
+                   "because a pass in a shared session could in principle depend on what ran before it")
     p.add_argument("--timeout", type=int, default=60, help="seconds per test")
     args = p.parse_args()
 
@@ -254,9 +262,15 @@ def main() -> int:
             links.add("JamomaMax3Tests", own)
         ordered = list(names)
         with tempfile.TemporaryDirectory() as work:
-            for i in range(0, len(ordered), args.per_launch):
-                batch = ordered[i:i + args.per_launch]
+            step = args.fast or args.per_launch
+            for i in range(0, len(ordered), step):
+                batch = ordered[i:i + step]
                 results, crashed = run_batch(batch, work, args.timeout)
+                if args.fast:
+                    for name in needs_isolated_rerun(results):
+                        again, alone_crashed = run_batch([name], work, args.timeout)
+                        results[name] = again[name]
+                        crashed = crashed or alone_crashed
                 for name, (status, detail) in results.items():
                     rows.append((names[name], status, detail))
                     print(f"{progress_bar(len(rows), len(ordered))} {status:8} {names[name]}  {detail}", flush=True)
