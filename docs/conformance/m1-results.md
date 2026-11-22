@@ -7,10 +7,7 @@ all seven help patchers open without missing objects; the reference pages match 
 messages; Max quits by itself with live models, parameters and running ramps and writes no crash report
 (`scripts/max-smoke.sh tests/smoke/quit_live_objects`).
 
-Note on one result: the full run recorded a timeout for the string `default_attr_value/value` test, because `j.model`
-crashed Max (attributes were set before its model pointer existed; fixed by declaring the state before the attributes).
-That one test was re-run alone after the fix and passes; the other 81 results are from the full run. A complete re-run
-is still to be done before the milestone is merged.
+This is one complete run, made after the fixes from the final review, with no Max crash.
 
 ## Not passing, with the cause
 
@@ -106,7 +103,7 @@ is still to be done before the milestone is merged.
 | `j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_others.maxtest.maxpat` | PASS | 7 assertions |
 | `j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_ramp.maxtest.maxpat` | PASS | 3 assertions |
 | `j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_range.maxtest.maxpat` | PASS | 2 assertions |
-| `j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_value.maxtest.maxpat` | PASS | re-run alone after the j.model fix (see below) |
+| `j.parameter/type_string/default_attr_value/j.parameter_type_string_default_attr_value_value.maxtest.maxpat` | PASS | 2 assertions |
 
 ## What remains of the 22 objects used by the pass-bar set
 

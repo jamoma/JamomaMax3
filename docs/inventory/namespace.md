@@ -29,9 +29,14 @@ The subscribed node's address is then reported back (relative to the context nod
 - Unsubscribing an object whose node has **no children** removes the node; a node **with children** only loses its object (observers are notified of the unregistration). *Read.*
 - After a removal, the **parent is removed too if it has no children and no valid object**, recursively upwards (the root is never removed). *Read.*
 
-## Not characterised yet (milestone 1, Task 9)
+## Models and contexts (milestone 1, Task 9)
 
-How a patcher (a model) becomes a context node and how its abstraction instances are named (`name.1`): written in this file when Task 9 reads `TTSubscriber::registerContextList`.
+Written from the old `TTContainer::initNode`, `TTApplication` and the old `j.init` / `j.model` sources, and from the one old test that uses `j.model` and `j.init`.
+
+- A `j.model` subscribes at `/<name>`: its first argument, else the file name of its patcher (the `.maxpat` removed, dots, spaces and slashes replaced by underscores, because a dot starts an instance). A second model with the same name becomes `/<name>.1`.
+- A data object (`j.parameter`, `j.message`, `j.return`) first subscribes at the top level, `/<name>`, so it works without a model. Once the patcher has finished loading (a deferred call) it looks for a model: the model of its own patcher, else of the nearest enclosing patcher, and if there is one it subscribes again at `<model address>/<name>`. An object created without a name uses its role as the name: `parameter`, `message` or `return`.
+- Models are flat in milestone 1: a model inside the patcher of another model is at the top level, not below it (nested addresses and `amenities` come with `j.view` and `j.ui` in milestone 3).
+- Initialisation (`Model::init`): children are visited in order of priority, then name, then instance; only data with the parameter service are initialised; a nested model runs its own init at its place; every child is looked up again by address before it is used, so one removed meanwhile is skipped. `j.model` initialises itself two deferred hops after creation, so every data object has joined it first.
 
 ## Differences chosen on purpose
 

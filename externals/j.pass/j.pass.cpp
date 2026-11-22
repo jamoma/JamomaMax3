@@ -92,7 +92,7 @@ void pass_assist(t_pass* x, void*, long msg, long arg, char* dst)
 }
 
 /** An integer goes to the outlet of the first equal integer argument. @param x The object. @param n The number. */
-void pass_int(t_pass* x, long n)
+void pass_int(t_pass* x, t_atom_long n)
 {
     for (long i = 0; i < x->count; ++i) {
         if (atom_gettype(&x->arguments[i]) == A_LONG && n == atom_getlong(&x->arguments[i])) {

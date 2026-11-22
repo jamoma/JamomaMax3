@@ -763,6 +763,41 @@ TEST_CASE("data destroyed while a tick is pending never calls back")
     REQUIRE_FALSE(clock.has_pending());
 }
 
+/** An output callback may free the data object that is calling it; the command must not touch it afterwards (run under AddressSanitizer). */
+TEST_CASE("output callback may free the data object during a command")
+{
+    auto data = std::make_unique<Data>();
+    data->set_type(DataType::Decimal);
+    int outputs = 0;
+    data->set_output([&](const Value&) {
+        ++outputs;
+        data.reset();
+    });
+    data->command(Value{f(0.5)});
+    REQUIRE(outputs == 1);
+    REQUIRE(data == nullptr);
+}
+
+/** A ramp tick whose output frees the data object leaves nothing pending and nothing to call back. */
+TEST_CASE("ramp tick may free the data object")
+{
+    ManualClock clock;
+    auto data = std::make_unique<Data>();
+    data->set_type(DataType::Decimal);
+    data->set_ramp_drive("max");
+    data->set_clock(&clock);
+    int outputs = 0;
+    data->set_output([&](const Value&) {
+        if (++outputs == 2) {
+            data.reset(); // the first tick frees the object
+        }
+    });
+    data->command(Value{f(100.0), Atom("ramp"), i(100)});
+    clock.advance(1000.0);
+    REQUIRE(outputs == 2);
+    REQUIRE_FALSE(clock.has_pending());
+}
+
 /** An integer ramp outputs whole numbers. */
 TEST_CASE("integer ramp outputs whole numbers")
 {

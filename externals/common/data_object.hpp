@@ -51,6 +51,9 @@ public:
      */
     explicit data_object(const c74::min::atoms& args = {})
     {
+        if (c74::min::dummy()) {
+            return; // Min builds one instance without a Max object while it sets the class up: no side effects
+        }
         if (!jamoma::Registry::check_abi(jamoma::kAbiVersion)) {
             throw std::runtime_error("Jamoma: core ABI mismatch");
         }
@@ -70,6 +73,17 @@ public:
         subscribe(name);
         // Once the whole patcher exists, move under the model of the patcher (if there is one).
         defer_call(this->maxobj(), alive_.weak(), [this] { join_model(); });
+    }
+
+    /**
+     * Unsubscribes first and cuts the data object off from the clock and the outlets, so that nothing (another thread's lookup,
+     * a ramp tick that is running now) can reach members that are about to be destroyed.
+     */
+    ~data_object() override
+    {
+        subscription_ = jamoma::Subscription();
+        data_.set_output(nullptr);
+        data_.set_clock(nullptr);
     }
 
     c74::min::inlet<> input{this, "(anything) value or message"};         /**< The inlet. */
@@ -270,6 +284,9 @@ private:
     /** Sets an attribute. @param a Which attribute. @param v The new value (not empty). */
     void set_attr(Attr a, const jamoma::Value& v)
     {
+        if (v.empty()) {
+            return; // nothing usable was given (the Max setter drops atoms that are neither numbers nor symbols)
+        }
         switch (a) {
         case Attr::Type: data_.set_type(jamoma::data_type_from_name(first_text(v))); break;
         case Attr::Range: data_.set_range(v); break;
@@ -402,7 +419,7 @@ private:
         if (v.empty()) {
             data_out.send("bang");
         } else if (v.size() == 1 && v[0].is_int()) {
-            data_out.send(static_cast<long>(v[0].as_int()));
+            data_out.send(static_cast<c74::max::t_atom_long>(v[0].as_int()));
         } else if (v.size() == 1 && v[0].is_float()) {
             data_out.send(v[0].as_double());
         } else {

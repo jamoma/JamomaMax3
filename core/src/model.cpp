@@ -117,11 +117,12 @@ bool Model::initialized() const { return impl_->initialized; }
 
 void Model::init()
 {
-    impl_->initialized = false;
-    impl_->notify(false);
-    init_children(*impl_->ns, address(), this);
-    impl_->initialized = true;
-    impl_->notify(true);
+    const std::shared_ptr<Impl> keep = impl_; // an observer or a parameter's output may free the owner of this model
+    keep->initialized = false;
+    keep->notify(false);
+    init_children(*keep->ns, keep->subscription.address(), this);
+    keep->initialized = true;
+    keep->notify(true);
 }
 
 std::shared_ptr<void> Model::on_init_changed(std::function<void(bool)> callback)

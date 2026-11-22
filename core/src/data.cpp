@@ -79,7 +79,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     std::string ramp_drive = "none";       /**< The ramp drive: none, max or system. */
     bool ramp_drive_explicit = false;      /**< Whether the drive was set by the user. */
     std::string ramp_function = "none";    /**< The ramp function name (the old default, which behaves as linear). */
-    std::unique_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp. */
+    std::shared_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp (shared so a command that starts a ramp keeps it alive). */
     std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
 
     /** A ramp to start once the command has been processed and its lock and guard released. */
@@ -226,17 +226,17 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     }
 
     /** @return The ramp engine, created on first use. */
-    Ramp* ensure_ramp()
+    std::shared_ptr<Ramp> ensure_ramp()
     {
         if (!ramp) {
             std::weak_ptr<Impl> weak = weak_from_this();
-            ramp = std::make_unique<Ramp>(*clock, [weak](const std::vector<double>& v) {
+            ramp = std::make_shared<Ramp>(*clock, [weak](const std::vector<double>& v) {
                 if (auto state = weak.lock()) {
                     state->apply_ramp_value(v);
                 }
             });
         }
-        return ramp.get();
+        return ramp;
     }
 
     /** Handles one value emitted by the ramp: unit conversion, filter, clip, store, output. @param v The ramp's vector. */
@@ -385,11 +385,16 @@ Data::Data(Service service) : impl_(std::make_shared<Impl>(service)) {}
 
 Data::~Data()
 {
-    // Stop the ramp so that no tick is pending; the clock must still be alive (it outlives this object).
+    // The clock must still be alive here (it outlives this object). Destroy the ramp now, so that no tick is pending and
+    // the last owner of the state (a tick that is running this very moment) never touches the clock; forget the clock and
+    // the output so that such a tick cannot call into the object that owns them.
     std::lock_guard<std::mutex> lock(impl_->mutex);
     if (impl_->ramp) {
         impl_->ramp->stop();
+        impl_->ramp.reset();
     }
+    impl_->clock = nullptr;
+    impl_->output = nullptr;
 }
 
 Service Data::service() const noexcept { return impl_->service; }
@@ -602,9 +607,10 @@ void Data::set_output(std::function<void(const Value&)> output)
 
 void Data::command(const Value& input)
 {
-    Impl& s = *impl_;
+    const std::shared_ptr<Impl> keep = impl_; // the output callback may free the owner of this object
+    Impl& s = *keep;
     std::optional<Impl::RampPlan> plan;
-    Ramp* ramp = nullptr;
+    std::shared_ptr<Ramp> ramp;
     {
         if (s.sending.exchange(true)) {
             return; // another command is in progress (possibly this thread's own output callback): dropped
@@ -632,7 +638,7 @@ void Data::command(const Value& input)
             callback(out);
         }
     } // the guard is released here, so the ramp's first value can pass through it
-    if (plan && ramp != nullptr) {
+    if (plan && ramp) {
         ramp->start(plan->from, plan->to, plan->duration_ms, plan->function);
     }
 }
