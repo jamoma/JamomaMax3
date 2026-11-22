@@ -14,6 +14,10 @@ macOS arm64, Max 9, one test per Max launch (`scripts/run-maxtests.sh`), after t
 | Core unit tests | 218 pass; also under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer (no reports) |
 | Doxygen | no warnings |
 
+## After the final review
+
+The review found threading problems introduced when the value messages were made thread safe (Task 9); they were fixed and the whole set was run again in quick mode (`--fast`): 82 of 82 old tests, 15 of 15 own tests, 3 of 3 `j.unit` tests, 12 of 12 help patchers, the quit smoke, and 221 core unit tests under ASan/UBSan and TSan. The table above is the one-test-per-launch run made before the fixes; a one-test-per-launch run of the final tree is still to be done before merging.
+
 ## Not covered
 
 - **No old integration tests exist for `j.send`, `j.receive`, `j.in` or `j.out`.** Their behaviour was read from the old source (`docs/inventory/send-receive.md`, `docs/inventory/j.in-j.out.md`) and is checked by the own tests only. The old help patchers of these objects open without a missing object but their behaviour in them was not compared.

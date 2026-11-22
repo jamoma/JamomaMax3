@@ -73,25 +73,25 @@ public:
 
     /** A bang is forwarded. */
     message<threadsafe::yes> bang{this, "bang", MIN_FUNCTION {
-        forward(jamoma::Value{});
+        forward_later(jamoma::Value{});
         return {};
     }};
 
     /** An integer is forwarded. */
     message<threadsafe::yes> m_int{this, "int", MIN_FUNCTION {
-        forward(jamoma_max::to_value(args));
+        forward_later(jamoma_max::to_value(args));
         return {};
     }};
 
     /** A float is forwarded. */
     message<threadsafe::yes> m_float{this, "float", MIN_FUNCTION {
-        forward(jamoma_max::to_value(args));
+        forward_later(jamoma_max::to_value(args));
         return {};
     }};
 
     /** A list is forwarded. */
     message<threadsafe::yes> m_list{this, "list", MIN_FUNCTION {
-        forward(jamoma_max::to_value(args));
+        forward_later(jamoma_max::to_value(args));
         return {};
     }};
 
@@ -108,6 +108,18 @@ public:
      * of its own, a message whose selector is an absolute address sets the target and sends the rest; any other message is forwarded whole.
      */
     message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
+        const atoms copy = args;
+        jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, copy] { handle_message(copy); });
+        return {};
+    }};
+
+    /** Class setup: nothing to add. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+
+private:
+    /** Handles a message other than bang, int, float and list (on the main thread). @param args The message with its selector first. */
+    void handle_message(const atoms& args)
+    {
         atoms message = args;
         bool is_symbol = false;
         if (message.size() >= 2 && static_cast<symbol>(message[0]) == symbol("symbol")) {
@@ -125,13 +137,14 @@ public:
         } else if (!text_.empty() || is_symbol) {
             forward(jamoma_max::to_value(message));
         }
-        return {};
-    }};
+    }
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Forwards a value on the main thread (the Sender and the namespace nodes belong to it). @param v The value. */
+    void forward_later(const jamoma::Value& v)
+    {
+        jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, v] { forward(v); });
+    }
 
-private:
     /** Binds (again) to the address as written, resolved against the model of the patcher, and reports it. */
     void rebind()
     {

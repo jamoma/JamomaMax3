@@ -140,14 +140,16 @@ TEST_CASE("recursion through receiver is dropped once")
     Sender s(ns);
     s.set_address(Address::parse("/m/p"));
     int callbacks = 0;
+    bool inner_reached = true;
     Receiver r(ns, [](const Address&) {}, [&](const Value&) {
         ++callbacks;
-        s.send(Value{f(0.9)}); // the guard of s drops this one
+        inner_reached = s.send(Value{f(0.9)}); // the guard of s drops this one: nothing is reached
     });
     r.set_address(Address::parse("/m/p"));
     callbacks = 0; // the report on binding
     REQUIRE(s.send(Value{f(0.5)}));
     REQUIRE(callbacks == 1);
+    REQUIRE_FALSE(inner_reached); // only the sender's own guard can make this false: the Data would have accepted a command
     REQUIRE(p.data.value() == Value{f(0.5)});
 }
 
@@ -166,6 +168,8 @@ TEST_CASE("two parameters bound through sender and receiver settle")
     Value last_a, last_b;
     Receiver ra(ns, [](const Address&) {}, [&](const Value& v) { last_a = v; to_b.send(v); });
     Receiver rb(ns, [](const Address&) {}, [&](const Value& v) { last_b = v; to_a.send(v); });
+    (void)last_a;
+    (void)last_b;
     ra.set_address(Address::parse("/m/a"));
     rb.set_address(Address::parse("/m/b"));
     REQUIRE(entry.send(Value{f(0.5)}));

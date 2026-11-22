@@ -42,3 +42,8 @@ Differences from the old behaviour, on top of the list above. The old test suite
 - Network OSC (`directory:` addresses beyond parsing, remote applications), `j.remote`, `j.view`, `j.ui`, presets (milestone 3).
 - `j.map`, `j.cue` (milestone 3 and 4), `j.namespace`, `j.node` (decided in the milestone 3 plan).
 - Messages and attributes removed from the reference pages because they are not built: see the ledger of milestone 2 and `docs/changes.md` above (preset messages of `j.model`; `type` and `dump` of `j.in` / `j.out`).
+
+## Known gaps found in the milestone 2 review
+
+- A `j.send` or `j.receive` binds to the model of its patcher once, after the patcher has loaded. A model that appears later (created by script) or is replaced under another name (`name.1`) is not followed; set the `address` attribute again. (Planned in the first draft of the milestone 2 plan; left out: it needs a model observer.)
+- A `j.parameter` still drops a command that arrives while another command (on another thread, for example a ramp tick) is being processed, as the old object did.

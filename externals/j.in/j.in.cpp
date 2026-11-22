@@ -10,6 +10,7 @@
  * docs/inventory/j.in-j.out.md.
  */
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -28,6 +29,7 @@ class j_in : public c74::min::object<j_in> {
     jamoma::Subscription subscription_;            /**< Its registration. */
     std::string instance_ = "1";                   /**< The instance (the creation argument). */
     jamoma_max::Alive alive_;                      /**< Lets deferred calls see that the object is gone. */
+    std::atomic<int> mute_{0};                     /**< Copy of the mute attribute that pass() reads (values arrive on any thread). */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -52,7 +54,11 @@ public:
     jamoma_max::dump_outlet data_out{this, "(anything) the data"};     /**< Outlet 0. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};         /**< Outlet 1: the dump outlet. */
 
-    attribute<int> mute{this, "mute", 0};       /**< When on, nothing passes. */
+    /** When on, nothing passes. */
+    attribute<int> mute{this, "mute", 0, setter{MIN_FUNCTION {
+        mute_.store(static_cast<int>(args[0]));
+        return args;
+    }}};
     attribute<int> bypass{this, "bypass", 0};   /**< Stored only: the link to the j.out of the same instance is not built yet. */
 
     /** After construction: registers the dump outlet. */
@@ -89,7 +95,15 @@ public:
         }
         const std::string selector = static_cast<symbol>(message[0]).c_str();
         if (message.size() >= 2 && (selector == "mute" || selector == "bypass")) {
-            (selector == "mute" ? mute : bypass) = static_cast<int>(message[1]);
+            // Setting a Min attribute is for the main thread (its setter and Max's notifications run there).
+            const int number = static_cast<int>(message[1]);
+            jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, selector, number] {
+                if (selector == "mute") {
+                    mute = number;
+                } else {
+                    bypass = number;
+                }
+            });
         } else {
             pass(jamoma_max::to_value(message));
         }
@@ -112,7 +126,7 @@ private:
     /** Sends a value into the model unless muted. @param in The incoming value. */
     void pass(const jamoma::Value& in)
     {
-        if (static_cast<int>(mute) != 0) {
+        if (mute_.load() != 0) {
             return;
         }
         jamoma_max::output_value(data_out.max_outlet(), in);

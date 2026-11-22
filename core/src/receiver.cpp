@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -41,6 +42,9 @@ struct Receiver::Impl : std::enable_shared_from_this<Receiver::Impl> {
     unsigned generation = 0;                         /**< Counts rebinds so that late callbacks of an old binding are ignored. */
     std::vector<Binding> bindings;                   /**< The bound nodes in binding order. */
     std::shared_ptr<void> ns_observer;               /**< Keeps the namespace observer registered. */
+    std::atomic<int> in_flight{0};                   /**< How many callbacks (of the observers) are running now, on any thread. */
+    std::mutex idle_mutex;                           /**< Guards the wait for in_flight to reach zero. */
+    std::condition_variable idle;                    /**< Signalled when in_flight drops to zero. */
 
     /** @param node A node address. @param attr The followed attribute. @return What is reported as its address: with `:<attribute>` unless the attribute is `value`. */
     Address report_address(const Address& node, const std::string& attr) const
@@ -61,6 +65,42 @@ struct Receiver::Impl : std::enable_shared_from_this<Receiver::Impl> {
 };
 
 namespace {
+
+thread_local const void* t_inside = nullptr; /**< The receiver whose callback this thread is running, or null. */
+
+/** Marks a callback as in flight for its lifetime; the receiver's destructor and set_address wait for these (see wait_idle). */
+struct Flight {
+    /** @param i The receiver state; it must stay alive for the lifetime of this object (hold a shared pointer). */
+    explicit Flight(Receiver::Impl* i) : impl(i), previous(t_inside)
+    {
+        ++impl->in_flight;
+        t_inside = impl;
+    }
+    ~Flight()
+    {
+        t_inside = previous;
+        if (--impl->in_flight == 0) {
+            std::lock_guard<std::mutex> lock(impl->idle_mutex);
+            impl->idle.notify_all();
+        }
+    }
+    Flight(const Flight&) = delete;            /**< A flight is never copied. */
+    Flight& operator=(const Flight&) = delete; /**< A flight is never assigned. */
+    Receiver::Impl* impl;                      /**< The receiver state. */
+    const void* previous;                      /**< What this thread was inside before. */
+};
+
+/**
+ * Waits until no callback of this receiver is running on another thread; callbacks running on the calling thread (a receiver rebound or
+ * destroyed from inside its own callback) are not waited for.
+ * @param impl The receiver state.
+ */
+void wait_idle(Receiver::Impl& impl)
+{
+    const int mine = (t_inside == &impl) ? 1 : 0;
+    std::unique_lock<std::mutex> lock(impl.idle_mutex);
+    impl.idle.wait(lock, [&impl, mine] { return impl.in_flight.load() <= mine; });
+}
 
 /**
  * Binds one node: observes the attribute and, if asked, reports the current value once.
@@ -84,7 +124,11 @@ void bind_node(const std::shared_ptr<Receiver::Impl>& impl, const Address& node,
     std::weak_ptr<Receiver::Impl> weak = impl;
     std::shared_ptr<void> observer = data->observe(attr, [weak, node, attr, gen](const Value& v) {
         const auto keep = weak.lock();
-        if (!keep || !keep->active.load() || v.empty()) {
+        if (!keep) {
+            return;
+        }
+        const Flight flight(keep.get()); // counted before the generation check, so a destructor that bumps it waits for us
+        if (!keep->active.load() || v.empty()) {
             return;
         }
         {
@@ -120,6 +164,7 @@ void bind_node(const std::shared_ptr<Receiver::Impl>& impl, const Address& node,
 /** Reacts to an object appearing or going at the address. */
 void on_node_event(const std::shared_ptr<Receiver::Impl>& impl, unsigned gen, const Address& node, Object* object, bool created)
 {
+    const Flight flight(impl.get());
     std::string attr;
     {
         std::lock_guard<std::mutex> lock(impl->mutex);
@@ -178,6 +223,7 @@ void Receiver::set_address(const Address& address)
     }
     old_bindings.clear();
     old_observer.reset();
+    wait_idle(*impl_); // callbacks of the old binding that are running on other threads finish before we go on
     if (address.empty()) {
         return;
     }
@@ -216,6 +262,7 @@ bool Receiver::active() const { return impl_->active.load(); }
 
 bool Receiver::bang()
 {
+    const Flight flight(impl_.get());
     Address node;
     Data* data = nullptr;
     std::string attr;

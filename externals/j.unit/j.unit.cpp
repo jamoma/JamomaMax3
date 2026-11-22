@@ -23,22 +23,14 @@ using namespace c74::min;
 /** The j.unit external. */
 class j_unit : public c74::min::object<j_unit> {
     // State comes before the attributes: Min runs every attribute setter with its default while constructing them.
-    std::string dataspace_ = "temperature"; /**< The dataspace name. */
-    std::string input_;                     /**< The input unit. */
-    std::string output_;                    /**< The output unit. */
+    jamoma::UnitConverter converter_;       /**< The dataspace and the units; thread safe (numbers arrive on any thread). */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
     const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
 
     /** Creates the object. @param args Unused (the attributes are applied by Max). */
-    explicit j_unit(const atoms& args = {})
-    {
-        (void)args;
-        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(dataspace_); d != nullptr && input_.empty()) {
-            input_ = output_ = d->default_unit();
-        }
-    }
+    explicit j_unit(const atoms& args = {}) { (void)args; }
 
     inlet<> x_in{this, "(number or list) x"};                       /**< The inlet. */
     jamoma_max::dump_outlet y_out{this, "(number or list) y = f(x)"}; /**< Outlet 0: the converted value. */
@@ -47,10 +39,7 @@ public:
     /** The dataspace; the input and output units are reset to its neutral unit. */
     attribute<symbol> dataspace{this, "dataspace", "temperature", setter{MIN_FUNCTION {
         const std::string name = static_cast<symbol>(args[0]).c_str();
-        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(name)) {
-            dataspace_ = name;
-            input_ = output_ = d->default_unit();
-        } else {
+        if (!converter_.set_dataspace(name)) {
             c74::max::error("j.unit: unknown dataspace %s", name.c_str());
         }
         return args;
@@ -58,13 +47,13 @@ public:
 
     /** The unit of the incoming numbers. */
     attribute<symbol> input{this, "input", "", setter{MIN_FUNCTION {
-        set_unit(input_, static_cast<symbol>(args[0]).c_str());
+        set_unit(true, static_cast<symbol>(args[0]).c_str());
         return args;
     }}};
 
     /** The unit of the outgoing numbers. */
     attribute<symbol> output{this, "output", "", setter{MIN_FUNCTION {
-        set_unit(output_, static_cast<symbol>(args[0]).c_str());
+        set_unit(false, static_cast<symbol>(args[0]).c_str());
         return args;
     }}};
 
@@ -100,7 +89,7 @@ public:
 
     /** Sends the names of the units of the current dataspace to the dump outlet as the lines of a menu. */
     message<> units_get{this, "units.get", MIN_FUNCTION {
-        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(dataspace_)) {
+        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(converter_.dataspace())) {
             menu("UnitsMenu", d->unit_names());
         }
         return {};
@@ -110,32 +99,25 @@ public:
     message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
 
 private:
-    /** Sets a unit if the dataspace has it. @param unit Where to store it. @param name The unit name. */
-    void set_unit(std::string& unit, const std::string& name)
+    /** Sets a unit if the dataspace has it. @param input True for the input unit, false for the output unit. @param name The unit name. */
+    void set_unit(bool input, const std::string& name)
     {
         if (name.empty()) {
             return;
         }
-        const jamoma::Dataspace* d = jamoma::Dataspace::find(dataspace_);
-        if (d != nullptr && d->has_unit(name)) {
-            unit = name;
-        } else {
-            c74::max::error("j.unit: %s is not a unit of the %s dataspace", name.c_str(), dataspace_.c_str());
+        if (!(input ? converter_.set_input(name) : converter_.set_output(name))) {
+            c74::max::error("j.unit: %s is not a unit of the %s dataspace", name.c_str(), converter_.dataspace().c_str());
         }
     }
 
     /** Converts a number or list and outputs the result as floats. @param args The incoming atoms. */
     void convert(const atoms& args)
     {
-        const jamoma::Dataspace* d = jamoma::Dataspace::find(dataspace_);
-        if (d == nullptr) {
-            return;
-        }
         jamoma::Value in;
         for (std::size_t i = 0; i < args.size(); ++i) {
             in.push_back(jamoma::Atom(static_cast<double>(args[i])));
         }
-        const auto out = d->convert(in, input_, output_);
+        const auto out = converter_.convert(in);
         if (!out || out->empty()) {
             return;
         }

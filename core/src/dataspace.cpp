@@ -315,4 +315,72 @@ std::optional<Value> Dataspace::convert(const Value& input, std::string_view fro
     return out;
 }
 
+bool UnitConverter::set_dataspace(std::string_view name)
+{
+    const Dataspace* d = Dataspace::find(name);
+    if (d == nullptr) {
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    dataspace_ = std::string(name);
+    input_ = output_ = d->default_unit();
+    return true;
+}
+
+bool UnitConverter::set_input(std::string_view unit)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    const Dataspace* d = Dataspace::find(dataspace_);
+    if (d == nullptr || !d->has_unit(unit)) {
+        return false;
+    }
+    input_ = std::string(unit);
+    return true;
+}
+
+bool UnitConverter::set_output(std::string_view unit)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    const Dataspace* d = Dataspace::find(dataspace_);
+    if (d == nullptr || !d->has_unit(unit)) {
+        return false;
+    }
+    output_ = std::string(unit);
+    return true;
+}
+
+std::string UnitConverter::dataspace() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return dataspace_;
+}
+
+std::string UnitConverter::input() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return input_;
+}
+
+std::string UnitConverter::output() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return output_;
+}
+
+std::optional<Value> UnitConverter::convert(const Value& value) const
+{
+    if (value.empty()) {
+        return std::nullopt;
+    }
+    std::string space, from, to;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        space = dataspace_;
+        from = input_;
+        to = output_;
+    }
+    const Dataspace* d = Dataspace::find(space);
+    return d != nullptr ? d->convert(value, from, to) : std::nullopt;
+}
+
 } // namespace jamoma

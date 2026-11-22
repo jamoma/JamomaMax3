@@ -271,7 +271,8 @@ TEST_CASE("concurrent use is race free")
     auto reader = [&ns, &stop, &searches] {
         while (!stop.load()) {
             ns.lookup(Address::parse("/m/a"));
-            searches += static_cast<long>(ns.find(Address::parse("/m/*")).size() >= 0);
+            ns.find(Address::parse("/m/*"));
+            ++searches;
         }
     };
     std::thread first(reader);
@@ -367,11 +368,12 @@ TEST_CASE("concurrent observers are race free")
 {
     Namespace ns;
     std::atomic<bool> stop{false};
-    std::atomic<long> events{0};
+    std::atomic<long> rounds{0};
     std::thread watcher([&] {
         while (!stop.load()) {
-            const auto handle = ns.observe(Address::parse("/m/*"), [&events](const Address&, Object*, bool) { ++events; });
+            const auto handle = ns.observe(Address::parse("/m/*"), [](const Address&, Object*, bool) {});
             ns.lookup(Address::parse("/m/a"));
+            ++rounds;
         }
     });
     std::vector<std::unique_ptr<Probe>> objects;
@@ -382,7 +384,7 @@ TEST_CASE("concurrent observers are race free")
     }
     stop = true;
     watcher.join();
-    REQUIRE(events.load() >= 0);
+    REQUIRE(rounds.load() > 0);
 }
 
 /** A name of a star matches every child, whatever its instance, and works on any level of the path. */

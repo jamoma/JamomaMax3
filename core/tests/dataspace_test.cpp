@@ -8,6 +8,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
+#include <thread>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -275,4 +277,47 @@ TEST_CASE("aed values along a ramp convert to xyz")
             REQUIRE(std::isfinite(x));
         }
     }
+}
+
+/** The converter of j.unit: setting the dataspace resets the units to its neutral unit; unknown names are refused and change nothing. */
+TEST_CASE("unit converter keeps a consistent state")
+{
+    jamoma::UnitConverter c;
+    REQUIRE(c.dataspace() == "temperature");
+    REQUIRE(c.input() == "Kelvin");
+    REQUIRE(c.set_dataspace("gain"));
+    REQUIRE(c.input() == "linear");
+    REQUIRE(c.set_input("db"));
+    REQUIRE(c.set_output("linear"));
+    REQUIRE_FALSE(c.set_input("furlong"));
+    REQUIRE(c.input() == "db");
+    REQUIRE_FALSE(c.set_dataspace("colour"));
+    REQUIRE(c.dataspace() == "gain");
+    const auto out = c.convert(jamoma::Value{jamoma::Atom(-6.0)});
+    REQUIRE(out.has_value());
+    REQUIRE(close((*out)[0].as_double(), 0.501187, 1e-5));
+    REQUIRE_FALSE(c.convert(jamoma::Value{}).has_value());
+}
+
+/** Review: setting and converting from two threads is race free (run under the thread sanitizer). */
+TEST_CASE("unit converter is race free")
+{
+    jamoma::UnitConverter c;
+    std::atomic<bool> stop{false};
+    std::atomic<long> converted{0};
+    std::thread reader([&] {
+        while (!stop.load()) {
+            if (c.convert(jamoma::Value{jamoma::Atom(1.0)})) {
+                ++converted;
+            }
+        }
+    });
+    for (int i = 0; i < 2000; ++i) {
+        c.set_dataspace(i % 2 == 0 ? "gain" : "temperature");
+        c.set_input(i % 2 == 0 ? "db" : "Celsius");
+        c.set_output(i % 2 == 0 ? "linear" : "Fahrenheit");
+    }
+    stop = true;
+    reader.join();
+    REQUIRE(converted.load() > 0);
 }

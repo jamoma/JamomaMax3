@@ -8,8 +8,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "jamoma/data.hpp"
@@ -243,4 +246,33 @@ TEST_CASE("receiver outliving namespace is safe")
         r->set_address(Address::parse("/m/a"));
     }
     REQUIRE_NOTHROW(r.reset());
+}
+
+/** Review: a receiver destroyed while a callback runs on another thread waits for it; the callback never runs after the destructor returned. */
+TEST_CASE("destroying receiver waits for a callback running on another thread")
+{
+    Namespace ns;
+    Data a;
+    a.set_type(DataType::Decimal);
+    Subscription s = ns.subscribe(Address::parse("/m/a"), a);
+    std::atomic<bool> started{false};
+    std::atomic<bool> destroyed{false};
+    std::atomic<bool> violation{false};
+    auto receiver = std::make_unique<Receiver>(ns, [](const Address&) {}, [&](const Value&) {
+        started = true;
+        std::this_thread::sleep_for(std::chrono::milliseconds(40)); // the window in which the destructor runs
+        if (destroyed.load()) {
+            violation = true;
+        }
+    });
+    receiver->set_address(Address::parse("/m/a"));
+    started = false;
+    std::thread driver([&a] { a.command(Value{f(0.5)}); });
+    while (!started.load()) {
+        std::this_thread::yield();
+    }
+    receiver.reset(); // must wait for the running callback
+    destroyed = true;
+    driver.join();
+    REQUIRE_FALSE(violation.load());
 }

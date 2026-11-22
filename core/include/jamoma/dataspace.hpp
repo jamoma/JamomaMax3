@@ -9,6 +9,7 @@
 #pragma once
 
 #include <optional>
+#include <mutex>
 #include <string>
 #include <vector>
 #include <string_view>
@@ -65,6 +66,36 @@ private:
     explicit Dataspace(const Impl* impl) : impl_(impl) {}
     const Impl* impl_;                   /**< The tables of this dataspace. */
     friend struct DataspaceTables;       /**< Builds the dataspaces. */
+};
+
+/**
+ * @brief The state of a unit converter such as j.unit: a dataspace and the units numbers come in and go out in. Safe to use from several threads.
+ *
+ * Starts in the temperature dataspace (the old j.unit default) with both units at its neutral unit. Setting the dataspace resets both units to
+ * the neutral unit of the new one. A name that does not exist is refused and changes nothing.
+ */
+class JAMOMA_API UnitConverter {
+public:
+    /** @brief Sets the dataspace and resets both units to its neutral unit. @param name The dataspace. @return False if there is no such dataspace. */
+    bool set_dataspace(std::string_view name);
+    /** @brief Sets the unit of the incoming numbers. @param unit The unit. @return False if the current dataspace has no such unit. */
+    bool set_input(std::string_view unit);
+    /** @brief Sets the unit of the outgoing numbers. @param unit The unit. @return False if the current dataspace has no such unit. */
+    bool set_output(std::string_view unit);
+    /** @return The dataspace name. */
+    std::string dataspace() const;
+    /** @return The unit of the incoming numbers. */
+    std::string input() const;
+    /** @return The unit of the outgoing numbers. */
+    std::string output() const;
+    /** @brief Converts a number or list. @param value The input in the input unit. @return The result in the output unit, or nothing for an empty input. */
+    std::optional<Value> convert(const Value& value) const;
+
+private:
+    mutable std::mutex mutex_;                   /**< Guards the three names. */
+    std::string dataspace_ = "temperature";      /**< The dataspace name. */
+    std::string input_ = "Kelvin";               /**< The input unit. */
+    std::string output_ = "Kelvin";              /**< The output unit. */
 };
 
 } // namespace jamoma

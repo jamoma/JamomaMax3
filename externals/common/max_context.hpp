@@ -68,6 +68,24 @@ inline void defer_call(c74::max::t_object* box, std::weak_ptr<int> alive, std::f
     c74::max::defer_low(box, reinterpret_cast<c74::max::method>(&detail::run_deferred), nullptr, 1, &atom);
 }
 
+/**
+ * @brief Runs a function now if this is the main thread, else later on the main thread (every call is kept, in order; nothing is coalesced).
+ *
+ * The core's Sender and the Min attribute machinery are for the main thread, but the value messages must be accepted on any thread (ramp
+ * ticks arrive on the scheduler thread), so the handlers hand their work over with this.
+ * @param box The box object of the caller.
+ * @param alive The token of the caller; if it has expired by then the function is not called.
+ * @param function The function.
+ */
+inline void run_on_main(c74::max::t_object* box, std::weak_ptr<int> alive, std::function<void()> function)
+{
+    if (c74::max::systhread_ismainthread()) {
+        function();
+    } else {
+        defer_call(box, std::move(alive), std::move(function));
+    }
+}
+
 /** @param box A box object. @return Its patcher (as an opaque key), or null. */
 inline const void* patcher_of(c74::max::t_object* box)
 {

@@ -10,6 +10,7 @@
  * (stored only: they act on audio, which is not built yet). See docs/inventory/j.in-j.out.md for what is and is not done.
  */
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -31,6 +32,8 @@ class j_out : public c74::min::object<j_out> {
     mutable std::mutex mutex_;                     /**< Guards `last_`. */
     jamoma::Value last_;                           /**< The last value that was not frozen out. */
     jamoma_max::Alive alive_;                      /**< Lets deferred calls see that the object is gone. */
+    std::atomic<int> mute_{0};                     /**< Copy of the mute attribute that pass() reads (values arrive on any thread). */
+    std::atomic<int> freeze_{0};                   /**< Copy of the freeze attribute that pass() reads. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -55,8 +58,16 @@ public:
     jamoma_max::dump_outlet data_out{this, "(anything) the data"};     /**< Outlet 0. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};         /**< Outlet 1: the dump outlet. */
 
-    attribute<int> mute{this, "mute", 0};            /**< When on, nothing passes. */
-    attribute<int> freeze{this, "freeze", 0};        /**< When on, the last value is output again instead of the new one. */
+    /** When on, nothing passes. */
+    attribute<int> mute{this, "mute", 0, setter{MIN_FUNCTION {
+        mute_.store(static_cast<int>(args[0]));
+        return args;
+    }}};
+    /** When on, the last value is output again instead of the new one. */
+    attribute<int> freeze{this, "freeze", 0, setter{MIN_FUNCTION {
+        freeze_.store(static_cast<int>(args[0]));
+        return args;
+    }}};
     attribute<double> mix{this, "mix", 100.0};       /**< Stored only (audio). */
     attribute<double> gain{this, "gain", 100.0};     /**< Stored only (audio). */
 
@@ -93,10 +104,20 @@ public:
             message.erase(message.begin());
         }
         const std::string selector = static_cast<symbol>(message[0]).c_str();
-        if (message.size() >= 2 && (selector == "mute" || selector == "freeze")) {
-            (selector == "mute" ? mute : freeze) = static_cast<int>(message[1]);
-        } else if (message.size() >= 2 && (selector == "mix" || selector == "gain")) {
-            (selector == "mix" ? mix : gain) = static_cast<double>(message[1]);
+        if (message.size() >= 2 && (selector == "mute" || selector == "freeze" || selector == "mix" || selector == "gain")) {
+            // Setting a Min attribute is for the main thread (its setter and Max's notifications run there).
+            const double number = static_cast<double>(message[1]);
+            jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, selector, number] {
+                if (selector == "mute") {
+                    mute = static_cast<int>(number);
+                } else if (selector == "freeze") {
+                    freeze = static_cast<int>(number);
+                } else if (selector == "mix") {
+                    mix = number;
+                } else {
+                    gain = number;
+                }
+            });
         } else {
             pass(jamoma_max::to_value(message));
         }
@@ -119,13 +140,13 @@ private:
     /** Sends a value out of the model unless muted; a frozen output repeats the last value. @param in The incoming value. */
     void pass(const jamoma::Value& in)
     {
-        if (static_cast<int>(mute) != 0) {
+        if (mute_.load() != 0) {
             return;
         }
         jamoma::Value out = in;
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            if (static_cast<int>(freeze) != 0) {
+            if (freeze_.load() != 0) {
                 out = last_;
             } else {
                 last_ = in;
