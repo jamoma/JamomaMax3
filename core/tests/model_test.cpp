@@ -296,3 +296,34 @@ TEST_CASE("model owns its preset manager")
     REQUIRE(second.presets().new_preset("x"));
     REQUIRE(second.presets().presets().at(0).entries.empty());
 }
+
+/** The context map lists its registrations in order. */
+TEST_CASE("context map lists its entries")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    Model b(w.ns, Address::parse("/b"));
+    int p1 = 0;
+    int p2 = 0;
+    jamoma::ContextMap map;
+    map.add(&p1, &a);
+    map.add(&p2, &b);
+    const auto all = map.all();
+    REQUIRE(all.size() == 2);
+    REQUIRE(all[0].first == &p1);
+    REQUIRE(all[1].second == &b);
+}
+
+/** A view is known by its patcher and the model argument it was given. */
+TEST_CASE("view map keeps the argument of a view")
+{
+    jamoma::ViewMap map;
+    int p = 0;
+    int q = 0;
+    map.add(&p, "/qmetro");
+    REQUIRE(map.find(&p).has_value());
+    REQUIRE(*map.find(&p) == "/qmetro");
+    REQUIRE_FALSE(map.find(&q).has_value());
+    map.remove(&p);
+    REQUIRE_FALSE(map.find(&p).has_value());
+}

@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "c74_min.h"
@@ -99,6 +100,76 @@ inline const void* parent_patcher(const void* patcher)
 {
     return c74::max::object_attr_getobj(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher)),
                                         c74::max::gensym("parentpatcher"));
+}
+
+/**
+ * @brief The class of a patcher, taken from its file name: `qmetro.model.maxpat` and `qmetro.view.maxpat` are of class `qmetro`.
+ * @param patcher The patcher (as patcher_of gives it).
+ * @return The class, or nothing if the file name has neither the `.model` nor the `.view` context.
+ */
+inline std::optional<std::string> patcher_class(const void* patcher)
+{
+    if (patcher == nullptr) {
+        return std::nullopt;
+    }
+    c74::max::t_symbol* s = c74::max::jpatcher_get_name(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher)));
+    if (s == nullptr || s->s_name == nullptr) {
+        return std::nullopt;
+    }
+    const std::string name = s->s_name;
+    for (const char* context : {".model", ".view"}) {
+        const std::size_t at = name.rfind(context);
+        const std::string tail = at == std::string::npos ? std::string() : name.substr(at + std::string(context).size());
+        if (at != std::string::npos && at > 0 && (tail.empty() || tail == ".maxpat")) {
+            return name.substr(0, at);
+        }
+    }
+    return std::nullopt;
+}
+
+/**
+ * @brief The address of the model a view patcher is bound to, if there is one now.
+ *
+ * With a model argument: an absolute address is used as it is, a relative one is taken below the model of the patcher that contains the view
+ * (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
+ * finds `qmetro.model`). The answer is worked out from what exists now, so it follows models coming and going.
+ * @param view_patcher The patcher of the view.
+ * @return The address of the model, or nothing while there is none (the view is waiting).
+ */
+inline std::optional<std::string> view_model_address(const void* view_patcher)
+{
+    const std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
+    if (!argument) {
+        return std::nullopt;
+    }
+    const void* container = parent_patcher(view_patcher);
+    std::string address;
+    if (!argument->empty()) {
+        std::string base;
+        for (const void* p = container; p != nullptr; p = parent_patcher(p)) {
+            if (const jamoma::Model* model = jamoma::Registry::instance().contexts().find(p)) {
+                base = model->address().str();
+                break;
+            }
+        }
+        address = (*argument)[0] == '/' ? *argument : base + "/" + *argument;
+    } else {
+        const std::optional<std::string> wanted = patcher_class(view_patcher);
+        for (const auto& entry : jamoma::Registry::instance().contexts().all()) {
+            if (parent_patcher(entry.first) == container && wanted && patcher_class(entry.first) == wanted) {
+                address = entry.second->address().str();
+                break;
+            }
+        }
+    }
+    if (address.empty()) {
+        return std::nullopt;
+    }
+    jamoma::Node* node = jamoma::Registry::instance().names().lookup(jamoma::Address::parse(address));
+    if (node == nullptr || dynamic_cast<jamoma::Model*>(node->object()) == nullptr) {
+        return std::nullopt;
+    }
+    return address;
 }
 
 /**

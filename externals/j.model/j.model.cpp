@@ -279,7 +279,8 @@ public:
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
         patcher_ = jamoma_max::patcher_of(maxobj());
         if (name_.empty()) {
-            name_ = patcher_name();
+            const std::optional<std::string> cls = jamoma_max::patcher_class(patcher_);
+            name_ = cls ? *cls : patcher_name();
         }
         place();
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {

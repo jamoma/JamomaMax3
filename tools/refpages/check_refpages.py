@@ -38,6 +38,7 @@ OBJECT_SOURCES = {
     "j.unit": ["j.unit/j.unit.cpp"],
     "j.in": ["j.in/j.in.cpp"],
     "j.out": ["j.out/j.out.cpp"],
+    "j.view": ["j.view/j.view.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.

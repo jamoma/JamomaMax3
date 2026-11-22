@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -97,6 +98,8 @@ public:
      * @return A handle that unregisters the observer when dropped; it may outlive the map.
      */
     std::shared_ptr<void> observe(std::function<void(const void* patcher, Model* model, bool added)> callback);
+    /** @return Every registration, in the order they were made. */
+    std::vector<std::pair<const void*, Model*>> all() const;
     /** @brief Finds the model of a patcher. @param patcher The patcher. @return The earliest registered model, or null. */
     Model* find(const void* patcher) const;
 
@@ -105,6 +108,26 @@ private:
     mutable std::mutex mutex_;                              /**< Guards the entries. */
     std::vector<std::pair<const void*, Model*>> entries_;   /**< The registrations in order. */
     std::shared_ptr<Observers> observers_;                  /**< The observers of add and remove. */
+};
+
+/**
+ * @brief The map from patchers to the views in them: a view is known by the model argument it was given (empty if none).
+ *
+ * Which model a view is bound to is worked out from the context map when it is asked (the Max layer does that), so nothing here
+ * has to follow models coming and going. Thread safe.
+ */
+class JAMOMA_API ViewMap {
+public:
+    /** @brief Registers a view. @param patcher The patcher of the view. @param argument The model address as given to the view (may be empty). */
+    void add(const void* patcher, std::string argument);
+    /** @brief Removes a view. @param patcher The patcher of the view. */
+    void remove(const void* patcher);
+    /** @brief Finds a view. @param patcher The patcher. @return The model argument it was given, or nothing if there is no view there. */
+    std::optional<std::string> find(const void* patcher) const;
+
+private:
+    mutable std::mutex mutex_;                                  /**< Guards the entries. */
+    std::vector<std::pair<const void*, std::string>> entries_;  /**< The views. */
 };
 
 } // namespace jamoma

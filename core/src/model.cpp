@@ -219,6 +219,35 @@ std::shared_ptr<void> ContextMap::observe(std::function<void(const void*, Model*
     });
 }
 
+std::vector<std::pair<const void*, Model*>> ContextMap::all() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return entries_;
+}
+
+void ViewMap::add(const void* patcher, std::string argument)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    entries_.emplace_back(patcher, std::move(argument));
+}
+
+void ViewMap::remove(const void* patcher)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    entries_.erase(std::remove_if(entries_.begin(), entries_.end(), [patcher](const auto& e) { return e.first == patcher; }), entries_.end());
+}
+
+std::optional<std::string> ViewMap::find(const void* patcher) const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& entry : entries_) {
+        if (entry.first == patcher) {
+            return entry.second;
+        }
+    }
+    return std::nullopt;
+}
+
 Model* ContextMap::find(const void* patcher) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
