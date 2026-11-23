@@ -5,14 +5,18 @@ macOS arm64, Max 9, after the last code change that touched an object. **Deviati
 | What | Result |
 |---|---|
 | The 82 old `j.parameter` integration tests and the old `j.remote` test (`conformance/m1-tests.txt`, `m2-tests.txt`, `m3-tests.txt`) | **83 of 83 pass** (the `j.remote` dataspace test `j_remote_dataspace_db2linear` timed out before the milestone) |
-| Own Max tests (`conformance/own-tests.txt`, 27: the 15 of milestone 2 and `late_model`, `nested_model`, `dieze`, `model_presets`, `preset_files`, `view_basic`, `view_late_model`, `remote_basic`, `remote_feedback`, `ui_state`, `node_basic`, `qmetro`) | **27 of 27 pass** |
-| Whole acceptance set together (`build/accept.txt`: own, old, m3) | **110 of 110 pass** |
+| Own Max tests (`conformance/own-tests.txt`, 28: the 15 of milestone 2 and `late_model`, `nested_model`, `dieze`, `model_presets`, `preset_files`, `view_basic`, `view_late_model`, `remote_basic`, `remote_feedback`, `ui_state`, `node_basic`, `qmetro`, `view_argument`) | **28 of 28 pass** |
+| Whole acceptance set together (`build/accept.txt`: own, old, m3) | **111 of 111 pass** (run again after the review fixes) |
 | Help patchers (`scripts/check-help.sh`) | all 16 open without a missing object (the four new ones included) |
 | Reference pages (`tools/refpages/check_refpages.py`, and its own tests) | match the implemented attributes and messages of all 16 objects |
 | Quit with live objects (`scripts/max-smoke.sh tests/smoke/quit_live_objects`: models, parameters, a running ramp, a `j.send` / `j.receive` pair, now also a view, a remote, a node, a `j.ui` and a preset recall on the running ramp) | Max quits by itself, no crash report (the script could not replace the permanent `Jamoma` link in the Packages folder this time, `Operation not permitted`, so it ran against the package the link points to) |
 | The old `qmetro` model, view and module (`package/Jamoma/patchers/models/data/qmetro`) | the own test `qmetro` loads the module without a missing object, reads `qmetro.model.presets.txt`, recalls `default` (time 100, `data/active` 0) |
-| Core unit tests | 271 pass; also under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer (no reports); includes a text preset file of 10 MB read whole under ASan |
+| Core unit tests | 274 pass; also under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer (no reports); includes a text preset file of 10 MB read whole under ASan |
 | Doxygen | no warnings |
+
+## After the final review
+
+An Opus read-only review gave 19 findings; the important ones were fixed (the panel's "Create New Preset" overwrote preset 1, a raw model pointer kept across the modal menu, file items sent a model address as a path, Max-style paths, `j.remote` reading nodes off the main thread without the lock, a view with a model argument never returning to waiting, a nested model losing its default preset) and the rest is listed as deferred in the ledger of the run. The menu, path and nested-default fixes are in code that no automated test reaches.
 
 ## Findings on the way (each found by a test or by opening a migrated help patcher)
 
