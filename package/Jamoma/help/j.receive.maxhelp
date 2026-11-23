@@ -68,12 +68,6 @@
 							1034.0,
 							638.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -258,13 +252,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Wildcards enable j.receive to listen to several nodes at the same time.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Wildcards enable j.receive to listen to several nodes at the same time."
 								}
 							},
 							{
@@ -877,12 +865,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-15",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -904,12 +886,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-13",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -931,12 +907,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-10",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -958,12 +928,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-8",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -985,12 +949,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-6",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -1012,12 +970,6 @@
 							{
 								"box": {
 									"handoff": "",
-									"hltcolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										0.501961
-									],
 									"id": "obj-55",
 									"maxclass": "ubutton",
 									"numinlets": 1,
@@ -1316,12 +1268,6 @@
 							26.0,
 							1034.0,
 							638.0
-						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -1968,12 +1914,6 @@
 							1034.0,
 							638.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -2103,13 +2043,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "/demo_model/bird",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "/demo_model/bird"
 								}
 							},
 							{
@@ -2125,13 +2059,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "bird",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "bird"
 								}
 							},
 							{
@@ -2148,13 +2076,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "When the view subscribes to a model, it attach itself to this local namespace. This way it is sufficient to access the parameter as bird within the view.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "When the view subscribes to a model, it attach itself to this local namespace. This way it is sufficient to access the parameter as bird within the view."
 								}
 							},
 							{
@@ -2170,13 +2092,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "demo_model",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "demo_model"
 								}
 							},
 							{
@@ -2193,13 +2109,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "The address of the model instance (here demo_model) helps establishing a global name for the parameter: /demo_model/bird. This way the parameter can also be accesed outside of models and views.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The address of the model instance (here demo_model) helps establishing a global name for the parameter: /demo_model/bird. This way the parameter can also be accesed outside of models and views."
 								}
 							},
 							{
@@ -2215,13 +2125,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "j.model sets up a local namespace within the model, so that \"bird\" is sufficient to name the parameter.\n",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.model sets up a local namespace within the model, so that \"bird\" is sufficient to name the parameter.\n"
 								}
 							},
 							{
@@ -2257,13 +2161,7 @@
 										74.0
 									],
 									"style": "",
-									"text": "Note to Jamoma-developers:\n\nThe bpacthers are embedded in the help patch itself. In order to edit the content of the bpatchers, select the bpacther object, and from the contextual menu choose \"Object > New View of Embedded Patcher\".",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma-developers:\n\nThe bpacthers are embedded in the help patch itself. In order to edit the content of the bpatchers, select the bpacther object, and from the contextual menu choose \"Object > New View of Embedded Patcher\"."
 								}
 							},
 							{
@@ -2386,13 +2284,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "demo_model",
-													"textcolor": [
-														0.113339,
-														0.606332,
-														0.609597,
-														1.0
-													]
+													"text": "demo_model"
 												}
 											},
 											{
@@ -2675,13 +2567,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "demo_model",
-													"textcolor": [
-														0.113339,
-														0.606332,
-														0.609597,
-														1.0
-													]
+													"text": "demo_model"
 												}
 											},
 											{
@@ -2969,12 +2855,6 @@
 							1034.0,
 							638.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -3037,13 +2917,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Get updated value on request only",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Get updated value on request only"
 								}
 							},
 							{
@@ -3148,13 +3022,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "j.receive subscribes to a node (j.parameter or j.return) and output values whenever the value of the node change.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.receive subscribes to a node (j.parameter or j.return) and output values whenever the value of the node change."
 								}
 							},
 							{
@@ -3224,13 +3092,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "The address can be changed on the fly",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The address can be changed on the fly"
 								}
 							},
 							{

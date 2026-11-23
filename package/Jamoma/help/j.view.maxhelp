@@ -117,13 +117,7 @@
 										132.0
 									],
 									"style": "",
-									"text": "Change the remote Jamoma model address using the model:address message and see how j.view can bind dynamically to different instances or the same Jamoma model",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Change the remote Jamoma model address using the model:address message and see how j.view can bind dynamically to different instances or the same Jamoma model"
 								}
 							},
 							{
@@ -143,13 +137,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "The model address your Jamoma view is binding to can also be set using the model:address message",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "The model address your Jamoma view is binding to can also be set using the model:address message"
 								}
 							},
 							{
@@ -249,12 +237,6 @@
 											379.0,
 											258.0,
 											158.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -508,12 +490,6 @@
 											252.0,
 											128.0
 										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -766,12 +742,6 @@
 											154.0,
 											258.0,
 											158.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -1105,18 +1075,6 @@
 			{
 				"box": {
 					"annotation": "none",
-					"bgcolor": [
-						1.0,
-						1.0,
-						1.0,
-						1.0
-					],
-					"color": [
-						0.619608,
-						0.0,
-						0.360784,
-						0.7
-					],
 					"fontname": "Arial",
 					"fontsize": 16.0,
 					"id": "obj-38",
@@ -1555,13 +1513,7 @@
 						"tags": ""
 					},
 					"style": "",
-					"text": "p internals",
-					"textcolor": [
-						0.619608,
-						0.0,
-						0.360784,
-						0.701961
-					]
+					"text": "p internals"
 				}
 			},
 			{
@@ -1633,13 +1585,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "j.view binds by default to the model name set as first argument to the patcher or bpatcher (here: '/jviewmaxhelp/myModel')",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "j.view binds by default to the model name set as first argument to the patcher or bpatcher (here: '/jviewmaxhelp/myModel')"
 								}
 							},
 							{
@@ -1660,13 +1606,7 @@
 										104.0
 									],
 									"style": "",
-									"text": "Grab one of the number boxes attached to j.remote and see how value changes are internally reflected into the Jamoma model below",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Grab one of the number boxes attached to j.remote and see how value changes are internally reflected into the Jamoma model below"
 								}
 							},
 							{
@@ -1686,13 +1626,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "When placed into a patcher, j.view will make all j.remotes placed at the same patcher level or below to connect to the j.parameters in your Jamoma model",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "When placed into a patcher, j.view will make all j.remotes placed at the same patcher level or below to connect to the j.parameters in your Jamoma model"
 								}
 							},
 							{
@@ -1774,12 +1708,6 @@
 											609.0,
 											132.0
 										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -1828,13 +1756,7 @@
 														49.0
 													],
 													"style": "",
-													"text": "Model address j.view is binding to",
-													"textcolor": [
-														0.3,
-														0.3,
-														0.3,
-														1.0
-													]
+													"text": "Model address j.view is binding to"
 												}
 											},
 											{
@@ -2195,12 +2117,6 @@
 											706.0,
 											609.0,
 											153.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,

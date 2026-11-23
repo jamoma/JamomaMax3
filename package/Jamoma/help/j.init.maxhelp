@@ -14,18 +14,6 @@
 			1105.0,
 			793.0
 		],
-		"bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 10.0,
@@ -155,18 +143,6 @@
 							1105.0,
 							767.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -222,12 +198,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-30",
 									"maxclass": "panel",
 									"mode": 0,
@@ -246,40 +216,12 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
 									"bgfillcolor_color": [
 										0.65098,
 										0.666667,
 										0.662745,
 										0.0
 									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Lato Black",
 									"fontsize": 16.0,
@@ -298,13 +240,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Bring Max console to monitor init process",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Bring Max console to monitor init process"
 								}
 							},
 							{
@@ -325,13 +261,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Bind to a sub-model and listen to its initialization process ",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Bind to a sub-model and listen to its initialization process "
 								}
 							},
 							{
@@ -352,13 +282,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Report initalization process of the whole model",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Report initalization process of the whole model"
 								}
 							},
 							{
@@ -379,13 +303,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Manually restart initialization process",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Manually restart initialization process"
 								}
 							},
 							{
@@ -406,13 +324,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Two models embedded as bpatcher",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Two models embedded as bpatcher"
 								}
 							},
 							{
@@ -673,18 +585,6 @@
 											375.0,
 											162.0
 										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -905,12 +805,6 @@
 											},
 											{
 												"box": {
-													"bgcolor": [
-														0.113725,
-														0.607843,
-														0.607843,
-														1.0
-													],
 													"fontface": 1,
 													"fontname": "Lato Regular",
 													"fontsize": 12.0,
@@ -925,13 +819,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Another sub-model",
-													"textcolor": [
-														1.0,
-														1.0,
-														1.0,
-														1.0
-													]
+													"text": "Another sub-model"
 												}
 											}
 										],
@@ -1092,18 +980,6 @@
 											375.0,
 											155.0
 										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
-										],
-										"editing_bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -1190,12 +1066,6 @@
 											},
 											{
 												"box": {
-													"bgcolor": [
-														0.113725,
-														0.607843,
-														0.607843,
-														1.0
-													],
 													"fontface": 1,
 													"fontname": "Lato Regular",
 													"fontsize": 12.0,
@@ -1210,13 +1080,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "A sub-model",
-													"textcolor": [
-														1.0,
-														1.0,
-														1.0,
-														1.0
-													]
+													"text": "A sub-model"
 												}
 											},
 											{
@@ -1491,40 +1355,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"bgcolor2": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"bgfillcolor_color1": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontname": "Arial",
 									"fontsize": 12.0,
 									"frozen_box_attributes": [
@@ -1545,13 +1375,7 @@
 										22.0
 									],
 									"style": "",
-									"text": "init",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "init"
 								}
 							},
 							{
@@ -1621,18 +1445,6 @@
 											356.0,
 											166.0
 										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -1680,13 +1492,7 @@
 														35.0
 													],
 													"style": "",
-													"text": "j.init may be used at any patcher level in the model (here in a simple sub-patcher)",
-													"textcolor": [
-														0.6,
-														0.6,
-														0.6,
-														1.0
-													]
+													"text": "j.init may be used at any patcher level in the model (here in a simple sub-patcher)"
 												}
 											},
 											{

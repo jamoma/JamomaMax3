@@ -168,13 +168,7 @@
 										121.0,
 										62.0
 									],
-									"text": "This will send a bang when saving patch",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "This will send a bang when saving patch"
 								}
 							},
 							{

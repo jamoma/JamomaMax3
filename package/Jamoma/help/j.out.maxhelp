@@ -69,18 +69,6 @@
 							1227.0,
 							858.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -129,13 +117,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "These are not available when @amenities is set to 'none'",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "These are not available when @amenities is set to 'none'"
 								}
 							},
 							{
@@ -157,13 +139,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "Explore both models and see how @amenities set to 'none' removes nodes from the namespace and disables j.in/out features",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Explore both models and see how @amenities set to 'none' removes nodes from the namespace and disables j.in/out features"
 								}
 							},
 							{
@@ -688,12 +664,6 @@
 									],
 									"style": "",
 									"text": "A model named /jout/without_amenities",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},
@@ -718,12 +688,6 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cellmap": [
 										[
 											0,
@@ -748,27 +712,9 @@
 									],
 									"cols": 1,
 									"colwidth": 200,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-7",
 									"maxclass": "jit.cellblock",
@@ -787,13 +733,7 @@
 										122.75
 									],
 									"rows": 4,
-									"savemode": 1,
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -942,13 +882,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Service provided by j.out (& optional j.in combination) can be toggled on or off using @amenities attribute",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Service provided by j.out (& optional j.in combination) can be toggled on or off using @amenities attribute"
 								}
 							},
 							{
@@ -1454,12 +1388,6 @@
 									],
 									"style": "",
 									"text": "A model named /jout/with_amenities",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},
@@ -1756,18 +1684,6 @@
 							1227.0,
 							858.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -1814,13 +1730,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "These parameters affect all inputs (and outputs)",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "These parameters affect all inputs (and outputs)"
 								}
 							},
 							{
@@ -1890,23 +1800,11 @@
 										79.0
 									],
 									"style": "",
-									"text": "Remotely listen to value from model outputs",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Remotely listen to value from model outputs"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Lato Regular",
 									"fontsize": 14.0,
@@ -1921,23 +1819,11 @@
 										23.0
 									],
 									"style": "",
-									"text": "Remote listening",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Remote listening"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Lato Regular",
 									"fontsize": 14.0,
@@ -1952,13 +1838,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "mute & bypass",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "mute & bypass"
 								}
 							},
 							{
@@ -1979,13 +1859,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Internally send value from j.in to paired j.out",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Internally send value from j.in to paired j.out"
 								}
 							},
 							{
@@ -2006,13 +1880,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Toggle all model inputs & outputs",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Toggle all model inputs & outputs"
 								}
 							},
 							{
@@ -2434,13 +2302,7 @@
 														78.0
 													],
 													"style": "",
-													"text": "Argument sets the instance name to register output in the namespace.\n\nj.in and j.out sharing the same name are internally linked so model processing can be bypassed.",
-													"textcolor": [
-														0.6,
-														0.6,
-														0.6,
-														1.0
-													]
+													"text": "Argument sets the instance name to register output in the namespace.\n\nj.in and j.out sharing the same name are internally linked so model processing can be bypassed."
 												}
 											},
 											{
@@ -2461,13 +2323,7 @@
 														64.0
 													],
 													"style": "",
-													"text": "Name of the instance output to manage (<model>/data/out.<argument>)",
-													"textcolor": [
-														0.3,
-														0.3,
-														0.3,
-														1.0
-													]
+													"text": "Name of the instance output to manage (<model>/data/out.<argument>)"
 												}
 											},
 											{
@@ -3310,12 +3166,6 @@
 									],
 									"style": "",
 									"text": "A model embedded as bpatcher (name /jout/myModel)",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},

@@ -68,18 +68,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -578,13 +566,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -882,12 +864,6 @@
 										358.0
 									],
 									"style": "",
-									"textcolor": [
-										0.0,
-										0.0,
-										0.0,
-										0.0
-									],
 									"xplace": [
 										0.5
 									],
@@ -1354,13 +1330,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "The combination of ramping and dataspace leads to interesting compositional possibilities.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The combination of ramping and dataspace leads to interesting compositional possibilities."
 								}
 							},
 							{
@@ -1688,12 +1658,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -1742,13 +1706,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -1816,13 +1774,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "The range of the parameters are used for auto-scaling in mappings",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The range of the parameters are used for auto-scaling in mappings"
 								}
 							},
 							{
@@ -2017,13 +1969,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Clipping works with @type integer, decimal, array and generic.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Clipping works with @type integer, decimal, array and generic."
 								}
 							},
 							{
@@ -2149,18 +2095,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-32",
 									"maxclass": "live.numbox",
@@ -2191,18 +2125,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-33",
 									"maxclass": "live.numbox",
@@ -2277,18 +2199,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-36",
 									"maxclass": "live.numbox",
@@ -2319,18 +2229,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-37",
 									"maxclass": "live.numbox",
@@ -2405,18 +2303,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-40",
 									"maxclass": "live.numbox",
@@ -2447,18 +2333,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-41",
 									"maxclass": "live.numbox",
@@ -2533,18 +2407,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-28",
 									"maxclass": "live.numbox",
@@ -2575,18 +2437,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-29",
 									"maxclass": "live.numbox",
@@ -2661,18 +2511,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-24",
 									"maxclass": "live.numbox",
@@ -2703,18 +2541,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-25",
 									"maxclass": "live.numbox",
@@ -2789,18 +2615,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-16",
 									"maxclass": "live.numbox",
@@ -2831,18 +2645,6 @@
 							},
 							{
 								"box": {
-									"activeslidercolor": [
-										0.952941,
-										0.564706,
-										0.098039,
-										1.0
-									],
-									"activetricolor2": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"appearance": 2,
 									"id": "obj-15",
 									"maxclass": "live.numbox",
@@ -2911,13 +2713,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@clipmode specifies what to do when values exceed the specified range.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@clipmode specifies what to do when values exceed the specified range."
 								}
 							},
 							{
@@ -2948,13 +2744,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@range specified the expected range of values.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@range specified the expected range of values."
 								}
 							},
 							{
@@ -3276,12 +3066,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -3403,13 +3187,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -3616,13 +3394,7 @@
 										87.0
 									],
 									"style": "",
-									"text": "All subnodes of one node will be triggered at the same time. @priority controls priority within this node level, but not relative to higher nodes.\n\nIn order to make sure that nodes fire in a specific sequence, we cna use the j.node object.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "All subnodes of one node will be triggered at the same time. @priority controls priority within this node level, but not relative to higher nodes.\n\nIn order to make sure that nodes fire in a specific sequence, we cna use the j.node object."
 								}
 							},
 							{
@@ -3638,13 +3410,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "\"cake\" and \"ice_cream\" are subnodes of \"dessert\":",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "\"cake\" and \"ice_cream\" are subnodes of \"dessert\":"
 								}
 							},
 							{
@@ -3660,13 +3426,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "\"fish\" and \"vegetarian\" are subnodes of \"main_course\".",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "\"fish\" and \"vegetarian\" are subnodes of \"main_course\"."
 								}
 							},
 							{
@@ -3682,13 +3442,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "\"soup\" and \"salad\" are subnodes of \"starter\".",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "\"soup\" and \"salad\" are subnodes of \"starter\"."
 								}
 							},
 							{
@@ -3931,13 +3685,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "The addresses of the below parameters make use of subnodes.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The addresses of the below parameters make use of subnodes."
 								}
 							},
 							{
@@ -4306,12 +4054,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -4398,13 +4140,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -4488,13 +4224,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "The unit used for display and interaction can be set separately for each j.remote object associated with the parameter.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The unit used for display and interaction can be set separately for each j.remote object associated with the parameter."
 								}
 							},
 							{
@@ -5300,13 +5030,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "Sets what unit is used by default. j.parameter output will always be according to this unit.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Sets what unit is used by default. j.parameter output will always be according to this unit."
 								}
 							},
 							{
@@ -5572,13 +5296,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Sets what dataspace to use.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Sets what dataspace to use."
 								}
 							},
 							{
@@ -5611,13 +5329,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "Using dataspaces, common parameter types such as audio gain, colour or position in space, can be updated using several different units interchangeably.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Using dataspaces, common parameter types such as audio gain, colour or position in space, can be updated using several different units interchangeably."
 								}
 							},
 							{
@@ -6208,12 +5920,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -6300,13 +6006,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -6322,13 +6022,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Ramping works with @type integer, decimal and array.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Ramping works with @type integer, decimal and array."
 								}
 							},
 							{
@@ -6537,13 +6231,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "Use the Max scheduler (default, recommended).\nUse the OS system scheduler.\nDisables ramping, parameter will be set to target value immediately.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Use the Max scheduler (default, recommended).\nUse the OS system scheduler.\nDisables ramping, parameter will be set to target value immediately."
 								}
 							},
 							{
@@ -6560,13 +6248,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "max\nsystem\nnone",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "max\nsystem\nnone"
 								}
 							},
 							{
@@ -6582,13 +6264,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Controls what mechanism is used to drive output of new values during the ramp.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Controls what mechanism is used to drive output of new values during the ramp."
 								}
 							},
 							{
@@ -6795,13 +6471,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "A wide range of easing functions are available.\nWindowing functions can be used as well.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "A wide range of easing functions are available.\nWindowing functions can be used as well."
 								}
 							},
 							{
@@ -7593,12 +7263,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -8120,13 +7784,7 @@
 										234.0
 									],
 									"style": "",
-									"text": "j.parameter is somewhat similar to the pattr object, while enabling a number of additional features offered by Jamoma.\n\nThe parameter is an acces point for controlling the processing of the patch. The parameter value can be updated immediately, or by easing over time. Common types of parameters, such as frequency, can be controlled using several different units (e.g. Hz, midinote or midicent) interchangeably.\n\nThe value of the parameter can be stored and recalled using model presets. User interfaces can access the parameter remotely. Mappings enable one parameter dynamically control the value of another parameter. Cues can control all parameters in all models. When designing cues, the value can be queried for every single parameter in the patch.\n\nAdditionally the parameter enables inter-application communication. The parameter is provided with a unique global OSC address. Parameters can also be declared on the network in order for other applications such as i-score to inspect and control models.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.parameter is somewhat similar to the pattr object, while enabling a number of additional features offered by Jamoma.\n\nThe parameter is an acces point for controlling the processing of the patch. The parameter value can be updated immediately, or by easing over time. Common types of parameters, such as frequency, can be controlled using several different units (e.g. Hz, midinote or midicent) interchangeably.\n\nThe value of the parameter can be stored and recalled using model presets. User interfaces can access the parameter remotely. Mappings enable one parameter dynamically control the value of another parameter. Cues can control all parameters in all models. When designing cues, the value can be queried for every single parameter in the patch.\n\nAdditionally the parameter enables inter-application communication. The parameter is provided with a unique global OSC address. Parameters can also be declared on the network in order for other applications such as i-score to inspect and control models."
 								}
 							}
 						],
@@ -8400,12 +8058,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -8510,13 +8162,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -8552,13 +8198,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "j.parameter does not support the \"none\" type.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.parameter does not support the \"none\" type."
 								}
 							},
 							{
@@ -9049,13 +8689,7 @@
 										36.0
 									],
 									"style": "",
-									"text": "Stores and output any kind of value, including lists combining integers, decimals and symbols.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and output any kind of value, including lists combining integers, decimals and symbols."
 								}
 							},
 							{
@@ -9091,13 +8725,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Stores and outputs a symbol",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and outputs a symbol"
 								}
 							},
 							{
@@ -9133,13 +8761,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Stores and outputs 1 or 0",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and outputs 1 or 0"
 								}
 							},
 							{
@@ -9175,13 +8797,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Stores and outputs one or more decimal (float) values",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and outputs one or more decimal (float) values"
 								}
 							},
 							{
@@ -9217,13 +8833,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Stores and outputs one decimal (float) value",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and outputs one decimal (float) value"
 								}
 							},
 							{
@@ -9280,13 +8890,7 @@
 										36.0
 									],
 									"style": "",
-									"text": "Stores and outputs one integer number, other values gets converted to integer",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Stores and outputs one integer number, other values gets converted to integer"
 								}
 							},
 							{
@@ -9327,13 +8931,7 @@
 										47.0
 									],
 									"style": "",
-									"text": "The type attribute determines the kind of values that the parameter may store and output. The behaviour of other attributes such as ramping and dataspace is optimised based on type.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The type attribute determines the kind of values that the parameter may store and output. The behaviour of other attributes such as ramping and dataspace is optimised based on type."
 								}
 							},
 							{
@@ -9709,18 +9307,6 @@
 							1203.0,
 							859.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -10065,13 +9651,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "@default sets the initial value of the paraneter. This can be overruled by model presets.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@default sets the initial value of the paraneter. This can be overruled by model presets."
 								}
 							},
 							{
@@ -10087,13 +9667,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@value is the current parameter value  expressed as an attribute",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@value is the current parameter value  expressed as an attribute"
 								}
 							},
 							{
@@ -10220,13 +9794,7 @@
 										69.0
 									],
 									"style": "",
-									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly.",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma developers:\n\nIf you do changes to this patch, please remember to update the help files for j.message and j.return accordingly."
 								}
 							},
 							{
@@ -10361,13 +9929,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@repetitions/filter is not enabled by default.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@repetitions/filter is not enabled by default."
 								}
 							},
 							{
@@ -10498,13 +10060,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "The parameter can be made temporarily inactive using the @active attribtue. When inactive its value will not be updated, and it will not produce any output.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The parameter can be made temporarily inactive using the @active attribtue. When inactive its value will not be updated, and it will not produce any output."
 								}
 							},
 							{
@@ -10571,13 +10127,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "Keywords can be specified in the tag attribute in order to allow easier and more powerful sorting in j.namespace and elsewhere.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Keywords can be specified in the tag attribute in order to allow easier and more powerful sorting in j.namespace and elsewhere."
 								}
 							},
 							{
@@ -10593,13 +10143,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@tag",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@tag"
 								}
 							},
 							{
@@ -10615,13 +10159,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Text describing the parameter, used for auto-documenting models.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Text describing the parameter, used for auto-documenting models."
 								}
 							},
 							{
@@ -10637,13 +10175,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "@description",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "@description"
 								}
 							},
 							{

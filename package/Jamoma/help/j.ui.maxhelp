@@ -14,18 +14,6 @@
 			1165.0,
 			697.0
 		],
-		"bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 10.0,
@@ -153,18 +141,6 @@
 							1165.0,
 							671.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -216,13 +192,7 @@
 										160.0
 									],
 									"style": "",
-									"text": "Top-left corner arrow brings a dropdown menu displaying all of the model presets, preset management messages as well as other goodies",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Top-left corner arrow brings a dropdown menu displaying all of the model presets, preset management messages as well as other goodies"
 								}
 							},
 							{
@@ -245,13 +215,7 @@
 										119.0
 									],
 									"style": "",
-									"text": "Click the model address the view currently binds to and see a dropdown menu of all messages, parameters and returns in the model.\n\nSee that clicking one of the items will bring an inspector displaying all attributes values",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Click the model address the view currently binds to and see a dropdown menu of all messages, parameters and returns in the model.\n\nSee that clicking one of the items will bring an inspector displaying all attributes values"
 								}
 							},
 							{
@@ -336,13 +300,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "This model is embedded in a bpatcher. ",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "This model is embedded in a bpatcher. "
 												}
 											},
 											{
@@ -771,13 +729,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "This view is embedded in a bpatcher. ",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "This view is embedded in a bpatcher. "
 												}
 											},
 											{
@@ -1173,18 +1125,6 @@
 							1165.0,
 							671.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -1236,13 +1176,7 @@
 										91.0
 									],
 									"style": "",
-									"text": "j.ui will display a (+) button at its top-right corner when a subpatcher is connected to j.ui. This allows to add a secondary panel window for your view",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "j.ui will display a (+) button at its top-right corner when a subpatcher is connected to j.ui. This allows to add a secondary panel window for your view"
 								}
 							},
 							{
@@ -1605,13 +1539,7 @@
 										77.0
 									],
 									"style": "",
-									"text": "j.ui automatically displays widgets to control gain, mix, mute and bypass services provided by j.in~ and j.out~ in your model",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "j.ui automatically displays widgets to control gain, mix, mute and bypass services provided by j.in~ and j.out~ in your model"
 								}
 							},
 							{
@@ -1633,13 +1561,7 @@
 										77.0
 									],
 									"style": "",
-									"text": "j.ui automatically displays widgets to control bypass and active services provided by j.in and j.out in your model",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "j.ui automatically displays widgets to control bypass and active services provided by j.in and j.out in your model"
 								}
 							},
 							{
@@ -1658,13 +1580,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "A Jamoma video model embedded as a bpatcher",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "A Jamoma video model embedded as a bpatcher"
 								}
 							},
 							{
@@ -1683,13 +1599,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "A Jamoma audio model embedded as a bpatcher",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "A Jamoma audio model embedded as a bpatcher"
 								}
 							},
 							{
@@ -1707,13 +1617,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "A Jamoma view embedded as a bpatcher",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "A Jamoma view embedded as a bpatcher"
 								}
 							},
 							{
@@ -1734,13 +1638,7 @@
 										76.0
 									],
 									"style": "",
-									"text": "Set the model address the view is to bind to and see how j.ui automatically display available widget",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set the model address the view is to bind to and see how j.ui automatically display available widget"
 								}
 							},
 							{
@@ -2003,8 +1901,6 @@
 														0.4,
 														0.0
 													],
-													"bgfillcolor_angle": 270.0,
-													"bgfillcolor_autogradient": 0.0,
 													"bgfillcolor_color": [
 														0.290196,
 														0.309804,
@@ -2017,14 +1913,6 @@
 														0.4,
 														0.0
 													],
-													"bgfillcolor_color2": [
-														0.290196,
-														0.309804,
-														0.301961,
-														1.0
-													],
-													"bgfillcolor_proportion": 0.39,
-													"bgfillcolor_type": "color",
 													"gradient": 1,
 													"id": "obj-8",
 													"ignoreclick": 1,
@@ -2041,13 +1929,7 @@
 														22.0
 													],
 													"style": "",
-													"text": "/myVideoModel",
-													"textcolor": [
-														0.0,
-														0.0,
-														0.0,
-														1.0
-													]
+													"text": "/myVideoModel"
 												}
 											},
 											{
@@ -2093,18 +1975,6 @@
 															161.0,
 															640.0,
 															480.0
-														],
-														"bgcolor": [
-															0.862745,
-															0.870588,
-															0.878431,
-															1.0
-														],
-														"editing_bgcolor": [
-															0.862745,
-															0.870588,
-															0.878431,
-															1.0
 														],
 														"bglocked": 0,
 														"openinpresentation": 0,
@@ -2152,13 +2022,7 @@
 																		50.0
 																	],
 																	"style": "",
-																	"text": "An optional second panel",
-																	"textcolor": [
-																		0.7,
-																		0.7,
-																		0.7,
-																		1.0
-																	]
+																	"text": "An optional second panel"
 																}
 															},
 															{
@@ -2490,12 +2354,6 @@
 											179.0,
 											203.0
 										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -2764,12 +2622,6 @@
 											399.0,
 											267.0,
 											203.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,

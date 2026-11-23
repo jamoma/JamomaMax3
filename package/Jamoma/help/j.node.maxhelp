@@ -88,18 +88,6 @@
 							1175.0,
 							674.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -147,13 +135,7 @@
 										179.0
 									],
 									"style": "",
-									"text": "Given the hierarchical structure of Jamoma, priorities are manage per node and not on a full address. Hence, when storing a state, you'll note that despite having set synth/pitch a priority of 1, it is stored after buffer/* parameters. This is because when storing the state, j.cue first take (alphabetically) parameters under the buffer node, then parameters under the synth node.\n\nHowever, since we defined a priority for the 'anothersynth' node, j.cue stored its parameters before the 'anotherbuffer' node.",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Given the hierarchical structure of Jamoma, priorities are manage per node and not on a full address. Hence, when storing a state, you'll note that despite having set synth/pitch a priority of 1, it is stored after buffer/* parameters. This is because when storing the state, j.cue first take (alphabetically) parameters under the buffer node, then parameters under the synth node.\n\nHowever, since we defined a priority for the 'anothersynth' node, j.cue stored its parameters before the 'anotherbuffer' node."
 								}
 							},
 							{
@@ -513,23 +495,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"id": "obj-7",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -547,27 +516,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -588,13 +537,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Makes this tab a model, to ease namespace selection with j.cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Makes this tab a model, to ease namespace selection with j.cue"
 								}
 							},
 							{
@@ -698,13 +641,7 @@
 										54.0
 									],
 									"style": "",
-									"text": "Set priority to 1 so it is stored before anotherbuffer node",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set priority to 1 so it is stored before anotherbuffer node"
 								}
 							},
 							{
@@ -859,18 +796,6 @@
 							1175.0,
 							674.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -920,13 +845,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Attach tags, description or priority to empty nodes",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Attach tags, description or priority to empty nodes"
 								}
 							},
 							{
@@ -976,13 +895,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "See in j.namespace_explorer on the right how parameters and return created empty nodes in the tree",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "See in j.namespace_explorer on the right how parameters and return created empty nodes in the tree"
 								}
 							},
 							{
@@ -1036,13 +949,7 @@
 										39.0
 									],
 									"style": "",
-									"text": "Makes this tab a model, to ease namespace monitoring",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Makes this tab a model, to ease namespace monitoring"
 								}
 							},
 							{
@@ -1164,13 +1071,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Slashes in parameter addresses create implicit nodes in the namespace tree",
-									"textcolor": [
-										0.7,
-										0.7,
-										0.7,
-										1.0
-									]
+									"text": "Slashes in parameter addresses create implicit nodes in the namespace tree"
 								}
 							},
 							{

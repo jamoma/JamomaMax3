@@ -14,18 +14,6 @@
 			1556.0,
 			827.0
 		],
-		"bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 12.0,
@@ -79,18 +67,6 @@
 							26.0,
 							1556.0,
 							801.0
-						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -163,13 +139,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "One can define priorities in which model state will be stored/recalled by j.cue, for example",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "One can define priorities in which model state will be stored/recalled by j.cue, for example"
 								}
 							},
 							{
@@ -189,13 +159,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "When developping a model, one can set the priority of the model.\n\nNote that when instanciating a model as a sub-patcher or abstraction, one can define the priority as standard attribute. This will override the priority attribute defined within the model",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "When developping a model, one can set the priority of the model.\n\nNote that when instanciating a model as a sub-patcher or abstraction, one can define the priority as standard attribute. This will override the priority attribute defined within the model"
 								}
 							},
 							{
@@ -238,13 +202,7 @@
 										107.0
 									],
 									"style": "",
-									"text": "Recall models state.\n\nNotice that model with priority = 1 will be recalled before model with priority = 2",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Recall models state.\n\nNotice that model with priority = 1 will be recalled before model with priority = 2"
 								}
 							},
 							{
@@ -265,13 +223,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Send some values to parameters inside the models, then store state as a cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Send some values to parameters inside the models, then store state as a cue"
 								}
 							},
 							{
@@ -292,35 +244,16 @@
 										49.0
 									],
 									"style": "",
-									"text": "Set j.cue to store state of both models in the patch",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set j.cue to store state of both models in the patch"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"fontsize": 12.0,
 									"id": "obj-25",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -338,49 +271,16 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"fontsize": 12.0,
 									"id": "obj-24",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -398,49 +298,16 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"fontsize": 12.0,
 									"id": "obj-23",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -458,27 +325,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -763,12 +610,6 @@
 											341.0,
 											264.0,
 											220.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -1104,12 +945,6 @@
 											341.0,
 											261.0,
 											224.0
-										],
-										"bgcolor": [
-											1.0,
-											1.0,
-											1.0,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -1606,18 +1441,6 @@
 							1556.0,
 							801.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -1667,12 +1490,6 @@
 									],
 									"style": "",
 									"text": "bpatcher's first argument sets model's name\n(here it's called 'metronome')",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},
@@ -1695,12 +1512,6 @@
 									],
 									"style": "",
 									"text": "Model nodes can be accessed remotely.\n\nThis way the processing logics (model)\nand interface (view) can be separated. \n\nSee the help file of j.view for further \ndiscusson of the benefits of \nMVC (model-view-controller) separation.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},
@@ -1722,12 +1533,6 @@
 									],
 									"style": "",
 									"text": "A model contains some media processing algorithm. In this simple example, it's a metronome.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									],
 									"textjustification": 1
 								}
 							},
@@ -1953,13 +1758,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "This model is embedded in a bpatcher. ",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "This model is embedded in a bpatcher. "
 												}
 											},
 											{
@@ -1994,13 +1793,7 @@
 														37.0
 													],
 													"style": "",
-													"text": "Return data generated by the model.",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "Return data generated by the model."
 												}
 											},
 											{
@@ -2018,13 +1811,7 @@
 														51.0
 													],
 													"style": "",
-													"text": "j.message makes it possible to send messages to the model.",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "j.message makes it possible to send messages to the model."
 												}
 											},
 											{
@@ -2042,13 +1829,7 @@
 														78.0
 													],
 													"style": "",
-													"text": "Parameter values can be stored in presets and cues.\n\nThey represent the state of the model.",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "Parameter values can be stored in presets and cues.\n\nThey represent the state of the model."
 												}
 											},
 											{
@@ -2066,13 +1847,7 @@
 														64.0
 													],
 													"style": "",
-													"text": "Declares this bpatcher as a model, and provides many of the services that the model offer.",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"text": "Declares this bpatcher as a model, and provides many of the services that the model offer."
 												}
 											},
 											{
@@ -2517,18 +2292,6 @@
 							1556.0,
 							801.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -2579,13 +2342,7 @@
 										93.0
 									],
 									"style": "",
-									"text": "Explore namespace of the various models in that patchers and see how services are added to the namespace",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Explore namespace of the various models in that patchers and see how services are added to the namespace"
 								}
 							},
 							{
@@ -2798,12 +2555,6 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cellmap": [
 										[
 											0,
@@ -3148,27 +2899,9 @@
 									],
 									"cols": 1,
 									"colwidth": 200,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-22",
 									"maxclass": "jit.cellblock",
@@ -3187,13 +2920,7 @@
 										252.75
 									],
 									"rows": 68,
-									"savemode": 1,
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -3252,13 +2979,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Amenities can be set within the model or when instanciating it",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Amenities can be set within the model or when instanciating it"
 								}
 							},
 							{
@@ -3304,13 +3025,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "enable multiple amenities",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "enable multiple amenities"
 								}
 							},
 							{
@@ -3331,13 +3046,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "enable data i/o handling (see j.in/j.out helppatch)",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "enable data i/o handling (see j.in/j.out helppatch)"
 								}
 							},
 							{
@@ -3358,13 +3067,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "enable audio i/o handling (see j.in~/j.out~ helppatch)",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "enable audio i/o handling (see j.in~/j.out~ helppatch)"
 								}
 							},
 							{
@@ -3384,13 +3087,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "enable preset handling only",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "enable preset handling only"
 								}
 							},
 							{
@@ -3410,13 +3107,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "enable all amenities (default)",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "enable all amenities (default)"
 								}
 							},
 							{
@@ -3451,13 +3142,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "disable all amenities",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "disable all amenities"
 								}
 							},
 							{
@@ -3476,13 +3161,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "j.model embed a number of handy features (data and audio in/out handling, and preset management). the @amenities attribute let one set which feature to enable (all by default)",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "j.model embed a number of handy features (data and audio in/out handling, and preset management). the @amenities attribute let one set which feature to enable (all by default)"
 								}
 							}
 						],
@@ -3534,18 +3213,6 @@
 							1556.0,
 							801.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -3593,13 +3260,7 @@
 										39.0
 									],
 									"style": "",
-									"text": "Speak to the model directly",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Speak to the model directly"
 								}
 							},
 							{
@@ -3665,12 +3326,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Lato Regular",
 									"fontsize": 14.0,
@@ -3685,23 +3340,11 @@
 										23.0
 									],
 									"style": "",
-									"text": "Create and delete presets",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Create and delete presets"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Lato Regular",
 									"fontsize": 14.0,
@@ -3716,13 +3359,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "Recall model presets",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Recall model presets"
 								}
 							},
 							{
@@ -3740,13 +3377,7 @@
 										37.0
 									],
 									"style": "",
-									"text": "Update current preset to reflect current state of model",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Update current preset to reflect current state of model"
 								}
 							},
 							{
@@ -3853,13 +3484,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Rename \"default\" preset to \"boring\"",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Rename \"default\" preset to \"boring\""
 								}
 							},
 							{
@@ -3896,13 +3521,7 @@
 										37.0
 									],
 									"style": "",
-									"text": "Copy \"default\" to new preset named \"foo\", and insert at slot 2.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Copy \"default\" to new preset named \"foo\", and insert at slot 2."
 								}
 							},
 							{
@@ -3938,13 +3557,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Move \"default\" preset to slot 3",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Move \"default\" preset to slot 3"
 								}
 							},
 							{
@@ -3961,13 +3574,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Move preset 1 to slot 2",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Move preset 1 to slot 2"
 								}
 							},
 							{
@@ -4019,13 +3626,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "You can see the the effect of these changes in the view pop-up menu ",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "You can see the the effect of these changes in the view pop-up menu "
 								}
 							},
 							{
@@ -4085,13 +3686,7 @@
 										52.0
 									],
 									"style": "",
-									"text": "Presets can be accessed and administered from this pop-up menu in the view",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Presets can be accessed and administered from this pop-up menu in the view"
 								}
 							},
 							{
@@ -4165,13 +3760,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Name of current preset",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Name of current preset"
 								}
 							},
 							{
@@ -4204,13 +3793,7 @@
 										37.0
 									],
 									"style": "",
-									"text": "The state of the model can be stored as presets.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The state of the model can be stored as presets."
 								}
 							},
 							{
@@ -4227,13 +3810,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Recall preset",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Recall preset"
 								}
 							},
 							{
@@ -4250,13 +3827,7 @@
 										24.0
 									],
 									"style": "",
-									"text": "Available presets",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Available presets"
 								}
 							},
 							{
@@ -5222,12 +4793,6 @@
 									"id": "obj-26",
 									"maxclass": "nodes",
 									"mousemode": 2,
-									"nodecolor": [
-										0.92549,
-										0.364706,
-										0.341176,
-										0.4
-									],
 									"nodenumber": 3,
 									"nsize": [
 										0.4,
@@ -5396,12 +4961,6 @@
 										0.301961,
 										0.0
 									],
-									"bgoncolor": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
-									],
 									"blinktime": 1000,
 									"id": "obj-72",
 									"maxclass": "textbutton",
@@ -5421,8 +4980,7 @@
 									],
 									"style": "",
 									"text": "\" \"",
-									"texton": "\" \"",
-									"usebgoncolor": 1
+									"texton": "\" \""
 								}
 							},
 							{
@@ -5432,12 +4990,6 @@
 										0.309804,
 										0.301961,
 										0.0
-									],
-									"bgoncolor": [
-										0.960784,
-										0.827451,
-										0.156863,
-										1.0
 									],
 									"blinktime": 1000,
 									"id": "obj-82",
@@ -5458,8 +5010,7 @@
 									],
 									"style": "",
 									"text": "\" \"",
-									"texton": "\" \"",
-									"usebgoncolor": 1
+									"texton": "\" \""
 								}
 							}
 						],
@@ -5900,18 +5451,6 @@
 							1556.0,
 							801.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -5960,13 +5499,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "set an alias name",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "set an alias name"
 								}
 							},
 							{
@@ -5987,13 +5520,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "address nodes using their alias",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "address nodes using their alias"
 								}
 							},
 							{
@@ -6023,23 +5550,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"id": "obj-28",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -6057,27 +5571,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -6174,34 +5668,15 @@
 										49.0
 									],
 									"style": "",
-									"text": "remove the alias if not needed anymore",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "remove the alias if not needed anymore"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Helvetica Neue Bold",
 									"id": "obj-17",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -6219,27 +5694,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -6343,13 +5798,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "the initial address of the model remains accessible.",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "the initial address of the model remains accessible."
 								}
 							},
 							{

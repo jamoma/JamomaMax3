@@ -14,18 +14,6 @@
 			1009.0,
 			658.0
 		],
-		"bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 12.0,
@@ -154,18 +142,6 @@
 							1009.0,
 							632.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -221,13 +197,7 @@
 										0.0
 									],
 									"style": "",
-									"text": "Strip leading slash from dumpout addresses",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Strip leading slash from dumpout addresses"
 								}
 							},
 							{
@@ -254,13 +224,7 @@
 										0.0
 									],
 									"style": "",
-									"text": "Strip leading slash from the output",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Strip leading slash from the output"
 								}
 							},
 							{
@@ -308,13 +272,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Both relative and absolute addresses can be routed the same path",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Both relative and absolute addresses can be routed the same path"
 								}
 							},
 							{

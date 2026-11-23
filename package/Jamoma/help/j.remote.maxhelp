@@ -112,13 +112,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Open the Clue Window from the Window menu to see the annotations.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "Open the Clue Window from the Window menu to see the annotations."
 								}
 							},
 							{
@@ -1403,13 +1397,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "/demo_model/bird",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "/demo_model/bird"
 								}
 							},
 							{
@@ -1425,13 +1413,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "bird",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "bird"
 								}
 							},
 							{
@@ -1448,13 +1430,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "When the view subscribes to a model, it attach itself to this local namespace. This way it is sufficient to access the parameter as bird within the view.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "When the view subscribes to a model, it attach itself to this local namespace. This way it is sufficient to access the parameter as bird within the view."
 								}
 							},
 							{
@@ -1470,13 +1446,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "demo_model",
-									"textcolor": [
-										0.093121,
-										0.536852,
-										0.511438,
-										1.0
-									]
+									"text": "demo_model"
 								}
 							},
 							{
@@ -1493,13 +1463,7 @@
 										33.0
 									],
 									"style": "",
-									"text": "The address of the model instance (here demo_model) helps establishing a global name for the parameter: /demo_model/bird. This way the parameter can also be accesed outside of models and views.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The address of the model instance (here demo_model) helps establishing a global name for the parameter: /demo_model/bird. This way the parameter can also be accesed outside of models and views."
 								}
 							},
 							{
@@ -1515,13 +1479,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "j.model sets up a local namespace within the model, so that \"bird\" is sufficient to name the parameter.\n",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.model sets up a local namespace within the model, so that \"bird\" is sufficient to name the parameter.\n"
 								}
 							},
 							{
@@ -1558,13 +1516,7 @@
 										74.0
 									],
 									"style": "",
-									"text": "Note to Jamoma-developers:\n\nThe bpacthers are embedded in the help patch itself. In order to edit the content of the bpatchers, select the bpacther object, and from the contextual menu choose \"Object > New View of Embedded Patcher\".",
-									"textcolor": [
-										0.784314,
-										0.145098,
-										0.023529,
-										1.0
-									]
+									"text": "Note to Jamoma-developers:\n\nThe bpacthers are embedded in the help patch itself. In order to edit the content of the bpatchers, select the bpacther object, and from the contextual menu choose \"Object > New View of Embedded Patcher\"."
 								}
 							},
 							{
@@ -1666,13 +1618,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "demo_model",
-													"textcolor": [
-														0.113339,
-														0.606332,
-														0.609597,
-														1.0
-													]
+													"text": "demo_model"
 												}
 											},
 											{
@@ -2013,13 +1959,7 @@
 														20.0
 													],
 													"style": "",
-													"text": "demo_model",
-													"textcolor": [
-														0.113339,
-														0.606332,
-														0.609597,
-														1.0
-													]
+													"text": "demo_model"
 												}
 											},
 											{
@@ -2761,13 +2701,7 @@
 										74.0
 									],
 									"style": "",
-									"text": "The 'set' message updates the parameter value without producing output from this j.remote object.\n\nOther j.remote objects associated with the same parameter will however be updated.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "The 'set' message updates the parameter value without producing output from this j.remote object.\n\nOther j.remote objects associated with the same parameter will however be updated."
 								}
 							},
 							{
@@ -2784,13 +2718,7 @@
 										74.0
 									],
 									"style": "",
-									"text": "j.remote binds to a parameter value. It is useful when designing user interfaces, as the model (the media processing algorithm) and the view (the interface) can be separated.\n\nSeveral instances of j.remote can bind to the same parameter.",
-									"textcolor": [
-										0.32549,
-										0.345098,
-										0.372549,
-										1.0
-									]
+									"text": "j.remote binds to a parameter value. It is useful when designing user interfaces, as the model (the media processing algorithm) and the view (the interface) can be separated.\n\nSeveral instances of j.remote can bind to the same parameter."
 								}
 							},
 							{

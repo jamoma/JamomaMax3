@@ -1298,12 +1298,7 @@
 , 			{
 				"box" : 				{
 					"arrow" : 0,
-					"bgfillcolor_angle" : 270.0,
 					"bgfillcolor_color" : [ 1.0, 1.0, 1.0, 0.0 ],
-					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
-					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-					"bgfillcolor_proportion" : 0.39,
-					"bgfillcolor_type" : "color",
 					"fontname" : "Arial Bold",
 					"fontsize" : 10.0,
 					"id" : "obj-56",
@@ -1315,8 +1310,7 @@
 					"outlettype" : [ "int", "", "" ],
 					"parameter_enable" : 0,
 					"patching_rect" : [ 702.0, 133.0, 123.0, 20.0 ],
-					"style" : "",
-					"textcolor" : [ 0.301961, 0.337255, 0.403922, 1.0 ]
+					"style" : ""
 				}
 
 			}
