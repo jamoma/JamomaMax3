@@ -3320,7 +3320,7 @@
 										78.0,
 										23.0
 									],
-									"style": "Jamoma-subtitle",
+									"style": "default",
 									"text": "Interpolate"
 								}
 							},
@@ -3466,7 +3466,7 @@
 										170.0,
 										23.0
 									],
-									"style": "Jamoma-subtitle",
+									"style": "default",
 									"text": "Edit presets"
 								}
 							},
@@ -3608,7 +3608,7 @@
 										166.0,
 										23.0
 									],
-									"style": "Jamoma-subtitle",
+									"style": "default",
 									"text": "Reorganise presets"
 								}
 							},
@@ -5377,34 +5377,6 @@
 							}
 						],
 						"styles": [
-							{
-								"name": "Jamoma-subtitle",
-								"default": {
-									"clearcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
-									"fontface": [
-										1
-									],
-									"fontsize": [
-										14.0
-									],
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"fontname": [
-										"Lato Regular"
-									]
-								},
-								"parentstyle": "",
-								"multi": 0
-							},
 							{
 								"name": "jpatcher001",
 								"parentstyle": "",

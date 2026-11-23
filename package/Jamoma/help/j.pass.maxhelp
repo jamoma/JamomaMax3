@@ -313,7 +313,7 @@
 										136.0,
 										23.0
 									],
-									"style": "j.subtitle",
+									"style": "default",
 									"text": "Leading slash option"
 								}
 							},
@@ -684,34 +684,6 @@
 							}
 						],
 						"styles": [
-							{
-								"name": "j.subtitle",
-								"default": {
-									"fontname": [
-										"Lato Regular"
-									],
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"fontface": [
-										1
-									],
-									"fontsize": [
-										14.0
-									],
-									"clearcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									]
-								},
-								"parentstyle": "",
-								"multi": 0
-							},
 							{
 								"name": "jpatcher001",
 								"parentstyle": "",
