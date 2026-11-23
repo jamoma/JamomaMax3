@@ -166,10 +166,17 @@ inline std::optional<std::string> view_model_address(const void* view_patcher)
         return std::nullopt;
     }
     jamoma::Node* node = jamoma::Registry::instance().names().lookup(jamoma::Address::parse(address));
-    if (node == nullptr || dynamic_cast<jamoma::Model*>(node->object()) == nullptr) {
+    auto* model = node != nullptr ? dynamic_cast<jamoma::Model*>(node->object()) : nullptr;
+    if (model == nullptr) {
         return std::nullopt;
     }
-    return address;
+    // A model that is being removed is told to the observers while it is still in the namespace: it counts only while a patcher has it.
+    for (const auto& entry : jamoma::Registry::instance().contexts().all()) {
+        if (entry.second == model) {
+            return address;
+        }
+    }
+    return std::nullopt;
 }
 
 /**

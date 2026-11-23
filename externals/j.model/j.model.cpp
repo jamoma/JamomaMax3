@@ -41,6 +41,8 @@ class j_model : public c74::min::object<j_model> {
     std::unique_ptr<jamoma::Model> model_;     /**< The model. */
     jamoma::Subscription active_sub_;          /**< The registration of `data/active` below the model. */
     std::string amenities_text_ = "all";       /**< The amenities as set (the `data` amenity provides `data/active`). */
+    std::shared_ptr<void> init_watch_;         /**< Recalls the default preset whenever the model has been initialised (a parent model may do it). */
+    bool in_default_ = false;                  /**< True while the default preset is recalled (it must not start itself again). */
     std::string last_file_;                    /**< The presets file used last. */
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
@@ -298,6 +300,14 @@ public:
                 if (model_) {
                     model_->init();
                     load_default_presets();
+                    recall_default();
+                    init_watch_ = model_->on_init_changed([this](bool done) {
+                        if (done && !in_default_) {
+                            in_default_ = true;
+                            recall_default();
+                            in_default_ = false;
+                        }
+                    });
                 }
             });
         });
@@ -339,11 +349,21 @@ private:
         return {};
     }
 
+    /** @return A path as Max writes it (`Macintosh HD:/Users/me/x.txt`, as opendialog gives it) in the native form of the system; a native path stays as it is. @param name The path. */
+    static std::string native_path(const std::string& name)
+    {
+        char out[c74::max::MAX_PATH_CHARS];
+        if (c74::max::path_nameconform(name.c_str(), out, c74::max::PATH_STYLE_NATIVE, c74::max::PATH_TYPE_BOOT) == 0 && out[0] != '\0') {
+            return out;
+        }
+        return name;
+    }
+
     /** @return The native path of a file the user named for reading: as given if absolute, else found in the Max search path (empty if not found). @param name The name. */
     std::string find_file(const std::string& name) const
     {
         if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return name;
+            return native_path(name);
         }
         char file[c74::max::MAX_FILENAME_CHARS];
         std::snprintf(file, sizeof file, "%s", name.c_str());
@@ -361,7 +381,7 @@ private:
     std::string target_file(const std::string& name) const
     {
         if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return name;
+            return native_path(name);
         }
         c74::max::t_symbol* path = patcher_ == nullptr ? nullptr
             : c74::max::object_attr_getsym(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher_)), c74::max::gensym("filepath"));
@@ -452,12 +472,20 @@ private:
         if (stem.empty()) {
             return;
         }
-        const std::string path = find_file(stem + ".presets.txt");
+        const std::string named = std::string(static_cast<symbol>(presets.get()).c_str());
+        const std::string path = find_file(named.empty() ? stem + ".presets.txt" : named);
         if (path.empty()) {
             return;
         }
         read_file(path);
-        model_->presets().recall("default");
+    }
+
+    /** Recalls the preset `default` if there is one (after every initialisation: a model that a parent model initialises again gets it again). */
+    void recall_default()
+    {
+        if (model_ && !model_->presets().names().empty()) {
+            model_->presets().recall("default");
+        }
     }
 
     /** Provides what the amenities promise: the `data` (or `all`) amenity gives the parameter `data/active` (1 = the model is on; presets store it). */
@@ -473,6 +501,7 @@ private:
         active_data_.set_attribute("default", {1});
         active_data_.set_attribute("description", {"Activates or deactivates the model"});
         active_sub_ = jamoma::Registry::instance().names().subscribe(model_->address().append(jamoma::Address::parse("data/active")), active_data_);
+        active_data_.command({1}); // set_type reset the value to 0
     }
 
     /** @return The address the model belongs at: below the model of the nearest enclosing patcher, else at the root. */
@@ -508,6 +537,7 @@ private:
         }
         if (model_) {
             active_sub_ = jamoma::Subscription();
+            init_watch_.reset();
             jamoma::Registry::instance().contexts().remove(patcher_, model_.get());
             model_.reset();
         }

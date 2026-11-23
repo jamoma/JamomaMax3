@@ -160,6 +160,12 @@ public:
     bool visit_below(const Address& root, const std::function<void(const std::string& relative, const std::string& name, const std::string& instance, Object* object)>& visit) const;
 
     /**
+     * @brief Calls a function with the object at an address while the namespace's read lock is held, so the object cannot go meanwhile (any thread).
+     * @param address The address. @param use What to do with the object; it must not call the namespace. @return False if there is no node or no object there.
+     */
+    bool read_object(const Address& address, const std::function<void(Object&)>& use) const;
+
+    /**
      * @brief Finds nodes by a pattern.
      * @param pattern An address whose segments may use `*`: as a name it matches any name (and any instance unless one is given), as an instance any instance (including none).
      * @return The matching nodes.

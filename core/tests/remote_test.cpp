@@ -8,7 +8,10 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
+#include <chrono>
 #include <cmath>
+#include <thread>
 #include <memory>
 #include <vector>
 
@@ -167,4 +170,32 @@ TEST_CASE("set shows without sending")
     REQUIRE(r.shown.size() == 1);
     REQUIRE(r.value() == 1.0);
     REQUIRE(r.remote.current()->at(0).as_double() == 8.0);
+}
+
+/** Ticks of a node with a unit arrive on another thread while the node is removed on this one: nothing reads a freed node (the sanitizer builds are the ones that can fail this). */
+TEST_CASE("node changes with a unit while the node goes away")
+{
+    for (int round = 0; round < 20; ++round) {
+        jamoma::Namespace ns;
+        std::atomic<int> shown{0};
+        Remote remote(ns, [&shown](const Value&) { ++shown; });
+        remote.set_unit("db");
+        auto node = std::make_unique<Data>();
+        node->set_type(DataType::Decimal);
+        node->set_attribute("dataspace", {"gain"});
+        node->set_attribute("unit", {"linear"});
+        auto subscription = std::make_unique<jamoma::Subscription>(ns.subscribe(Address::parse("/m/x"), *node));
+        remote.set_address(Address::parse("/m/x"));
+        std::atomic<bool> stop{false};
+        std::thread ticker([&] {
+            for (int i = 1; i < 500 && !stop; ++i) {
+                node->command({0.01 * i});
+            }
+        });
+        std::this_thread::sleep_for(std::chrono::microseconds(200));
+        subscription.reset();
+        stop = true;
+        ticker.join();
+        node.reset();
+    }
 }

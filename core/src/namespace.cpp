@@ -298,6 +298,26 @@ std::shared_ptr<void> Namespace::observe(const Address& pattern, std::function<v
     });
 }
 
+bool Namespace::read_object(const Address& address, const std::function<void(Object&)>& use) const
+{
+    if (address.empty()) {
+        return false;
+    }
+    std::shared_lock lock(state_->mutex);
+    Node* current = state_->root.get();
+    for (const Segment& segment : address.path()) {
+        current = find_child(*current, segment.name, segment.instance, current->kids_);
+        if (current == nullptr) {
+            return false;
+        }
+    }
+    if (current->object_ == nullptr) {
+        return false;
+    }
+    use(*current->object_);
+    return true;
+}
+
 bool Namespace::visit_below(const Address& root, const std::function<void(const std::string&, const std::string&, const std::string&, Object*)>& visit) const
 {
     std::shared_lock lock(state_->mutex);

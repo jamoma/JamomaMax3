@@ -9,6 +9,7 @@
 #include "jamoma/preset.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 
 #include "jamoma/data.hpp"
@@ -231,7 +232,7 @@ RecallReport PresetManager::interpolate(std::string_view a, std::string_view b, 
     RecallReport report;
     const auto ia = find(a);
     const auto ib = find(b);
-    if (!ia || !ib) {
+    if (!ia || !ib || std::isnan(position)) {
         return report;
     }
     report.found = true;
@@ -412,6 +413,16 @@ bool PresetManager::move(std::string_view name_or_index, std::size_t position)
     }
     changed();
     return true;
+}
+
+std::string PresetManager::free_name(std::string_view stem) const
+{
+    for (unsigned n = 1;; ++n) {
+        const std::string name = std::string(stem) + " " + std::to_string(n);
+        if (std::none_of(presets_.begin(), presets_.end(), [&name](const Preset& p) { return p.name == name; })) {
+            return name;
+        }
+    }
 }
 
 void PresetManager::clear()

@@ -105,6 +105,8 @@ public:
     bool copy(std::string_view from, std::string_view to, std::optional<std::size_t> position = {});
     /** @brief Moves a preset. @param name_or_index Its name or 1-based position. @param position The new 0-based position (less than the count). @return False if not possible. */
     bool move(std::string_view name_or_index, std::size_t position);
+    /** @brief The first name of the form `<stem> <n>` (n from 1) that no preset has. @param stem The text before the number. @return The name. */
+    std::string free_name(std::string_view stem) const;
     /** @brief Removes every preset. */
     void clear();
     /**

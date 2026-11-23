@@ -8,6 +8,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <cmath>
 #include <memory>
 #include <string>
 #include <vector>
@@ -351,4 +352,28 @@ TEST_CASE("observer is told of changes")
     handle.reset();
     r.presets.new_preset("three");
     REQUIRE(calls == 4);
+}
+
+/** A new preset name for "Create New Preset" never collides with an existing one (review finding: the panel overwrote preset 1). */
+TEST_CASE("free name skips taken names")
+{
+    Rig r;
+    r.add("a", 1.0);
+    REQUIRE(r.presets.free_name("preset") == "preset 1");
+    r.presets.new_preset("preset 1");
+    r.presets.new_preset("preset 2");
+    REQUIRE(r.presets.free_name("preset") == "preset 3");
+}
+
+/** A position that is not a number is not applied (review finding: NaN went to every parameter). */
+TEST_CASE("interpolate with a nan position does nothing")
+{
+    Rig r;
+    Data& a = r.add("a", 0.0);
+    r.presets.new_preset("lo");
+    a.command({10.0});
+    r.presets.new_preset("hi");
+    const auto report = r.presets.interpolate("lo", "hi", std::nan(""));
+    REQUIRE_FALSE(report.found);
+    REQUIRE(r.number("a") == 10.0);
 }

@@ -247,13 +247,18 @@ private:
         }
         const int choice = c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
         c74::max::jpopupmenu_destroy(menu);
+        m = model(); // the menu runs its own event loop: the model may have gone or been made again meanwhile
         if (choice >= 1 && choice <= static_cast<int>(utilities.size())) {
-            send_symbol(utilities[static_cast<std::size_t>(choice - 1)], model_);
-        } else if (choice == 100) {
-            int n = 1;
-            while (!m->presets().new_preset("preset " + std::to_string(n)) || false) {
-                ++n;
+            const std::string item = utilities[static_cast<std::size_t>(choice - 1)];
+            if (item.compare(0, 7, "preset:") == 0) {
+                c74::max::outlet_anything(out.max_outlet(), c74::max::gensym(item.c_str()), 0, nullptr); // no argument: the model asks for a file
+            } else {
+                send_symbol(item.c_str(), model_);
             }
+        } else if (m == nullptr) {
+            return;
+        } else if (choice == 100) {
+            m->presets().new_preset(m->presets().free_name("preset"));
         } else if (choice == 101 && m->presets().current()) {
             m->presets().update(std::to_string(*m->presets().current() + 1));
         } else if (choice == 102 && m->presets().current()) {

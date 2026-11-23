@@ -103,22 +103,27 @@ Value Remote::to_ui_unit(const Value& value) const
     if (unit.empty() || !all_numbers(value)) {
         return value;
     }
-    Node* found = ns_.lookup(node);
-    auto* data = found != nullptr ? dynamic_cast<Data*>(found->object()) : nullptr;
-    if (data == nullptr) {
-        return value;
-    }
-    const auto space = data->get_attribute("dataspace");
-    const auto from = data->get_attribute("unit");
-    if (!space || space->empty() || !from || from->empty()) {
-        return value;
-    }
-    const Dataspace* dataspace = Dataspace::find(space->at(0).to_string());
-    if (dataspace == nullptr) {
-        return value;
-    }
-    const auto converted = dataspace->convert(value, from->at(0).to_string(), unit);
-    return converted ? *converted : value;
+    Value result = value;
+    ns_.read_object(node, [&](Object& object) {
+        auto* data = dynamic_cast<Data*>(&object);
+        if (data == nullptr) {
+            return;
+        }
+        const auto space = data->get_attribute("dataspace");
+        const auto from = data->get_attribute("unit");
+        if (!space || space->empty() || !from || from->empty()) {
+            return;
+        }
+        const Dataspace* dataspace = Dataspace::find(space->at(0).to_string());
+        if (dataspace == nullptr) {
+            return;
+        }
+        const auto converted = dataspace->convert(value, from->at(0).to_string(), unit);
+        if (converted) {
+            result = *converted;
+        }
+    });
+    return result;
 }
 
 void Remote::node_changed(const Value& value)
