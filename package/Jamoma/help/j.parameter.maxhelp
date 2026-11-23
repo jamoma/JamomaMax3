@@ -18,7 +18,7 @@
 		"openinpresentation": 0,
 		"default_fontsize": 10.0,
 		"default_fontface": 0,
-		"default_fontname": "Verdana",
+		"default_fontname": "Arial",
 		"gridonopen": 1,
 		"gridsize": [
 			5.0,

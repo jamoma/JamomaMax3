@@ -102,7 +102,7 @@
 						"boxes": [
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-22",
 									"linecount": 2,
@@ -125,7 +125,7 @@
 									"bubble": 1,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-19",
 									"linecount": 5,
@@ -869,7 +869,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-3",
 									"maxclass": "comment",
@@ -1717,7 +1717,7 @@
 						"boxes": [
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-42",
 									"maxclass": "comment",
@@ -1786,7 +1786,7 @@
 									"bubblepoint": 0.08,
 									"bubbleside": 0,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-38",
 									"linecount": 3,
@@ -1806,7 +1806,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-37",
 									"maxclass": "comment",
@@ -1825,7 +1825,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-78",
 									"maxclass": "comment",
@@ -1845,7 +1845,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-20",
 									"linecount": 3,
@@ -1866,7 +1866,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-19",
 									"linecount": 2,
@@ -2288,7 +2288,7 @@
 											},
 											{
 												"box": {
-													"fontname": "Lato Regular",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-3",
 													"linecount": 5,
@@ -2309,7 +2309,7 @@
 												"box": {
 													"bubble": 1,
 													"bubbletextmargin": 10,
-													"fontname": "Lato Regular",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-6",
 													"linecount": 3,

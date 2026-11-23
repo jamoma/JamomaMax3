@@ -178,7 +178,7 @@
 									"bubblepoint": 0.04,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-9",
 									"linecount": 10,
@@ -201,7 +201,7 @@
 									"bubblepoint": 0.04,
 									"bubbleside": 2,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-8",
 									"linecount": 6,
@@ -700,7 +700,7 @@
 										"boxes": [
 											{
 												"box": {
-													"fontname": "Verdana",
+													"fontname": "Arial",
 													"fontsize": 11.0,
 													"id": "obj-6",
 													"maxclass": "comment",
@@ -1162,7 +1162,7 @@
 									"bubblepoint": 0.08,
 									"bubbleside": 0,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-27",
 									"linecount": 4,
@@ -1521,7 +1521,7 @@
 									"bubble": 1,
 									"bubbleside": 2,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"frozen_box_attributes": [
 										"hidden"
@@ -1547,7 +1547,7 @@
 									"bubble": 1,
 									"bubbleside": 2,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-10",
 									"linecount": 3,
@@ -1624,7 +1624,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-5",
 									"linecount": 4,
@@ -2009,7 +2009,7 @@
 														"boxes": [
 															{
 																"box": {
-																	"fontname": "Lato Regular",
+																	"fontname": "Arial",
 																	"fontsize": 36.0,
 																	"id": "obj-3",
 																	"maxclass": "comment",

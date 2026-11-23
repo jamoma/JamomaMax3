@@ -197,7 +197,7 @@
 									"bubble": 1,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-25",
 									"maxclass": "comment",
@@ -218,7 +218,7 @@
 									"bubble": 1,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-24",
 									"linecount": 2,
@@ -240,7 +240,7 @@
 									"bubble": 1,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-23",
 									"linecount": 4,
@@ -375,7 +375,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-12",
 									"maxclass": "comment",
@@ -416,7 +416,7 @@
 									"bubblepoint": 0.0,
 									"bubbleside": 2,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-13",
 									"maxclass": "comment",
@@ -779,7 +779,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"id": "obj-26",
 													"maxclass": "comment",
 													"numinlets": 1,
@@ -804,7 +804,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-23",
 													"maxclass": "comment",
@@ -830,7 +830,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-19",
 													"maxclass": "comment",
@@ -2388,8 +2388,8 @@
 						"boxes": [
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-1",
 									"maxclass": "comment",
@@ -2407,8 +2407,8 @@
 							},
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-2",
 									"maxclass": "comment",
@@ -2426,8 +2426,8 @@
 							},
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-3",
 									"maxclass": "comment",
@@ -2511,7 +2511,7 @@
 										0.0
 									],
 									"fontface": 2,
-									"fontname": "Lato Black",
+									"fontname": "Arial",
 									"gradient": 1,
 									"id": "obj-26",
 									"maxclass": "message",
@@ -2863,7 +2863,7 @@
 									"bubble": 1,
 									"bubbleside": 3,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-25",
 									"maxclass": "comment",
@@ -3271,7 +3271,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-21",
 									"maxclass": "comment",
@@ -3290,7 +3290,7 @@
 							{
 								"box": {
 									"fontface": 0,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-22",
 									"maxclass": "comment",
@@ -3927,7 +3927,7 @@
 										0.0
 									],
 									"fontface": 2,
-									"fontname": "Lato Black",
+									"fontname": "Arial",
 									"gradient": 1,
 									"id": "obj-6",
 									"maxclass": "message",
@@ -4276,8 +4276,8 @@
 							},
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-8",
 									"maxclass": "comment",
@@ -4295,8 +4295,8 @@
 							},
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-9",
 									"maxclass": "comment",
@@ -4314,8 +4314,8 @@
 							},
 							{
 								"box": {
-									"fontface": 0,
-									"fontname": "Lato Black",
+									"fontface": 1,
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-10",
 									"maxclass": "comment",
@@ -4333,7 +4333,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-11",
 									"maxclass": "comment",
@@ -4351,7 +4351,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-12",
 									"maxclass": "comment",
@@ -4465,7 +4465,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-21",
 									"maxclass": "comment",
@@ -4484,7 +4484,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-22",
 									"maxclass": "comment",
@@ -4623,7 +4623,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-29",
 									"maxclass": "comment",
@@ -5175,7 +5175,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-4",
 									"linecount": 4,
@@ -5215,7 +5215,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-10",
 									"maxclass": "comment",
@@ -5258,7 +5258,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-21",
 									"maxclass": "comment",
@@ -5277,7 +5277,7 @@
 							{
 								"box": {
 									"fontface": 0,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-22",
 									"linecount": 2,
@@ -5350,7 +5350,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-29",
 									"maxclass": "comment",
@@ -5830,7 +5830,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"id": "obj-26",
 													"maxclass": "comment",
 													"numinlets": 1,
@@ -5855,7 +5855,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-23",
 													"maxclass": "comment",
@@ -5881,7 +5881,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-19",
 													"maxclass": "comment",
@@ -7232,7 +7232,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"id": "obj-26",
 													"maxclass": "comment",
 													"numinlets": 1,
@@ -7257,7 +7257,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-23",
 													"maxclass": "comment",
@@ -7283,7 +7283,7 @@
 											{
 												"box": {
 													"fontface": 1,
-													"fontname": "Lato Heavy",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-19",
 													"maxclass": "comment",
@@ -8355,7 +8355,7 @@
 										0.0
 									],
 									"fontface": 2,
-									"fontname": "Lato Black",
+									"fontname": "Arial",
 									"gradient": 1,
 									"id": "obj-26",
 									"maxclass": "message",
@@ -8376,7 +8376,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-25",
 									"maxclass": "comment",
@@ -8394,7 +8394,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-24",
 									"maxclass": "comment",
@@ -8412,7 +8412,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-23",
 									"maxclass": "comment",
@@ -8430,7 +8430,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-14",
 									"maxclass": "comment",
@@ -8448,7 +8448,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-12",
 									"maxclass": "comment",
@@ -8467,7 +8467,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-10",
 									"maxclass": "comment",
@@ -8910,7 +8910,7 @@
 							{
 								"box": {
 									"fontface": 1,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 14.0,
 									"id": "obj-11",
 									"maxclass": "comment",

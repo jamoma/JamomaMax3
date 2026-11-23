@@ -14,7 +14,7 @@
 		"openinpresentation" : 1,
 		"default_fontsize" : 10.0,
 		"default_fontface" : 0,
-		"default_fontname" : "Verdana",
+		"default_fontname" : "Arial",
 		"gridonopen" : 1,
 		"gridsize" : [ 5.0, 5.0 ],
 		"gridsnaponopen" : 1,
@@ -38,7 +38,7 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-3",
 					"maxclass" : "newobj",
@@ -54,7 +54,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-5",
 					"maxclass" : "comment",
@@ -87,7 +87,7 @@
 , 			{
 				"box" : 				{
 					"annotation" : "Defines a range of randomness in milliseconds to be applied to the metro interval",
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-7",
 					"maxclass" : "number",
@@ -107,7 +107,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-8",
 					"maxclass" : "comment",
@@ -123,7 +123,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-10",
 					"maxclass" : "newobj",
@@ -139,7 +139,7 @@
 , 			{
 				"box" : 				{
 					"annotation" : "Metro interval (ms)",
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-11",
 					"maxclass" : "number",
@@ -159,7 +159,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-17",
 					"maxclass" : "comment",
@@ -175,7 +175,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-34",
 					"maxclass" : "newobj",
@@ -191,7 +191,7 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Verdana",
+					"fontname" : "Arial",
 					"fontsize" : 10.0,
 					"id" : "obj-40",
 					"maxclass" : "newobj",

@@ -1299,7 +1299,8 @@
 				"box" : 				{
 					"arrow" : 0,
 					"bgfillcolor_color" : [ 1.0, 1.0, 1.0, 0.0 ],
-					"fontname" : "Arial Bold",
+					"fontname" : "Arial",
+					"fontface": 1,
 					"fontsize" : 10.0,
 					"id" : "obj-56",
 					"ignoreclick" : 1,

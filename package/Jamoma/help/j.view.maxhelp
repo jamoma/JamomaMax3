@@ -103,7 +103,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-8",
 									"linecount": 8,
@@ -122,7 +122,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Medium",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-3",
 									"linecount": 2,
@@ -1592,7 +1592,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-6",
 									"linecount": 6,
@@ -1611,7 +1611,7 @@
 							},
 							{
 								"box": {
-									"fontname": "Lato Medium",
+									"fontname": "Arial",
 									"fontsize": 13.0,
 									"id": "obj-2",
 									"linecount": 3,
@@ -1743,7 +1743,7 @@
 													"bubble": 1,
 													"bubbleside": 0,
 													"bubbletextmargin": 10,
-													"fontname": "Helvetica Neue",
+													"fontname": "Arial",
 													"fontsize": 12.0,
 													"id": "obj-10",
 													"maxclass": "comment",

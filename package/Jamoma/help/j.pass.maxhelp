@@ -177,7 +177,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-24",
 									"linecount": 2,
@@ -204,7 +204,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-21",
 									"linecount": 2,
@@ -258,7 +258,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-16",
 									"linecount": 3,

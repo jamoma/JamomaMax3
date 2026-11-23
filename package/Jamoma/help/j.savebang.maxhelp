@@ -154,7 +154,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Helvetica Neue",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"frgb": 0.0,
 									"id": "obj-6",
