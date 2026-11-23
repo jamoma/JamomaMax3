@@ -79,7 +79,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-16",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -93,7 +92,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-9",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -123,7 +122,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-60",
@@ -138,7 +137,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-15",
 					"maxclass" : "toggle",
 					"numinlets" : 1,

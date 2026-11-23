@@ -360,7 +360,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-141",
@@ -377,8 +377,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
-					"checkedcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"id" : "obj-142",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -387,13 +385,13 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 460.0, 308.488251, 24.0, 24.0 ],
 					"prototypename" : "test-toggle",
-					"style" : "",
-					"uncheckedcolor" : [ 0.0, 0.0, 0.0, 0.0 ]
+					"style" : ""
 				}
 
 			}
 , 			{
 				"box" : 				{
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-143",
@@ -632,7 +630,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-136",
@@ -649,8 +647,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
-					"checkedcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"id" : "obj-137",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -659,13 +655,13 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 460.0, 126.488235, 24.0, 24.0 ],
 					"prototypename" : "test-toggle",
-					"style" : "",
-					"uncheckedcolor" : [ 0.0, 0.0, 0.0, 0.0 ]
+					"style" : ""
 				}
 
 			}
 , 			{
 				"box" : 				{
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-138",
@@ -681,7 +677,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-60",

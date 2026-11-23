@@ -38,7 +38,7 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-20",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -53,7 +53,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-21",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -67,7 +66,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-22",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -120,7 +118,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-14",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -135,7 +133,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-15",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -149,7 +146,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-16",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -190,7 +186,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-9",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -205,7 +201,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-10",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -219,7 +214,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-11",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -260,7 +254,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-45",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -275,7 +269,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-8",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -289,7 +282,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-6",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -330,7 +322,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-3",
 					"maxclass" : "newobj",
 					"numinlets" : 1,

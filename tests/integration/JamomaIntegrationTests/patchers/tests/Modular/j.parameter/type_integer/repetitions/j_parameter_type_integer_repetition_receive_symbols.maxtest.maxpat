@@ -78,7 +78,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-27",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -92,7 +91,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
 					"id" : "obj-26",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -106,7 +104,6 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-24",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -133,7 +130,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-19",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -147,7 +143,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-17",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -161,7 +156,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-15",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -175,7 +169,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-13",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
@@ -201,7 +195,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-1",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -256,7 +250,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-11",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -324,7 +318,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-10",
 					"linecount" : 3,
 					"maxclass" : "newobj",

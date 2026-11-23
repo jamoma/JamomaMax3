@@ -318,7 +318,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-51",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -333,7 +333,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-52",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -348,6 +347,7 @@
 			}
 , 			{
 				"box" : 				{
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-53",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -570,7 +570,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-39",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -585,7 +585,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-42",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -600,6 +599,7 @@
 			}
 , 			{
 				"box" : 				{
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-45",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -822,7 +822,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-30",
 					"linecount" : 3,
 					"maxclass" : "newobj",
@@ -837,7 +837,6 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.952941, 0.564706, 0.098039, 1.0 ],
 					"id" : "obj-33",
 					"maxclass" : "toggle",
 					"numinlets" : 1,
@@ -852,6 +851,7 @@
 			}
 , 			{
 				"box" : 				{
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"id" : "obj-35",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -880,7 +880,7 @@
 			}
 , 			{
 				"box" : 				{
-					"color" : [ 1.0, 0.66, 0.0, 1.0 ],
+					"color" : [ 0.7, 0.4, 0.3, 1.0 ],
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
 					"id" : "obj-60",
