@@ -1612,7 +1612,7 @@
 							{
 								"box": {
 									"fontname": "Arial",
-									"fontsize": 13.0,
+									"fontsize": 12.0,
 									"id": "obj-2",
 									"linecount": 3,
 									"maxclass": "comment",
