@@ -555,7 +555,7 @@
 									"args": [
 										"another_sub_model"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -950,7 +950,7 @@
 									"args": [
 										"sub_model"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,

@@ -1682,7 +1682,7 @@
 									"args": [
 										"metronome"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,

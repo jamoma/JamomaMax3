@@ -209,7 +209,7 @@
 									"args": [
 										"jout/without_amenities"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -933,7 +933,7 @@
 									"args": [
 										"jout/with_amenities"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -1973,7 +1973,7 @@
 									"args": [
 										"jout/myModel"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
