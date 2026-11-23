@@ -209,7 +209,7 @@
 									"args": [
 										"jin/without_amenities"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -948,7 +948,7 @@
 									"args": [
 										"jin/with_amenities"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -1801,7 +1801,7 @@
 									"args": [
 										"addressing_parameter"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
@@ -2736,7 +2736,7 @@
 									"args": [
 										"jin/myModel"
 									],
-									"bgmode": 2,
+									"bgmode": 0,
 									"border": 0,
 									"clickthrough": 0,
 									"embed": 1,
