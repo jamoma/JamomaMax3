@@ -21,3 +21,6 @@ python3 tools/maxtest/add_toggles.py tests/max/patchers/<name>.maxtest.maxpat
 ```
 
 and are then laid out as above (adding toggles twice changes nothing). A test that waits for a model starts from the end outlet of `j.init`, never from a fixed delay.
+
+Patchers that script-create or script-delete objects (`late_model`, `nested_model`, `free_while_ramping`, `ui_state`, `view_argument`, `view_late_model`, `dieze`) change
+themselves when they run. Never save such a patcher after it has run (close it with "Don't Save"); a saved copy has lost the deleted objects (`free_while_ramping` lost its `j.parameter`).
