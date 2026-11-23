@@ -49,9 +49,9 @@
 			}
 , 			{
 				"box" : 				{
+					"border" : 1,
 					"args" : [ "@name", "qmetro.model", "@description", "A qmetro module (like metro, but can drop frames)" ],
 					"bgmode" : 1,
-					"border" : 0,
 					"clickthrough" : 0,
 					"enablehscroll" : 0,
 					"enablevscroll" : 0,
@@ -382,8 +382,8 @@
 			}
 , 			{
 				"box" : 				{
+					"border" : 1,
 					"bgmode" : 0,
-					"border" : 0,
 					"clickthrough" : 0,
 					"enablehscroll" : 0,
 					"enablevscroll" : 0,

@@ -556,7 +556,7 @@
 										"another_sub_model"
 									],
 									"bgmode": 0,
-									"border": 0,
+									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,
 									"enablehscroll": 0,
@@ -951,7 +951,7 @@
 										"sub_model"
 									],
 									"bgmode": 0,
-									"border": 0,
+									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,
 									"enablehscroll": 0,

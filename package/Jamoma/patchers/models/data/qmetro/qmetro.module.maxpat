@@ -29,6 +29,7 @@
 		"tags" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"border" : 1,
 					"annotation" : "none",
 					"args" : [ "#1" ],
 					"id" : "obj-5",

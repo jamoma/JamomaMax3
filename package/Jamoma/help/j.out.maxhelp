@@ -210,7 +210,7 @@
 										"jout/without_amenities"
 									],
 									"bgmode": 0,
-									"border": 0,
+									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,
 									"enablehscroll": 0,
@@ -934,7 +934,7 @@
 										"jout/with_amenities"
 									],
 									"bgmode": 0,
-									"border": 0,
+									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,
 									"enablehscroll": 0,
@@ -1974,7 +1974,7 @@
 										"jout/myModel"
 									],
 									"bgmode": 0,
-									"border": 0,
+									"border": 1,
 									"clickthrough": 0,
 									"embed": 1,
 									"enablehscroll": 0,
