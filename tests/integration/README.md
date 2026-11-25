@@ -55,7 +55,7 @@ and are then laid out as above (adding toggles twice changes nothing). A test th
 
 ## Tests that change themselves
 
-Patchers that script-create or script-delete objects (`j_model_late`, `j_model_nested`, `j_parameter_free_while_ramping`, `j_ui_state`, `j_ui_grid`, `j_view_argument`, `j_view_late_model`, `j_receive_dieze`) change
+Patchers that script-create or script-delete objects (`j_model_late`, `j_model_nested`, `j_parameter_free_while_ramping`, `j_ui_state`, `j_ui_grid`, `j_view_argument`, `j_view_late_model`, `j_receive_dieze`, `j_receive_other_models`) change
 themselves when they run. Never save such a patcher after it has run (close it with "Don't Save"); a saved copy has lost the deleted objects (`j_parameter_free_while_ramping` lost its `j.parameter`).
 
 ## Licence

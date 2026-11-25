@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -193,6 +194,34 @@ inline jamoma::Model* find_model(c74::max::t_object* box)
     }
     return nullptr;
 }
+
+/**
+ * @brief Runs a function once, later on the main thread, however often it is asked for before it runs.
+ *
+ * A burst of changes, such as a model that is removed and made again, gives one call after the burst, when everything has settled. Use one per object.
+ */
+class Settle {
+public:
+    /**
+     * Asks for the function to run (nothing happens if a call is already waiting).
+     * @param box The box object of the caller. @param alive The token of the caller; if it has expired by then the function is not called.
+     * @param function What to run.
+     */
+    void request(c74::max::t_object* box, std::weak_ptr<int> alive, std::function<void()> function)
+    {
+        if (pending_->exchange(true)) {
+            return;
+        }
+        const std::shared_ptr<std::atomic<bool>> pending = pending_;
+        defer_call(box, std::move(alive), [pending, function = std::move(function)] {
+            pending->store(false);
+            function();
+        });
+    }
+
+private:
+    std::shared_ptr<std::atomic<bool>> pending_ = std::make_shared<std::atomic<bool>>(false); /**< True while a call is waiting. */
+};
 
 /**
  * @brief Calls a function whenever a model is registered for a patcher or removed again (anywhere), so that an object can find its model

@@ -33,6 +33,8 @@ class j_remote : public c74::min::object<j_remote> {
     bool ready_ = false;                       /**< True once the patcher has loaded and the address may be resolved. */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;           /**< Binds again when the model of the patcher appears, is replaced or goes. */
+    jamoma_max::Settle settle_;                /**< Lets a burst of such changes be dealt with once, when it is over. */
+    jamoma::Address bound_;                    /**< The address the remote was bound to last. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -54,7 +56,7 @@ public:
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             ready_ = true;
             rebind();
-            watch_.start([this] { rebind(); });
+            watch_.start([this] { settle_.request(maxobj(), alive_.weak(), [this] { follow(); }); });
         });
     }
 
@@ -187,13 +189,25 @@ private:
         });
     }
 
+    /** Follows the model of the patcher coming, going or being replaced: binds again only if the address that the written one resolves to has changed. */
+    void follow()
+    {
+        if (!ready_ || !remote_) {
+            return;
+        }
+        if ((text_.empty() ? jamoma::Address() : jamoma_max::resolve_in_patcher(maxobj(), text_)) != bound_) {
+            rebind();
+        }
+    }
+
     /** Binds (again) to the address as written. */
     void rebind()
     {
         if (!ready_ || !remote_) {
             return;
         }
-        remote_->set_address(text_.empty() ? jamoma::Address() : jamoma_max::resolve_in_patcher(maxobj(), text_));
+        bound_ = text_.empty() ? jamoma::Address() : jamoma_max::resolve_in_patcher(maxobj(), text_);
+        remote_->set_address(bound_);
     }
 
     /** Shows a value: out of the value outlet and as `set <value>` out of the set outlet (`set bang` for a bang). @param v The value. */
