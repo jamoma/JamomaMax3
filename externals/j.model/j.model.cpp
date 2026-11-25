@@ -297,6 +297,31 @@ public:
         return {};
     }};
 
+    /**
+     * `<name> <value...>`: sends the value to the parameter or message of that name below the model (the name is relative to the model, as in
+     * the output). A name that is no parameter or message, and a return, is ignored. The messages above are tried first.
+     */
+    message<> anything{this, "anything", MIN_FUNCTION {
+        if (!model_ || args.empty()) {
+            return {};
+        }
+        atoms message = args;
+        if (message.size() >= 2 && static_cast<symbol>(message[0]) == symbol("symbol")) {
+            message.erase(message.begin());
+        }
+        if (message[0].type() != message_type::symbol_argument) {
+            return {};
+        }
+        const std::string name = static_cast<symbol>(message[0]).c_str();
+        const atoms rest(message.begin() + 1, message.end());
+        jamoma::Node* node = jamoma::Registry::instance().names().lookup(model_->address().append(jamoma::Address::parse(name)));
+        auto* data = node != nullptr ? dynamic_cast<jamoma::Data*>(node->object()) : nullptr;
+        if (data != nullptr && data->service() != jamoma::Service::Return) {
+            data->command(jamoma_max::to_value(rest));
+        }
+        return {};
+    }};
+
     /** After construction: creates the model, registers it for its patcher and schedules the first initialisation. */
     message<> setup{this, "setup", MIN_FUNCTION {
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
