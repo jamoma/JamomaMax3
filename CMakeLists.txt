@@ -29,6 +29,12 @@ set(JAMOMA_PACKAGE_DIR "${CMAKE_SOURCE_DIR}/package/Jamoma" CACHE PATH "Output f
 
 enable_testing()
 
+# Every file that a patcher of the package loads (bpatchers, js files, pictures) must be in the package.
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_Interpreter_FOUND)
+    add_test(NAME package_references COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/package/check_references.py ${CMAKE_CURRENT_SOURCE_DIR}/package/Jamoma)
+endif()
+
 add_subdirectory(core)
 
 include(cmake/JamomaExternal.cmake)
