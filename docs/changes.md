@@ -1,7 +1,7 @@
 # Deliberate differences from the old JamomaMax behaviour
 
 Milestone 1 (namespace and data). Everything not listed here behaves as the old objects did, and the old integration
-tests (`conformance/m1-tests.txt`) are the evidence. Differences are either additions, or things left out for a later
+tests (`tests/integration`, folder `Modular/j.parameter`) are the evidence. Differences are either additions, or things left out for a later
 milestone (so a patcher that uses them will not find them yet).
 
 ## Changed or added behaviour

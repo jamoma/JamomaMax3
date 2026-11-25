@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
-# Runs the old Jamoma integration tests (max-test patchers) in Max 9. Thin wrapper around tools/maxtest/run_maxtests.py.
-#   scripts/run-maxtests.sh <list file> <out dir> [extra run_maxtests.py options]
-# Example: scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests
+# Runs the Max tests (tests/integration, max-test patchers) in Max 9. Thin wrapper around tools/maxtest/run_maxtests.py: every argument goes to it.
+#   scripts/run-maxtests.sh --all --out <out dir> [options]                      every test of the tree
+#   scripts/run-maxtests.sh --dir <folder> [--dir <folder>...] --out <out dir>   the tests in some folders of Modular/ (j.model, j.ui, j.parameter/general, ...)
+#   scripts/run-maxtests.sh --list <file> --out <out dir>                        the tests named in a file
+# Example: scripts/run-maxtests.sh --all --out build/maxtests --fast 5
 # See docs/conformance/README.md for the one-time setup (max-test) and what the runner touches.
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-LIST="${1:?list file}"; OUT="${2:?out dir}"; shift 2
-exec python3 "$ROOT/tools/maxtest/run_maxtests.py" --list "$LIST" --out "$OUT" "$@"
+exec python3 "$ROOT/tools/maxtest/run_maxtests.py" "$@"

@@ -1,4 +1,6 @@
-# Conformance tests (old integration tests under max-test)
+# Conformance tests (the Max tests under max-test)
+
+The tests are in `tests/integration`, one folder for each external (see its README for the layout and names). They are the 82 old `j.parameter` integration tests and the tests of this project. There are no lists of tests to keep up to date: `--all` and `--dir` find them. The results records `m1-results.md`, `m2-results.md` and `m3-results.md` name the lists and the test names of the time they were written (`conformance/m1-tests.txt`, `own-tests.txt`, assertions called `JamomaMax3/...`); the lists were replaced by the folders when the own tests moved into the tree.
 
 The old Jamoma integration tests are Max patchers (`*.maxtest.maxpat`) that use Cycling '74's
 [max-test](https://github.com/Cycling74/max-test) objects (`test.assert`, `test.equals`, `test.terminate`, ...) and the
@@ -22,8 +24,10 @@ abstraction `test.list.equals` from the old `JamomaIntegrationTests` package.
 ## Running
 
 ```
-scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests            # all milestone 1 tests
-scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests --timeout 10 # shorter per-test timeout
+scripts/run-maxtests.sh --all --out build/maxtests                  # every test of tests/integration
+scripts/run-maxtests.sh --dir j.parameter --out build/maxtests      # the tests of one folder of Modular/ (repeat --dir for more)
+scripts/run-maxtests.sh --all --out build/maxtests --timeout 10     # shorter per-test timeout
+scripts/run-maxtests.sh --list some-list.txt --out build/maxtests   # the tests named in a file (paths relative to tests/integration)
 ```
 
 `results.tsv` in the output folder has one line per test: `<path>	PASS|FAIL|TIMEOUT	<detail>`; the exit code is non-zero
@@ -51,13 +55,13 @@ which needs `j.in~`/`j.out~`), so the old-test suite for milestone 1 is the 82 `
 
 ## The qmetro patchers
 
-The qmetro model, view, module and help patcher are the first test patch of the pass-bar set (`conformance/set.txt`). They are checked in three ways: the own test `qmetro` (`tests/max/patchers/qmetro.maxtest.maxpat`, in `conformance/own-tests.txt`: the module loads, the default preset sets the time and stops the metro, and switching the metro on makes the `trigger` return fire); `scripts/check-help.sh` with no arguments, which opens every help patcher and the four qmetro patchers and reports missing objects and load errors (a missing bpatcher too); and the unit test `package_references`, which checks that every bpatcher, `js` file and picture that a package patcher loads is in the package.
+The qmetro model, view, module and help patcher are the first test patch of the pass-bar set (`conformance/set.txt`). They are checked in three ways: the test `qmetro_module` (`tests/integration/.../Modular/qmetro/`, run by `--all` and `--dir qmetro`: the module loads, the default preset sets the time and stops the metro, and switching the metro on makes the `trigger` return fire); `scripts/check-help.sh` with no arguments, which opens every help patcher and the four qmetro patchers and reports missing objects and load errors (a missing bpatcher too); and the unit test `package_references`, which checks that every bpatcher, `js` file and picture that a package patcher loads is in the package.
 
 The help check can report `doesn't understand "foo"` and `doesn't understand "none"` in a full run, attributed to `j.receive.maxhelp`, which is clean when opened alone. The same errors come now and then in the Max window when a `nodes` object is used; they are not a regression of the qmetro patchers.
 
 ## Permanent links for working in Max yourself
 
 The runners link what they need into `~/Documents/Max 9/Packages` while they run and remove only what they created. To open the tests and help
-patchers in a Max that you start yourself, keep the four links in place with `scripts/max-links.sh on` (and take them away with `off`;
+patchers in a Max that you start yourself, keep the three links in place with `scripts/max-links.sh on` (and take them away with `off`;
 `status` shows them). Quit and reopen Max after changing them. The runners leave existing links alone, and `scripts/max-smoke.sh` moves the
 `Jamoma` link aside while it runs and puts it back.

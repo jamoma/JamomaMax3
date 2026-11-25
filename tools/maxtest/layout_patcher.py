@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Lays out Max patchers so that they read from top to bottom: every object sits below the objects that feed it.
 
-    layout_patcher.py tests/max/patchers/*.maxpat
+    layout_patcher.py <path>/<name>.maxtest.maxpat
 
 Rewrites the files in place. Rules:
 

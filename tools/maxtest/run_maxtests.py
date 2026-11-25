@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
-"""Runs max-test patchers (the old Jamoma integration tests) in Max 9 and reports PASS/FAIL/TIMEOUT per test.
+"""Runs max-test patchers (the tests in tests/integration) in Max 9 and reports PASS/FAIL/TIMEOUT per test.
 
-    run_maxtests.py --list conformance/m1-tests.txt --out build/maxtests
+    run_maxtests.py --all --out build/maxtests                 every test of the tree
+    run_maxtests.py --dir j.model --dir j.ui --out build/maxtests   the tests in some folders of Modular/
+    run_maxtests.py --list some-list.txt --out build/maxtests  the tests named in a list
 
-The list has one test patcher per line (paths relative to --tests, which defaults to tests/integration of this repository, where the old
-JamomaIntegrationTests package is kept; blank lines and # comments are skipped).
+The tests are the `*.maxtest.maxpat` files below `JamomaIntegrationTests/patchers/tests/Modular/<external>/` in --tests (default tests/integration of
+this repository); --dir takes the name of a folder there (`j.model`, `j.parameter/general`). A list has one test patcher per line (paths relative to --tests;
+blank lines and # comments are skipped).
 For each batch of tests it writes a small driver patcher that sends ``;test.master run <name>.maxtest ...``
 (max-test runs them in sequence and records every assertion in an sqlite database), launches Max 9 through
 Launch Services, waits for Max's own log to say the run is complete, asks Max to quit through a UDP message
@@ -14,7 +17,7 @@ Launch Services, waits for Max's own log to say the run is complete, asks Max to
 
 It temporarily links three packages into ~/Documents/Max 9/Packages (only those that are not already there,
 and it removes only what it created): Jamoma (this repository's package), max-test, and JamomaIntegrationTests
-(which supplies test.list.equals) and, when it exists, JamomaMax3Tests (this repository's own tests in tests/max). It refuses to run while a Max 9 process is open.
+(the tests, and test.list.equals). It refuses to run while a Max 9 process is open.
 """
 
 import argparse
@@ -174,6 +177,24 @@ def read_set(path) -> list:
     return [l for l in lines if l and not l.startswith("#")]
 
 
+MODULAR = pathlib.PurePosixPath("JamomaIntegrationTests/patchers/tests/Modular")
+
+
+def find_tests(tests_root, folders=()) -> list:
+    """Finds the tests below Modular/ in the tests folder: every `*.maxtest.maxpat` (in the given folders of Modular, or everywhere if there are none).
+
+    Returns the paths relative to the tests folder, sorted. A folder that does not exist is an error (ValueError).
+    """
+    root = pathlib.Path(tests_root)
+    found = []
+    for folder in (folders or [""]):
+        base = root / MODULAR / folder
+        if not base.is_dir():
+            raise ValueError(f"no test folder {MODULAR / folder} in {root}")
+        found += [str(f.relative_to(root)) for f in base.rglob("*.maxtest.maxpat")]
+    return sorted(set(found))
+
+
 class Links:
     """Temporary symlinks in Max's Packages folder; only links this object created are removed again."""
 
@@ -231,9 +252,11 @@ def run_batch(names, workdir, per_test_timeout) -> tuple:
 def main() -> int:
     """Command line entry point. Returns 0 if every test passed."""
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--list", required=True, type=pathlib.Path, help="the test list")
+    p.add_argument("--list", type=pathlib.Path, help="a file that names the tests to run, one path a line")
+    p.add_argument("--dir", action="append", default=[], metavar="FOLDER", help="run the tests in this folder of Modular/ (repeat for more)")
+    p.add_argument("--all", action="store_true", help="run every test of the tree")
     p.add_argument("--tests", "--old", dest="tests", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "tests/integration",
-                   help="folder that holds the JamomaIntegrationTests package; the list paths are relative to it (default: tests/integration)")
+                   help="folder that holds the JamomaIntegrationTests package; the paths are relative to it (default: tests/integration)")
     p.add_argument("--out", required=True, type=pathlib.Path, help="folder for results.tsv")
     p.add_argument("--max-test", type=pathlib.Path, default=pathlib.Path.home() / "Developer/Jamoma/max-test")
     p.add_argument("--package", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2] / "package/Jamoma")
@@ -247,7 +270,15 @@ def main() -> int:
     if max_running():
         print("FAIL: Max 9 is already running; quit it first", file=sys.stderr)
         return 2
-    paths = read_set(args.list)
+    if not (args.list or args.dir or args.all):
+        p.error("say which tests to run: --all, --dir <folder> or --list <file>")
+    try:
+        paths = read_set(args.list) if args.list else []
+        if args.all or args.dir:
+            paths += find_tests(args.tests, [] if args.all else args.dir)
+    except ValueError as e:
+        print(f"FAIL: {e}", file=sys.stderr)
+        return 2
     names = {test_name(path): path for path in paths}
     args.out.mkdir(parents=True, exist_ok=True)
     clear_recovery()
@@ -259,9 +290,6 @@ def main() -> int:
         links.add("max-test", args.max_test)
         if (args.tests / "JamomaIntegrationTests").is_dir():
             links.add("JamomaIntegrationTests", args.tests / "JamomaIntegrationTests")
-        own = pathlib.Path(__file__).resolve().parents[2] / "tests/max"
-        if own.is_dir():
-            links.add("JamomaMax3Tests", own)
         ordered = list(names)
         with tempfile.TemporaryDirectory() as work:
             step = args.fast or args.per_launch

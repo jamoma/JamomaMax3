@@ -35,8 +35,8 @@ Checks (Max 9 must be closed for the ones that start it):
 
 ```
 ctest --preset macos                                   # core unit tests
-scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests    # the integration tests of the old package (copied into tests/integration)
-scripts/run-maxtests.sh conformance/own-tests.txt build/maxtests   # own Max tests (tests/max)
+scripts/run-maxtests.sh --all --out build/maxtests                # every Max test (tests/integration: one folder for each external)
+scripts/run-maxtests.sh --dir j.model --out build/maxtests        # the tests of one external
 scripts/check-help.sh                                  # every help patcher opens without missing objects
 python3 tools/refpages/check_refpages.py --package package/Jamoma --externals externals
 ```

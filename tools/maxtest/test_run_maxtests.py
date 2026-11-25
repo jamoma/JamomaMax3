@@ -79,6 +79,39 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(r["a.maxtest"][0], "TIMEOUT")
 
 
+class FindTestsTests(unittest.TestCase):
+    """find_tests: the tests of a tree, or of some of its folders."""
+
+    def make_tree(self, root):
+        """Makes a small tree of tests and returns its root."""
+        import pathlib
+        for rel in ["j.model/j_model_a.maxtest.maxpat", "j.model/sub/j_model_b.maxtest.maxpat", "j.ui/j_ui_c.maxtest.maxpat", "j.ui/helper.maxpat"]:
+            f = pathlib.Path(root) / rm.MODULAR / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text("{}")
+        return root
+
+    def test_all_tests_are_found_and_helpers_are_not(self):
+        with tempfile.TemporaryDirectory() as root:
+            found = rm.find_tests(self.make_tree(root))
+            self.assertEqual([rm.test_name(f) for f in found], ["j_model_a.maxtest", "j_model_b.maxtest", "j_ui_c.maxtest"])
+
+    def test_a_folder_gives_its_tests_with_those_of_its_subfolders(self):
+        with tempfile.TemporaryDirectory() as root:
+            found = rm.find_tests(self.make_tree(root), ["j.model"])
+            self.assertEqual([rm.test_name(f) for f in found], ["j_model_a.maxtest", "j_model_b.maxtest"])
+
+    def test_paths_are_relative_to_the_tests_folder(self):
+        with tempfile.TemporaryDirectory() as root:
+            found = rm.find_tests(self.make_tree(root), ["j.ui"])
+            self.assertEqual(found, [str(rm.MODULAR / "j.ui/j_ui_c.maxtest.maxpat")])
+
+    def test_an_unknown_folder_is_an_error(self):
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaises(ValueError):
+                rm.find_tests(self.make_tree(root), ["j.nothing"])
+
+
 class LogTests(unittest.TestCase):
     def test_missing_objects_are_collected_from_the_log(self):
         text = "\n".join([

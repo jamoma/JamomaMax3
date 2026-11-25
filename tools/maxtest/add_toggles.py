@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 """Puts a toggle in front of every test.assert, so that a patcher shows by itself whether its checks passed.
 
-    add_toggles.py tests/max/patchers/*.maxpat
+    add_toggles.py <path>/<name>.maxtest.maxpat
 
 Whatever fed a test.assert now feeds a toggle, and the toggle feeds the test.assert. The toggle passes its value on at once, so the test does
 not change; when a check passes the toggle turns on, so you can open the patcher in Max and see it. A test.assert that already has a toggle

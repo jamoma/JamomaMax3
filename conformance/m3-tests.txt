@@ -1,3 +1,0 @@
-# Milestone 3 conformance tests: the old integration tests that need j.remote (paths relative to tests/integration).
-# The old suite has no integration tests for j.view, j.ui or presets (searched: no test patcher mentions them); those are covered by own tests (tests/max).
-JamomaIntegrationTests/patchers/tests/Modular/j.remote/dataspace/j_remote_dataspace_db2linear.maxtest.maxpat

@@ -28,7 +28,7 @@ An Opus read-only review gave 19 findings; the important ones were fixed (the pa
 ## Not covered
 
 - **No old integration tests exist for `j.view`, `j.ui`, `j.node` or presets.** Their behaviour was read from the old source (`docs/inventory/presets.md`, `view-model.md`, `j.remote.md`, `j.ui.md`) and is checked by own tests and the `qmetro` model. The XML preset format is tested for round trips and against a sample written like the old writer, not against a file written by the old software.
-- **The look of `j.ui` and its menus have not been seen by anyone.** Task 11 asks for the user to open `tests/max/patchers/ui_look.maxpat` in Max and say what is wrong; that is **still to be done**. No screenshot was taken.
+- **The look of `j.ui` and its menus have not been seen by anyone.** Task 11 asks for the user to open `ui_look.maxpat` (now in `tests/integration/.../Modular/j.ui/`) in Max and say what is wrong; that is **still to be done**. No screenshot was taken.
 - **Windows is untested** (no Windows machine yet). To run there: the unit tests, `scripts/max-smoke.ps1`, the conformance lists (`m1`, `m2`, `m3`, own tests), the help check (the Max-driving scripts are macOS only), and the drawing and menus of `j.ui` by eye. Windows conformance for milestones 1 to 3 is due.
 - The preset text editor window (`preset:edit`), file watching, aliases, text entry in the panel and the preset slider panel are not built (`docs/changes.md`).
 
