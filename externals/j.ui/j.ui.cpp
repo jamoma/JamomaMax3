@@ -15,6 +15,7 @@
  * `preset:current <name>`, on the outlet; this is what the own test reads.
  */
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,6 +24,7 @@
 
 #include "jamoma/explorer.hpp"
 #include "jamoma/registry.hpp"
+#include "jamoma/ui_grid.hpp"
 #include "max_address.hpp"
 #include "max_context.hpp"
 
@@ -76,6 +78,22 @@ public:
     attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
     attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color};
+
+    /** Whether the size snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down (on by default, as in the old object). */
+    attribute<int> snap{this, "snap", 1, title{"Snap Size to Grid"}, description{"The size of the object is a whole number of units, 150 pixels wide and 35 pixels high"}, range{0, 1}, style::onoff};
+
+    /** Called by Max when the box is resized: with `snap` on, the size becomes a whole number of units (at least one in each direction). */
+    message<> oksize{this, "oksize", MIN_FUNCTION {
+        if (static_cast<int>(snap.get()) != 0 && !args.empty()) {
+            if (auto* rect = static_cast<c74::max::t_rect*>(static_cast<void*>(args[0])); rect != nullptr) {
+                rect->width = jamoma::snap_to_unit(rect->width, jamoma::kUiUnitWidth);
+                rect->height = jamoma::snap_to_unit(rect->height, jamoma::kUiUnitHeight);
+            }
+        }
+        atom ok;
+        ok = reinterpret_cast<void*>(static_cast<std::intptr_t>(1)); // what Max expects: non-null, the size is accepted
+        return {ok};
+    }};
 
     /** Draws the panel. */
     message<> paint{this, "paint", MIN_FUNCTION {

@@ -566,6 +566,7 @@ private:
     /**
      * Creates the model, or makes it again if the model it should sit below has appeared, been replaced or gone. The data objects of
      * the patcher find the new model through the context map's observers.
+     * @param force True to make the model again even if it sits where it should (its name has changed).
      */
     void place(bool force = false)
     {

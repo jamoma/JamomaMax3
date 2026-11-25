@@ -54,7 +54,8 @@ add_executable(jamoma_core_tests
     tests/remote_test.cpp
     tests/explorer_test.cpp
     tests/receiver_test.cpp
-    tests/sender_test.cpp)
+    tests/sender_test.cpp
+    tests/ui_grid_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 target_compile_definitions(jamoma_core_tests PRIVATE JAMOMA_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/tests/data")
 # The registry must outlive static destruction (its own executable, checked through its exit code).

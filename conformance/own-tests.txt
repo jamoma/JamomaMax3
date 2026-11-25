@@ -26,3 +26,4 @@ tests/max/patchers/ui_state.maxtest.maxpat
 tests/max/patchers/node_basic.maxtest.maxpat
 tests/max/patchers/qmetro.maxtest.maxpat
 tests/max/patchers/view_argument.maxtest.maxpat
+tests/max/patchers/ui_grid.maxtest.maxpat

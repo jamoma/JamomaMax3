@@ -90,6 +90,14 @@
 				The color of the highlights.
 			</description>
 		</attribute>
+		<attribute name="snap" get="1" set="1" type="int" size="1">
+			<digest>
+				Snap the size to the grid
+			</digest>
+			<description>
+				When on (the default), the size of the object snaps to a whole number of units, 150 pixels wide and 35 pixels high, with at least one unit in each direction, as in the old version. When off, the object can have any size.
+			</description>
+		</attribute>
 		<attribute name="tags" get="1" set="1" type="symbol" size="1">
 			<digest>
 				Tags of the object
