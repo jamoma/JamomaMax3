@@ -1,6 +1,28 @@
 # Milestone 3 conformance results
 
-macOS arm64, Max 9, after the last code change that touched an object. **Deviation from the plan:** the acceptance set was run in batches of five tests per Max launch with every test that did not pass run again alone (`--fast 5`), not one test per launch: a one-test-per-launch run took about two minutes per test (an estimated three hours for 110 tests), and was stopped after three. Nothing failed in the batched run, so no isolation was needed. A one-test-per-launch run is still to be made before a release.
+## Run of 25 November 2026 (after the later changes and the move of the own tests into `tests/integration`)
+
+macOS arm64, Max 9, after the last code change. The changes since the first record: `j.model` outputs the changes of its parameters and forwards `<name> <value>` to them, `j.ui` snaps to the grid and has the active button, a bang of a node of type none reaches `j.receive` and `j.remote`, `j.maxhelpui` is in the package, and the own tests live in the folders of the externals (no lists any more).
+
+| What | Result |
+|---|---|
+| Every Max test of `tests/integration` (`run_maxtests.py --all`), **one test per Max launch** | **120 of 120 pass** (87 in `j.parameter`: the 82 old ones and 5 own; the others in `j.model` 11, `j.ui` 3, `j.view` 3, `j.receive` 4, `j.send` 3, `j.remote` 4, and one each in `j.in_out`, `j.node`, `j.pass`, `j.unit` and `qmetro`; the run took about 70 minutes) |
+| The same set in quick mode (`--all --fast 5`) | 120 of 120 pass |
+| Core unit tests (284, with the tool checks `test_layout` and `package_references`) | all pass; also under AddressSanitizer + UndefinedBehaviorSanitizer (284 of 284) and under ThreadSanitizer (284 of 284, no reports) |
+| Tool tests (`python3 -m unittest discover -s tools/maxtest`) | 52 pass |
+| Help patchers (`scripts/check-help.sh`, now also the four qmetro patchers) | all open without a missing object or load error; in a **full run** `j.receive.maxhelp` is reported with `doesn't understand "foo"` and `doesn't understand "none"`, see below |
+| Quit with live objects (`scripts/max-smoke.sh tests/smoke/quit_live_objects "live objects loaded"`) | passes: Max quits by itself, no crash report (the script could not replace the permanent `Jamoma` link, `Operation not permitted`, so it ran against the package the link points to) |
+| Doxygen | no warnings |
+
+The error lines of the help check: they are attributed to `j.receive.maxhelp` because that is the file that is being opened when they are written, but they come from the help patchers opened before it, after a delay. Opened with `j.parameter.maxhelp` first, `"none"` appears; with `j.model.maxhelp` first, `"foo"` (the default values of the string parameters there). `j.receive.maxhelp` alone, and with `j.message.maxhelp` first, is clean. A string parameter wired straight into a message box does not give the error (tried in a throwaway patcher), so the source is not yet found. The Max window also shows errors of Max's own Node process when Max quits. Not a failure of an object, but to be looked at.
+
+**What this record does not cover yet:** Windows, and the look of the `j.ui` menus (see below).
+
+---
+
+## First record, at the completion of the milestone (23 November 2026; the lists and test names are those of then)
+
+macOS arm64, Max 9, after the last code change that touched an object. **Deviation from the plan:** the acceptance set was run in batches of five tests per Max launch with every test that did not pass run again alone (`--fast 5`), not one test per launch: a one-test-per-launch run took about two minutes per test (an estimated three hours for 110 tests), and was stopped after three. Nothing failed in the batched run, so no isolation was needed. A one-test-per-launch run was made on 25 November (above).
 
 | What | Result |
 |---|---|
