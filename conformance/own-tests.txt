@@ -28,3 +28,4 @@ tests/max/patchers/qmetro.maxtest.maxpat
 tests/max/patchers/view_argument.maxtest.maxpat
 tests/max/patchers/ui_grid.maxtest.maxpat
 tests/max/patchers/ui_active.maxtest.maxpat
+tests/max/patchers/remote_bang.maxtest.maxpat

@@ -276,3 +276,17 @@ TEST_CASE("destroying receiver waits for a callback running on another thread")
     driver.join();
     REQUIRE_FALSE(violation.load());
 }
+
+/** A bang from a node of type none is a change like any other: the address and an empty value are output (binding to it reports nothing: it has no value). */
+TEST_CASE("a bang of a node of type none is output as an empty value")
+{
+    World w;
+    w.data.push_back(std::make_unique<Data>(jamoma::Service::Return));
+    w.data.back()->set_type(DataType::None);
+    w.subscriptions.push_back(w.ns.subscribe(Address::parse("/m/trigger"), *w.data.back()));
+    w.receiver->set_address(Address::parse("/m/trigger"));
+    REQUIRE(w.log.empty()); // binding reports nothing: there is no value
+    w.data.back()->command(Value{});
+    w.data.back()->command(Value{});
+    REQUIRE(w.log == std::vector<std::string>{"address /m/trigger", "value ", "address /m/trigger", "value "});
+}

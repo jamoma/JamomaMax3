@@ -199,3 +199,38 @@ TEST_CASE("node changes with a unit while the node goes away")
         node.reset();
     }
 }
+
+/** A bang of a node of type none reaches the UI as an empty value (a trigger button blinks), and the remote's value is not changed by it. */
+TEST_CASE("a bang of a node of type none reaches the ui")
+{
+    jamoma::Namespace ns;
+    Data trigger{jamoma::Service::Return};
+    trigger.set_type(DataType::None);
+    jamoma::Subscription subscription = ns.subscribe(Address::parse("/m/trigger"), trigger);
+    std::vector<Value> shown;
+    Remote remote{ns, [&shown](const Value& v) { shown.push_back(v); }};
+    remote.set_address(Address::parse("/m/trigger"));
+    shown.clear();
+    trigger.command(Value{});
+    trigger.command(Value{});
+    REQUIRE(shown.size() == 2);
+    REQUIRE(shown[0].empty());
+    REQUIRE(shown[1].empty());
+    REQUIRE_FALSE(remote.current().has_value());
+}
+
+/** A frozen remote does not show a bang either. */
+TEST_CASE("a frozen remote does not show a bang")
+{
+    jamoma::Namespace ns;
+    Data trigger{jamoma::Service::Return};
+    trigger.set_type(DataType::None);
+    jamoma::Subscription subscription = ns.subscribe(Address::parse("/m/trigger"), trigger);
+    std::vector<Value> shown;
+    Remote remote{ns, [&shown](const Value& v) { shown.push_back(v); }};
+    remote.set_address(Address::parse("/m/trigger"));
+    remote.set_freeze(true);
+    shown.clear();
+    trigger.command(Value{});
+    REQUIRE(shown.empty());
+}

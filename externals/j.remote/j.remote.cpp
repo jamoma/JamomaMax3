@@ -196,7 +196,7 @@ private:
         remote_->set_address(text_.empty() ? jamoma::Address() : jamoma_max::resolve_in_patcher(maxobj(), text_));
     }
 
-    /** Shows a value: out of the value outlet and as `set <value>` out of the set outlet. @param v The value. */
+    /** Shows a value: out of the value outlet and as `set <value>` out of the set outlet (`set bang` for a bang). @param v The value. */
     void show(const jamoma::Value& v)
     {
         if (c74::max::systhread_ismainthread()) {
@@ -220,8 +220,12 @@ private:
                 c74::max::atom_setsym(&list.back(), c74::max::gensym(a.as_symbol().c_str()));
             }
         }
-        c74::max::outlet_anything(set_out.max_outlet(), c74::max::gensym("set"), static_cast<short>(list.size()), list.empty() ? nullptr : list.data());
-        jamoma_max::output_value(value_out.max_outlet(), v);
+        if (list.empty()) { // a bang (a node of type none): the old object sent `set bang`, which makes a button blink
+            list.emplace_back();
+            c74::max::atom_setsym(&list.back(), c74::max::gensym("bang"));
+        }
+        c74::max::outlet_anything(set_out.max_outlet(), c74::max::gensym("set"), static_cast<short>(list.size()), list.data());
+        jamoma_max::output_value(value_out.max_outlet(), v); // an empty value comes out as a bang
     }
 };
 

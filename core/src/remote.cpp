@@ -128,7 +128,13 @@ Value Remote::to_ui_unit(const Value& value) const
 
 void Remote::node_changed(const Value& value)
 {
-    if (!active_ || value.empty()) {
+    if (!active_) {
+        return;
+    }
+    if (value.empty()) { // a bang of a node of type none: shown (a button blinks) but it is no value to remember
+        if (!freeze_ && to_ui_) {
+            to_ui_(value);
+        }
         return;
     }
     const Value shown = to_ui_unit(value);
