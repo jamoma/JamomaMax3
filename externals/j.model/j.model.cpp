@@ -15,6 +15,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <map>
+#include <set>
 #include <optional>
 #include <memory>
 #include <sstream>
@@ -24,9 +26,12 @@
 #include "c74_min.h"
 
 #include "jamoma/data.hpp"
+#include "jamoma/explorer.hpp"
 #include "jamoma/model.hpp"
 #include "jamoma/preset_files.hpp"
+#include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
+#include "max_atoms.hpp"
 #include "max_context.hpp"
 
 using namespace c74::min;
@@ -48,6 +53,9 @@ class j_model : public c74::min::object<j_model> {
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;           /**< Moves the model below its parent model when that one appears later, is replaced or goes. */
+    std::unique_ptr<jamoma::ModelExplorer> explorer_;                        /**< Tells when parameters below the model come or go. */
+    std::map<std::string, std::unique_ptr<jamoma::Receiver>> watches_;      /**< One receiver per parameter below the model, by its address relative to the model. */
+    std::string watched_root_;                                              /**< The address of the model the watches belong to. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -70,6 +78,8 @@ public:
     ~j_model() override
     {
         watch_.stop();
+        explorer_.reset();
+        watches_.clear();
         if (model_) {
             jamoma::Registry::instance().contexts().remove(patcher_, model_.get());
         }
@@ -110,7 +120,7 @@ public:
     }}};
 
     inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
-    outlet<> results_out{this, "(anything) results (presets, later milestone)"}; /**< Outlet 0 (unused so far). */
+    jamoma_max::dump_outlet results_out{this, "(anything) parameter changes: the name of the parameter and its value"}; /**< Outlet 0: every change of a parameter below the model, with the name (relative to the model) in front. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};              /**< Outlet 1: the dump outlet. */
 
     /** Initialises the model: sends the default value through every parameter below it. */
@@ -290,6 +300,13 @@ public:
     message<> setup{this, "setup", MIN_FUNCTION {
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
         patcher_ = jamoma_max::patcher_of(maxobj());
+        explorer_ = std::make_unique<jamoma::ModelExplorer>(jamoma::Registry::instance().names(), [this] {
+            if (c74::max::systhread_ismainthread()) {
+                sync_watches();
+            } else {
+                jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { sync_watches(); });
+            }
+        });
         if (name_.empty()) {
             const std::optional<std::string> cls = jamoma_max::patcher_class(patcher_);
             name_ = cls ? *cls : patcher_name();
@@ -551,6 +568,62 @@ private:
         make_amenities();
         jamoma::Registry::instance().contexts().add(patcher_, model_.get());
         placing_ = false;
+        if (explorer_) {
+            explorer_->set_model(model_->address());
+            sync_watches();
+        }
+    }
+
+    /**
+     * Makes the watches match the parameters below the model: a receiver for each one that is new, none for one that has gone. A receiver
+     * only reports changes made after it was bound (it is inactive while it binds), so nothing is output for a value that is already there.
+     */
+    void sync_watches()
+    {
+        if (!model_ || !explorer_) {
+            watches_.clear();
+            return;
+        }
+        const jamoma::Address root = model_->address();
+        if (root.str() != watched_root_) {
+            watches_.clear();
+            watched_root_ = root.str();
+        }
+        const std::vector<std::string> names = explorer_->contents().parameters;
+        const std::set<std::string> wanted(names.begin(), names.end());
+        for (auto it = watches_.begin(); it != watches_.end();) {
+            it = wanted.count(it->first) != 0 ? std::next(it) : watches_.erase(it);
+        }
+        for (const std::string& name : wanted) {
+            if (watches_.count(name) != 0) {
+                continue;
+            }
+            auto receiver = std::make_unique<jamoma::Receiver>(
+                jamoma::Registry::instance().names(), [](const jamoma::Address&) {},
+                [this, name](const jamoma::Value& v) { report_change(name, v); });
+            receiver->set_active(false);
+            receiver->set_address(root.append(jamoma::Address::parse(name)));
+            receiver->set_active(true);
+            watches_[name] = std::move(receiver);
+        }
+    }
+
+    /** Outputs `<name> <value>` on the left outlet (on the main thread: another thread defers). @param name The parameter, relative to the model. @param v The new value. */
+    void report_change(const std::string& name, const jamoma::Value& v)
+    {
+        if (c74::max::systhread_ismainthread()) {
+            output_change(name, v);
+        } else {
+            jamoma_max::defer_call(maxobj(), alive_.weak(), [this, name, v] { output_change(name, v); });
+        }
+    }
+
+    /** Sends the name and the value out. @param name The parameter. @param v The value. */
+    void output_change(const std::string& name, const jamoma::Value& v)
+    {
+        const c74::min::atoms atoms = jamoma_max::to_atoms(v);
+        auto* raw = atoms.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&atoms[0]));
+        c74::max::outlet_anything(results_out.max_outlet(), c74::max::gensym(name.c_str()), static_cast<short>(atoms.size()), raw);
     }
 
     /** @return A name taken from the patcher's file name, without extensions, with dots replaced. */
