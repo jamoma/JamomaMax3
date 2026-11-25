@@ -173,14 +173,6 @@ private:
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
             }
-            if (h > kHeader + 16.0 && explorer_) {
-                const jamoma::ModelContents c = explorer_->contents();
-                const std::string info = std::to_string(c.parameters.size()) + " parameters, " + std::to_string(c.messages.size()) + " messages, " +
-                                         std::to_string(c.returns.size()) + " returns, " + std::to_string(c.presets.size()) + " presets";
-                c74::max::jgraphics_set_font_size(g, 11.0);
-                c74::max::jgraphics_move_to(g, 8.0, kHeader + 16.0);
-                c74::max::jgraphics_show_text(g, info.c_str());
-            }
         }
         c74::max::jgraphics_set_source_jrgba(g, &border);
         c74::max::jgraphics_set_line_width(g, 1.0);
