@@ -41,6 +41,7 @@ class j_model : public c74::min::object<j_model> {
     // These come before the attributes: Min constructs the attributes in declaration order and calls each setter with its
     // default, and the setters use model_ (the same trap as in data_object, which crashed Max once).
     std::string name_;                         /**< The name of the model. */
+    bool name_from_patcher_ = false;           /**< True if the name was taken from the patcher (no argument): it is read again once the patcher has loaded. */
     const void* patcher_ = nullptr;            /**< The patcher the model governs. */
     jamoma::Data active_data_{jamoma::Service::Parameter}; /**< The parameter `data/active` of the `data` amenity (declared before the model and its subscription, which go first). */
     std::unique_ptr<jamoma::Model> model_;     /**< The model. */
@@ -308,12 +309,17 @@ public:
             }
         });
         if (name_.empty()) {
-            const std::optional<std::string> cls = jamoma_max::patcher_class(patcher_);
-            name_ = cls ? *cls : patcher_name();
+            name_from_patcher_ = true;
+            name_ = name_from_patcher();
         }
         place();
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
+                // A subpatcher has no name while it loads (`p child` is named afterwards): take it again now, and move the model if it changed.
+                if (name_from_patcher_ && name_from_patcher() != name_) {
+                    name_ = name_from_patcher();
+                    place(true);
+                }
                 if (model_) {
                     model_->init();
                     load_default_presets();
@@ -536,13 +542,13 @@ private:
      * Creates the model, or makes it again if the model it should sit below has appeared, been replaced or gone. The data objects of
      * the patcher find the new model through the context map's observers.
      */
-    void place()
+    void place(bool force = false)
     {
         if (placing_) {
             return; // our own add and remove call back through the watch
         }
         const std::string prefix = wanted_prefix();
-        if (model_ && prefix == prefix_) {
+        if (model_ && prefix == prefix_ && !force) {
             return;
         }
         placing_ = true;
@@ -624,6 +630,13 @@ private:
         const c74::min::atoms atoms = jamoma_max::to_atoms(v);
         auto* raw = atoms.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&atoms[0]));
         c74::max::outlet_anything(results_out.max_outlet(), c74::max::gensym(name.c_str()), static_cast<short>(atoms.size()), raw);
+    }
+
+    /** @return The name the patcher gives the model: its `.model` class if it has one, else its name (`model` while it has none). */
+    std::string name_from_patcher() const
+    {
+        const std::optional<std::string> cls = jamoma_max::patcher_class(patcher_);
+        return cls ? *cls : patcher_name();
     }
 
     /** @return A name taken from the patcher's file name, without extensions, with dots replaced. */
