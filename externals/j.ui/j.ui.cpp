@@ -13,6 +13,10 @@
  * `preset:write`, `preset:edit`, `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. The text is drawn,
  * not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then `preset:count <n>`, `presets <name>...` and
  * `preset:current <name>`, on the outlet; this is what the own test reads.
+ *
+ * If the model has the parameter `data/active` (the `data` amenity), a round button sits left of the menu arrow: filled while the model is active, a ring while it is
+ * not; a click on it switches the parameter. The button follows the parameter (also when something else changes it). `active 0|1` does the same from a patch (no
+ * argument: toggle), and `dump` adds `active <0|1>` when the model has the parameter.
  */
 
 #include <cstdint>
@@ -22,7 +26,9 @@
 
 #include "c74_min.h"
 
+#include "jamoma/data.hpp"
 #include "jamoma/explorer.hpp"
+#include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
 #include "jamoma/ui_grid.hpp"
 #include "max_address.hpp"
@@ -37,6 +43,7 @@ class j_ui : public c74::min::object<j_ui>, public c74::min::ui_operator<300, 70
     jamoma_max::Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;                   /**< Follows the model coming and going. */
     std::string model_;                                /**< The address of the model the panel is bound to (empty: waiting). */
+    std::unique_ptr<jamoma::Receiver> active_watch_;   /**< Follows `data/active` of the model so that the button shows its value. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -51,6 +58,9 @@ public:
         explorer_ = std::make_unique<jamoma::ModelExplorer>(jamoma::Registry::instance().names(), [this] {
             jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { redraw(); });
         });
+        active_watch_ = std::make_unique<jamoma::Receiver>(
+            jamoma::Registry::instance().names(), [](const jamoma::Address&) {},
+            [this](const jamoma::Value&) { jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { redraw(); }); });
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             bind();
             watch_.start([this] { bind(); });
@@ -61,6 +71,7 @@ public:
     ~j_ui() override
     {
         watch_.stop();
+        active_watch_.reset();
         explorer_.reset();
     }
 
@@ -108,10 +119,18 @@ public:
         if (e.y() < kHeader) {
             if (e.x() > e.target().width() - kHeader) {
                 open_utilities_menu(e);
+            } else if (on_active_button(e.x(), e.target().width())) {
+                switch_active(-1);
             } else {
                 open_nodes_menu(e);
             }
         }
+        return {};
+    }};
+
+    /** `active [0|1]`: switches the model on or off through its parameter `data/active` (no argument: the other way round). Does nothing without the parameter. */
+    message<> active{this, "active", MIN_FUNCTION {
+        switch_active(args.empty() ? -1 : (static_cast<double>(args[0]) != 0.0 ? 1 : 0));
         return {};
     }};
 
@@ -126,6 +145,7 @@ public:
 
 private:
     static constexpr double kHeader = 22.0; /**< The height of the header. */
+    static constexpr double kActiveRadius = 6.5; /**< The radius of the active button. */
 
     /** @return The colour of an attribute. @param values Its four numbers. */
     static c74::max::t_jrgba rgba(const numbers& values)
@@ -147,8 +167,55 @@ private:
             if (explorer_) {
                 explorer_->set_model(address.empty() ? jamoma::Address() : jamoma::Address::parse(address));
             }
+            if (active_watch_) {
+                active_watch_->set_address(address.empty() ? jamoma::Address() : jamoma::Address::parse(address + "/data/active"));
+            }
         }
         redraw();
+    }
+
+    /** @return The parameter `data/active` of the model, or null if there is none. */
+    jamoma::Data* active_data() const
+    {
+        if (model_.empty()) {
+            return nullptr;
+        }
+        jamoma::Node* node = jamoma::Registry::instance().names().lookup(jamoma::Address::parse(model_ + "/data/active"));
+        auto* data = node != nullptr ? dynamic_cast<jamoma::Data*>(node->object()) : nullptr;
+        return data != nullptr && data->service() == jamoma::Service::Parameter ? data : nullptr;
+    }
+
+    /** @return True if the model is active (it has `data/active` and its value is not zero). */
+    bool is_active() const
+    {
+        const jamoma::Data* data = active_data();
+        if (data == nullptr) {
+            return false;
+        }
+        const jamoma::Value v = data->value();
+        return !v.empty() && ((v[0].is_int() && v[0].as_int() != 0) || (v[0].is_float() && v[0].as_double() != 0.0));
+    }
+
+    /** Switches the model on or off. @param to 1 on, 0 off, -1 the other way round. */
+    void switch_active(int to)
+    {
+        jamoma::Data* data = active_data();
+        if (data == nullptr) {
+            return;
+        }
+        jamoma::Value v;
+        v.emplace_back(static_cast<std::int64_t>(to < 0 ? (is_active() ? 0 : 1) : to));
+        data->command(v);
+        redraw();
+    }
+
+    /** @return The x position of the middle of the active button. @param width The width of the panel. */
+    static double active_centre(double width) { return width - kHeader - 12.0; }
+
+    /** @return True if a click at x is on the active button (the model has the parameter and the panel is wide enough). @param x The position. @param width The width. */
+    bool on_active_button(double x, double width) const
+    {
+        return width > kHeader * 2 && active_data() != nullptr && x >= active_centre(width) - 10.0 && x <= active_centre(width) + 10.0;
     }
 
     /** @return The model the panel is bound to, or null. */
@@ -190,6 +257,18 @@ private:
                 c74::max::jgraphics_line_to(g, w - 12.0, 15.0);
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
+                if (active_data() != nullptr) { // the active button: filled while the model is on, a ring while it is off
+                    c74::max::t_jrgba lit = rgba(highlightcolor.get());
+                    c74::max::jgraphics_set_line_width(g, 1.5);
+                    c74::max::jgraphics_arc(g, active_centre(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
+                    if (is_active()) {
+                        c74::max::jgraphics_set_source_jrgba(g, &lit);
+                        c74::max::jgraphics_fill(g);
+                    } else {
+                        c74::max::jgraphics_set_source_jrgba(g, &text);
+                        c74::max::jgraphics_stroke(g);
+                    }
+                }
             }
         }
         c74::max::jgraphics_set_source_jrgba(g, &border);
@@ -295,6 +374,11 @@ private:
             return;
         }
         send_symbol("model:address", model_);
+        if (active_data() != nullptr) {
+            c74::max::t_atom on;
+            c74::max::atom_setlong(&on, is_active() ? 1 : 0);
+            c74::max::outlet_anything(out.max_outlet(), c74::max::gensym("active"), 1, &on);
+        }
         jamoma::Model* m = model();
         c74::max::t_atom count;
         c74::max::atom_setlong(&count, m == nullptr ? 0 : static_cast<c74::max::t_atom_long>(m->presets().names().size()));

@@ -5,7 +5,7 @@
 		The panel of a model
 	</digest>
 	<description>
-		j.ui shows the address of the model of its patcher (or of the model a <o>j.view</o> in it is bound to), a menu of what is below the model, and its presets. A click on the address opens the menu of parameters, messages and returns; the menu arrow opens the utilities and presets menu. While there is no model it says that it is waiting for one.
+		j.ui shows the address of the model of its patcher (or of the model a <o>j.view</o> in it is bound to), a menu of what is below the model, and its presets. A click on the address opens the menu of parameters, messages and returns; the menu arrow opens the utilities and presets menu. If the model has the parameter <m>data/active</m>, a round button next to the menu arrow shows whether the model is active (filled) or not (a ring), and a click on it switches the model. While there is no model it says that it is waiting for one.
 	</description>
 	<metadatalist>
 		<metadata name="author">
@@ -21,13 +21,24 @@
 	<objarglist>
 	</objarglist>
 	<methodlist>
+		<method name="active">
+			<arglist>
+				<arg name="on" optional="1" type="int" />
+			</arglist>
+			<digest>
+				Switch the model on or off
+			</digest>
+			<description>
+				Sets the parameter <m>data/active</m> of the model (the <m>data</m> amenity) to 1 or 0, as a click on the active button does; without an argument it switches to the other state. Nothing happens if the model has no such parameter.
+			</description>
+		</method>
 		<method name="dump">
 			<arglist />
 			<digest>
 				Report the state
 			</digest>
 			<description>
-				The <m>dump</m> message answers <m>model:address</m> and the address (or <m>model:waiting</m>), <m>preset:count</m> and the number of presets, <m>presets</m> and their names and <m>preset:current</m> and the current preset, out the outlet.
+				The <m>dump</m> message answers <m>model:address</m> and the address (or <m>model:waiting</m>), <m>preset:count</m> and the number of presets, <m>presets</m> and their names and <m>preset:current</m> and the current preset, out the outlet. If the model has the parameter <m>data/active</m>, <m>active</m> and 0 or 1 follow the address.
 			</description>
 		</method>
 		<method name="paint">
