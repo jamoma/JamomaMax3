@@ -10,7 +10,7 @@ macOS arm64, Max 9, after the last code change. The changes since the first reco
 |---|---|
 | Every Max test of `tests/integration` (`run_maxtests.py --all`), **one test per Max launch** | **120 of 120 pass** (87 in `j.parameter`: the 82 old ones and 5 own; the others in `j.model` 11, `j.ui` 3, `j.view` 3, `j.receive` 4, `j.send` 3, `j.remote` 4, and one each in `j.in_out`, `j.node`, `j.pass`, `j.unit` and `qmetro`; the run took about 70 minutes) |
 | The same set in quick mode (`--all --fast 5`) | 120 of 120 pass |
-| After the fix of the rebinding of `j.receive`, `j.send` and `j.remote` (121 tests with `j_receive_other_models`; quick mode, `--all --fast 5`; one test per launch was not repeated) | **121 of 121 pass**; 284 unit tests pass; all 20 help patchers open without errors |
+| After the fix of the rebinding of `j.receive`, `j.send` and `j.remote` (121 tests with `j_receive_other_models`; quick mode, `--all --fast 5`; the final run of all 121 with one test per launch, on `main` before the tag `milestone-3`, also passed) | **121 of 121 pass**; 284 unit tests pass; all 20 help patchers open without errors |
 | Core unit tests (284, with the tool checks `test_layout` and `package_references`) | all pass; also under AddressSanitizer + UndefinedBehaviorSanitizer (284 of 284) and under ThreadSanitizer (284 of 284, no reports) |
 | Tool tests (`python3 -m unittest discover -s tools/maxtest`) | 52 pass |
 | Help patchers (`scripts/check-help.sh`, now also the four qmetro patchers) | all open without a missing object or load error; at first a **full run** reported `doesn't understand "foo"` and `"none"` under `j.receive.maxhelp` (fixed, see below) |
