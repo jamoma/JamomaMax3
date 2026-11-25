@@ -1,5 +1,7 @@
 # Milestone 3 conformance results
 
+**Headline: the old `qmetro` model, view and module are fully working.** They were the first test patch of the project. The model, the view with its `j.ui` panel and the module load without a missing object or load error; `data/active` starts and stops the metro (from the message and from the active button of `j.ui`); the trigger fires and the trigger button blinks; the time and the randomness follow their `j.remote`; the presets recall, and presets made in the panel's menu can be recalled and deleted. Checked by the own test `qmetro_module`, the help check, and by the user in Max.
+
 ## Run of 25 November 2026 (after the later changes and the move of the own tests into `tests/integration`)
 
 macOS arm64, Max 9, after the last code change. The changes since the first record: `j.model` outputs the changes of its parameters and forwards `<name> <value>` to them, `j.ui` snaps to the grid and has the active button, a bang of a node of type none reaches `j.receive` and `j.remote`, `j.maxhelpui` is in the package, and the own tests live in the folders of the externals (no lists any more).

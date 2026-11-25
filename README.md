@@ -54,6 +54,9 @@ per Max launch (`scripts/run-maxtests.sh`).
 ## Status: milestone 3 (views, presets and the panel)
 
 Added: `j.view`, `j.remote`, `j.ui` (a drawn panel), `j.node`, and the presets of `j.model` (`preset`, `preset:new`, `preset:interpolate`, `preset:read`, `preset:write` and the others; the old text file format, and the XML format in the core).
-Models that appear later, are replaced or go are now followed by `j.send`, `j.receive`, `j.remote` and the data objects, and models nest. The old `qmetro` model, view and module load and work
-(`package/Jamoma/patchers/models/data/qmetro`). The core gained `PresetManager`, `Remote`, `ModelExplorer` and the preset file readers and writers. Differences from the old objects are in `docs/changes.md`;
+Models that appear later, are replaced or go are now followed by `j.send`, `j.receive`, `j.remote` and the data objects, and models nest.
+
+**The old `qmetro` model is fully working.** It was the first test patch of the whole project (`package/Jamoma/patchers/models/data/qmetro`): the model, the view with its `j.ui` panel and the module load with the old help patcher, `data/active` starts and stops the metro (also from the active button of `j.ui`), the trigger button blinks, the time and randomness follow the `j.remote` objects, and the presets (`default` and the ones made in the panel's menu) recall, create and delete. It is part of conformance: the test `qmetro_module`, the help check and the package check run it every time.
+
+The core gained `PresetManager`, `Remote`, `ModelExplorer` and the preset file readers and writers. Differences from the old objects are in `docs/changes.md`;
 results, and what still has to be run on Windows and looked at by eye, are in `docs/conformance/m3-results.md`.
