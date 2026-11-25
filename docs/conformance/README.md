@@ -49,6 +49,12 @@ which needs `j.in~`/`j.out~`), so the old-test suite for milestone 1 is the 82 `
 `j.savebang` and `j.pass` are covered by own tests under `docs/conformance/own/`.
 
 
+## The qmetro patchers
+
+The qmetro model, view, module and help patcher are the first test patch of the pass-bar set (`conformance/set.txt`). They are checked in three ways: the own test `qmetro` (`tests/max/patchers/qmetro.maxtest.maxpat`, in `conformance/own-tests.txt`: the module loads, the default preset sets the time and stops the metro, and switching the metro on makes the `trigger` return fire); `scripts/check-help.sh` with no arguments, which opens every help patcher and the four qmetro patchers and reports missing objects and load errors (a missing bpatcher too); and the unit test `package_references`, which checks that every bpatcher, `js` file and picture that a package patcher loads is in the package.
+
+The help check can report `doesn't understand "foo"` and `doesn't understand "none"` in a full run, attributed to `j.receive.maxhelp`, which is clean when opened alone. The same errors come now and then in the Max window when a `nodes` object is used; they are not a regression of the qmetro patchers.
+
 ## Permanent links for working in Max yourself
 
 The runners link what they need into `~/Documents/Max 9/Packages` while they run and remove only what they created. To open the tests and help
