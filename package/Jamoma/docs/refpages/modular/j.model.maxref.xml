@@ -39,6 +39,163 @@
 				The <m>init</m> message initializes this model. This message is implemented as a <o>j.message</o> embedded in the <o>j.model</o> object
 			</description>
 		</method>
+		<method name="preset">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Recall a preset
+			</digest>
+			<description>
+				The <m>preset</m> message recalls a preset by its name or by its position (from 1): the stored value of every parameter is sent to it as a command, in the order of priority, then name. A parameter that no longer exists is skipped and named on the console.
+			</description>
+		</method>
+		<method name="preset:new">
+			<arglist>
+				<arg name="name" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Store the present state as a preset
+			</digest>
+			<description>
+				The <m>preset:new</m> message stores the value of every parameter below the model as a preset. A position before the name puts the new preset there; a name that exists is stored again in place.
+			</description>
+		</method>
+		<method name="preset:update">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Store the present state into a preset
+			</digest>
+			<description>
+				The <m>preset:update</m> message stores the present state into an existing preset (the current one if none is named).
+			</description>
+		</method>
+		<method name="preset:delete">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Delete a preset
+			</digest>
+			<description>
+				The <m>preset:delete</m> message removes a preset.
+			</description>
+		</method>
+		<method name="preset:clear">
+			<arglist />
+			<digest>
+				Delete every preset
+			</digest>
+			<description>
+				The <m>preset:clear</m> message removes every preset of the model.
+			</description>
+		</method>
+		<method name="preset:names">
+			<arglist />
+			<digest>
+				List the presets
+			</digest>
+			<description>
+				The <m>preset:names</m> message answers <m>preset:names</m> followed by the names of the presets, in order, out the rightmost outlet.
+			</description>
+		</method>
+		<method name="preset:move">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Move a preset
+			</digest>
+			<description>
+				The <m>preset:move</m> message moves a preset to a position in the list (from 1).
+			</description>
+		</method>
+		<method name="preset:copy">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Copy a preset
+			</digest>
+			<description>
+				The <m>preset:copy</m> message stores a copy of a preset under a new name, at the end of the list or at the given position (from 1).
+			</description>
+		</method>
+		<method name="preset:rename">
+			<arglist>
+				<arg name="name-or-position" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Rename a preset
+			</digest>
+			<description>
+				The <m>preset:rename</m> message gives a preset another name, which must not be taken.
+			</description>
+		</method>
+		<method name="preset:interpolate">
+			<arglist>
+				<arg name="preset-a" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Send a blend of two presets
+			</digest>
+			<description>
+				The <m>preset:interpolate</m> message sends the blend of two presets; the position goes from 0 (the first preset) to 1 (the second). Numbers and lists of numbers of the same length are interpolated, anything else is taken from the nearer preset.
+			</description>
+		</method>
+		<method name="preset:mix">
+			<arglist>
+				<arg name="preset" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Send a weighted mix of presets
+			</digest>
+			<description>
+				The <m>preset:mix</m> message sends the mix of several presets, each followed by its factor; the factors are normalised by their sum.
+			</description>
+		</method>
+		<method name="preset:read">
+			<arglist>
+				<arg name="file" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Read presets from a text file
+			</digest>
+			<description>
+				The <m>preset:read</m> message replaces the presets by those of a text file (a file dialog opens without a file name). If the file is missing or holds no preset nothing changes and the console says why. When the model has initialised, the file named like the patcher with <m>.presets.txt</m> is read from the Max search path and the preset <m>default</m> is recalled.
+			</description>
+		</method>
+		<method name="preset:read/again">
+			<arglist />
+			<digest>
+				Read the presets file again
+			</digest>
+			<description>
+				The <m>preset:read/again</m> message reads the file used last.
+			</description>
+		</method>
+		<method name="preset:write">
+			<arglist>
+				<arg name="file" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Write the presets to a text file
+			</digest>
+			<description>
+				The <m>preset:write</m> message writes the presets as a text file (a save dialog opens without a file name).
+			</description>
+		</method>
+		<method name="preset:write/again">
+			<arglist />
+			<digest>
+				Write the presets file again
+			</digest>
+			<description>
+				The <m>preset:write/again</m> message writes to the file used last.
+			</description>
+		</method>
 	</methodlist>
 	<attributelist>
 		<attribute name="amenities" get="1" set="1" type="symbol" size="1">
@@ -110,6 +267,38 @@
 			</digest>
 			<description>
 				The <at>priority</at> attribute sets the priority of the model. It allows to define the order in which model will be saved/recalled from preset and cue. The <at>priority</at> attribute can be set as an argument to its patcher. It will then override priority defined within the model.
+			</description>
+		</attribute>
+		<attribute name="alias" get="1" set="1" type="symbol" size="1">
+			<digest>
+				The alias of the model
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+		<attribute name="activity" get="1" set="1" type="int" size="1">
+			<digest>
+				Report the activity of the model
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+		<attribute name="tags" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Tags of the model
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+		<attribute name="presets" get="1" set="1" type="symbol" size="1">
+			<digest>
+				The presets file
+			</digest>
+			<description>
+				The file the presets were last read from or written to.
 			</description>
 		</attribute>
 	</attributelist>

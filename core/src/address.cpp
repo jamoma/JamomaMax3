@@ -119,6 +119,32 @@ bool Address::operator==(const Address& other) const
     return directory_ == other.directory_ && absolute_ == other.absolute_ && path_ == other.path_ && attribute_ == other.attribute_;
 }
 
+std::string substitute_arguments(std::string_view text, const std::vector<std::string>& arguments, std::string_view unique_id)
+{
+    std::string out;
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        if (text[i] != '#' || i + 1 >= text.size() || text[i + 1] < '0' || text[i + 1] > '9') {
+            out += text[i];
+            continue;
+        }
+        std::size_t end = i + 1;
+        std::size_t number = 0;
+        while (end < text.size() && text[end] >= '0' && text[end] <= '9') {
+            number = number * 10 + static_cast<std::size_t>(text[end] - '0');
+            ++end;
+        }
+        if (number == 0) {
+            out += unique_id;
+        } else if (number <= arguments.size()) {
+            out += arguments[number - 1];
+        } else {
+            out += text.substr(i, end - i);
+        }
+        i = end - 1;
+    }
+    return out;
+}
+
 Address resolve_relative(const Address& address, const Address& model)
 {
     if (address.empty() || address.absolute()) {

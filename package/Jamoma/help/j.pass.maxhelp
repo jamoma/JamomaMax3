@@ -14,18 +14,6 @@
 			1009.0,
 			658.0
 		],
-		"bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.862745,
-			0.870588,
-			0.878431,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 12.0,
@@ -154,18 +142,6 @@
 							1009.0,
 							632.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -201,7 +177,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-24",
 									"linecount": 2,
@@ -221,20 +197,14 @@
 										0.0
 									],
 									"style": "",
-									"text": "Strip leading slash from dumpout addresses",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Strip leading slash from dumpout addresses"
 								}
 							},
 							{
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-21",
 									"linecount": 2,
@@ -254,13 +224,7 @@
 										0.0
 									],
 									"style": "",
-									"text": "Strip leading slash from the output",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Strip leading slash from the output"
 								}
 							},
 							{
@@ -294,7 +258,7 @@
 								"box": {
 									"bubble": 1,
 									"bubbletextmargin": 10,
-									"fontname": "Lato Regular",
+									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-16",
 									"linecount": 3,
@@ -308,13 +272,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Both relative and absolute addresses can be routed the same path",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Both relative and absolute addresses can be routed the same path"
 								}
 							},
 							{
@@ -355,7 +313,7 @@
 										136.0,
 										23.0
 									],
-									"style": "j.subtitle",
+									"style": "default",
 									"text": "Leading slash option"
 								}
 							},
@@ -726,34 +684,6 @@
 							}
 						],
 						"styles": [
-							{
-								"name": "j.subtitle",
-								"default": {
-									"fontname": [
-										"Lato Regular"
-									],
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"fontface": [
-										1
-									],
-									"fontsize": [
-										14.0
-									],
-									"clearcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									]
-								},
-								"parentstyle": "",
-								"multi": 0
-							},
 							{
 								"name": "jpatcher001",
 								"parentstyle": "",

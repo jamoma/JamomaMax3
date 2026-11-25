@@ -14,6 +14,10 @@ add_library(jamoma_core SHARED
     src/dataspace.cpp
     src/ramp.cpp
     src/model.cpp
+    src/preset.cpp
+    src/preset_files.cpp
+    src/remote.cpp
+    src/explorer.cpp
     src/receiver.cpp
     src/sender.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
@@ -45,9 +49,15 @@ add_executable(jamoma_core_tests
     tests/dataspace_test.cpp
     tests/ramp_test.cpp
     tests/model_test.cpp
+    tests/preset_test.cpp
+    tests/preset_files_test.cpp
+    tests/remote_test.cpp
+    tests/explorer_test.cpp
     tests/receiver_test.cpp
-    tests/sender_test.cpp)
+    tests/sender_test.cpp
+    tests/ui_grid_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
+target_compile_definitions(jamoma_core_tests PRIVATE JAMOMA_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/tests/data")
 # The registry must outlive static destruction (its own executable, checked through its exit code).
 add_executable(registry_exit_test tests/registry_exit_test.cpp)
 target_link_libraries(registry_exit_test PRIVATE jamoma::core)

@@ -8,8 +8,10 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "c74_min.h"
@@ -102,6 +104,83 @@ inline const void* parent_patcher(const void* patcher)
 }
 
 /**
+ * @brief The class of a patcher, taken from its file name: `qmetro.model.maxpat` and `qmetro.view.maxpat` are of class `qmetro`.
+ * @param patcher The patcher (as patcher_of gives it).
+ * @return The class, or nothing if the file name has neither the `.model` nor the `.view` context.
+ */
+inline std::optional<std::string> patcher_class(const void* patcher)
+{
+    if (patcher == nullptr) {
+        return std::nullopt;
+    }
+    c74::max::t_symbol* s = c74::max::jpatcher_get_name(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher)));
+    if (s == nullptr || s->s_name == nullptr) {
+        return std::nullopt;
+    }
+    const std::string name = s->s_name;
+    for (const char* context : {".model", ".view"}) {
+        const std::size_t at = name.rfind(context);
+        const std::string tail = at == std::string::npos ? std::string() : name.substr(at + std::string(context).size());
+        if (at != std::string::npos && at > 0 && (tail.empty() || tail == ".maxpat")) {
+            return name.substr(0, at);
+        }
+    }
+    return std::nullopt;
+}
+
+/**
+ * @brief The address of the model a view patcher is bound to, if there is one now.
+ *
+ * With a model argument: an absolute address is used as it is, a relative one is taken below the model of the patcher that contains the view
+ * (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
+ * finds `qmetro.model`). The answer is worked out from what exists now, so it follows models coming and going.
+ * @param view_patcher The patcher of the view.
+ * @return The address of the model, or nothing while there is none (the view is waiting).
+ */
+inline std::optional<std::string> view_model_address(const void* view_patcher)
+{
+    const std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
+    if (!argument) {
+        return std::nullopt;
+    }
+    const void* container = parent_patcher(view_patcher);
+    std::string address;
+    if (!argument->empty()) {
+        std::string base;
+        for (const void* p = container; p != nullptr; p = parent_patcher(p)) {
+            if (const jamoma::Model* model = jamoma::Registry::instance().contexts().find(p)) {
+                base = model->address().str();
+                break;
+            }
+        }
+        address = (*argument)[0] == '/' ? *argument : base + "/" + *argument;
+    } else {
+        const std::optional<std::string> wanted = patcher_class(view_patcher);
+        for (const auto& entry : jamoma::Registry::instance().contexts().all()) {
+            if (parent_patcher(entry.first) == container && wanted && patcher_class(entry.first) == wanted) {
+                address = entry.second->address().str();
+                break;
+            }
+        }
+    }
+    if (address.empty()) {
+        return std::nullopt;
+    }
+    jamoma::Node* node = jamoma::Registry::instance().names().lookup(jamoma::Address::parse(address));
+    auto* model = node != nullptr ? dynamic_cast<jamoma::Model*>(node->object()) : nullptr;
+    if (model == nullptr) {
+        return std::nullopt;
+    }
+    // A model that is being removed is told to the observers while it is still in the namespace: it counts only while a patcher has it.
+    for (const auto& entry : jamoma::Registry::instance().contexts().all()) {
+        if (entry.second == model) {
+            return address;
+        }
+    }
+    return std::nullopt;
+}
+
+/**
  * @brief Finds the model that governs a box: the one of its patcher, else of the nearest enclosing patcher.
  * @param box The box object.
  * @return The model, or null.
@@ -115,5 +194,59 @@ inline jamoma::Model* find_model(c74::max::t_object* box)
     }
     return nullptr;
 }
+
+/**
+ * @brief Runs a function once, later on the main thread, however often it is asked for before it runs.
+ *
+ * A burst of changes, such as a model that is removed and made again, gives one call after the burst, when everything has settled. Use one per object.
+ */
+class Settle {
+public:
+    /**
+     * Asks for the function to run (nothing happens if a call is already waiting).
+     * @param box The box object of the caller. @param alive The token of the caller; if it has expired by then the function is not called.
+     * @param function What to run.
+     */
+    void request(c74::max::t_object* box, std::weak_ptr<int> alive, std::function<void()> function)
+    {
+        if (pending_->exchange(true)) {
+            return;
+        }
+        const std::shared_ptr<std::atomic<bool>> pending = pending_;
+        defer_call(box, std::move(alive), [pending, function = std::move(function)] {
+            pending->store(false);
+            function();
+        });
+    }
+
+private:
+    std::shared_ptr<std::atomic<bool>> pending_ = std::make_shared<std::atomic<bool>>(false); /**< True while a call is waiting. */
+};
+
+/**
+ * @brief Calls a function whenever a model is registered for a patcher or removed again (anywhere), so that an object can find its model
+ *        again when it appears later, is replaced or goes.
+ *
+ * The function runs on the thread that registers the model (the main thread, for Max objects), after the registry's lock is released.
+ * It is not called for the object's own start-up: the object binds once itself and then watches.
+ */
+class ContextWatch {
+public:
+    /**
+     * Starts watching.
+     * @param changed What to do on every change (it must be safe to call while the watch exists only).
+     */
+    void start(std::function<void()> changed)
+    {
+        handle_ = jamoma::Registry::instance().contexts().observe(
+            [changed = std::move(changed)](const void*, jamoma::Model*, bool) { changed(); });
+    }
+
+    /** Stops watching (also done by the destructor). */
+    void stop() { handle_.reset(); }
+
+private:
+    std::shared_ptr<void> handle_; /**< The observer registration. */
+};
 
 } // namespace jamoma_max

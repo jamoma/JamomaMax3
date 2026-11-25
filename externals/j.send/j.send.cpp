@@ -28,6 +28,8 @@ class j_send : public c74::min::object<j_send> {
     std::string text_;                       /**< The address as written. */
     bool ready_ = false;                     /**< True once the patcher has loaded and the address may be resolved. */
     jamoma_max::Alive alive_;                /**< Lets deferred calls see that the object is gone. */
+    jamoma_max::ContextWatch watch_;         /**< Binds again when the model of the patcher appears, is replaced or goes. */
+    jamoma_max::Settle settle_;              /**< Lets a burst of such changes be dealt with once, when it is over. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -49,11 +51,16 @@ public:
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             ready_ = true;
             rebind();
+            watch_.start([this] { settle_.request(maxobj(), alive_.weak(), [this] { follow(); }); });
         });
     }
 
     /** Nothing to release before the members go. */
-    ~j_send() override { sender_.reset(); }
+    ~j_send() override
+    {
+        watch_.stop();
+        sender_.reset();
+    }
 
     inlet<> input{this, "(anything) value or message to forward"};                  /**< The inlet. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump and the target address"}; /**< Outlet 0: the dump outlet. */
@@ -143,6 +150,17 @@ private:
     void forward_later(const jamoma::Value& v)
     {
         jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, v] { forward(v); });
+    }
+
+    /** Follows the model of the patcher coming, going or being replaced: binds again only if the address that the written one resolves to has changed. */
+    void follow()
+    {
+        if (!ready_ || !sender_ || text_.empty()) {
+            return;
+        }
+        if (jamoma_max::resolve_in_patcher(maxobj(), text_) != sender_->address()) {
+            rebind();
+        }
     }
 
     /** Binds (again) to the address as written, resolved against the model of the patcher, and reports it. */

@@ -298,6 +298,51 @@ std::shared_ptr<void> Namespace::observe(const Address& pattern, std::function<v
     });
 }
 
+bool Namespace::read_object(const Address& address, const std::function<void(Object&)>& use) const
+{
+    if (address.empty()) {
+        return false;
+    }
+    std::shared_lock lock(state_->mutex);
+    Node* current = state_->root.get();
+    for (const Segment& segment : address.path()) {
+        current = find_child(*current, segment.name, segment.instance, current->kids_);
+        if (current == nullptr) {
+            return false;
+        }
+    }
+    if (current->object_ == nullptr) {
+        return false;
+    }
+    use(*current->object_);
+    return true;
+}
+
+bool Namespace::visit_below(const Address& root, const std::function<void(const std::string&, const std::string&, const std::string&, Object*)>& visit) const
+{
+    std::shared_lock lock(state_->mutex);
+    Node* current = state_->root.get();
+    for (const Segment& segment : root.path()) {
+        current = find_child(*current, segment.name, segment.instance, current->kids_);
+        if (current == nullptr) {
+            return false;
+        }
+    }
+    std::function<void(const std::vector<std::unique_ptr<Node>>&, const std::string&)> walk;
+    walk = [&walk, &visit](const std::vector<std::unique_ptr<Node>>& kids, const std::string& prefix) {
+        for (const auto& kid : kids) {
+            std::string text = prefix.empty() ? kid->name_ : prefix + "/" + kid->name_;
+            if (!kid->instance_.empty()) {
+                text += "." + kid->instance_;
+            }
+            visit(text, kid->name_, kid->instance_, kid->object_);
+            walk(kid->kids_, text);
+        }
+    };
+    walk(current->kids_, std::string());
+    return true;
+}
+
 std::vector<Node*> Namespace::find(const Address& pattern) const
 {
     std::shared_lock lock(state_->mutex);

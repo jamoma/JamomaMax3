@@ -64,3 +64,8 @@ The Windows build now uses the dynamic C runtime (`/MD`) for the core and every 
 - **Observers** (`Data::observe`, `Namespace::observe`) call back on the thread that made the change, after every lock is released. A callback may drop its own handle, set attributes and subscribe. A callback may run once more after its handle is dropped if the change was already in flight on another thread: the Max externals therefore guard every callback with an "alive" token and defer output to the main thread when they are called from another one.
 - **Threads and Min:** the value-carrying messages of the externals are declared `message<threadsafe::yes>`; Min's default defers a call from a non-main thread and loses most of a ramp. Outlets are written with the Max API, which is safe from the scheduler thread.
 - `Receiver::bang`/`grab` and `Sender::send` are for the main thread (nodes are created and removed there); everything else in them is safe from any thread.
+
+## Added in milestone 3
+
+- The patcher-to-model map (`ContextMap`) now has observers and a listing; a second map (`ViewMap`) records the views. Externals watch the map with `ContextWatch` (`externals/common/max_context.hpp`) and bind again when a model appears, is replaced or goes. Both maps live in the one registry and obey the rules above (a leaked singleton, nothing torn down at exit).
+- Anything that reads the namespace from a thread other than the main one must use `Namespace::visit_below` (read lock held, objects alive during the call); `Node` pointers from `lookup` and `find` are for the main thread, which creates and removes nodes.

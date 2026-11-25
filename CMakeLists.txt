@@ -29,6 +29,14 @@ set(JAMOMA_PACKAGE_DIR "${CMAKE_SOURCE_DIR}/package/Jamoma" CACHE PATH "Output f
 
 enable_testing()
 
+# Every file that a patcher of the package loads (bpatchers, js files, pictures) must be in the package.
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_Interpreter_FOUND)
+    add_test(NAME package_references COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/package/check_references.py ${CMAKE_CURRENT_SOURCE_DIR}/package/Jamoma)
+    # The Max tests follow the layout of tests/integration (a folder for each external, unique names, assertion names that start with the folder).
+    add_test(NAME test_layout COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/maxtest/check_test_layout.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration)
+endif()
+
 add_subdirectory(core)
 
 include(cmake/JamomaExternal.cmake)

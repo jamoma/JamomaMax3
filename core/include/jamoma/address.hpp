@@ -90,6 +90,18 @@ private:
 };
 
 /**
+ * @brief Replaces `#0` by the unique id of the patcher instance and `#1`, `#2`.. by the arguments of the abstraction or bpatcher.
+ *
+ * This is what the old objects did before they used an address or an argument (`jamoma_parse_dieze`). A `#` that is not followed by a number,
+ * and a `#n` for which there is no argument, are left as written.
+ * @param text The text.
+ * @param arguments The arguments of the patcher instance, `#1` first.
+ * @param unique_id The unique id of the patcher instance (`#0`).
+ * @return The text with the substitutions made.
+ */
+JAMOMA_API std::string substitute_arguments(std::string_view text, const std::vector<std::string>& arguments, std::string_view unique_id);
+
+/**
  * @brief Resolves an address written in a patcher against the model the patcher belongs to.
  *
  * An absolute address stays as it is; a relative one is appended to the model's address (to the root if there is no model); the empty

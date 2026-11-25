@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
+<c74object name="j.remote" module="" category="Jamoma">
+	<digest>
+		Link a UI object to a node
+	</digest>
+	<description>
+		j.remote keeps a UI object and a node (a parameter, message or return) showing the same value. What comes in is sent to the node as a command in the unit of the <at>unit</at> attribute; changes of the node come out of the left outlet as <m>set</m> messages for UI objects that understand them and out of the second outlet as values; the third outlet is reserved. The node's answer to the remote's own command is not shown again, and dragging a UI object while a ramp runs stops the ramp.
+	</description>
+	<metadatalist>
+		<metadata name="author">
+			Jamoma
+		</metadata>
+		<metadata name="tag">
+			model
+		</metadata>
+		<metadata name="tag">
+			Jamoma
+		</metadata>
+	</metadatalist>
+	<objarglist>
+		<objarg name="address" optional="1" type="symbol">
+			<digest>
+				The address of the node
+			</digest>
+			<description>
+				Relative to the model (or to the model of the view) of the patcher, or absolute.
+			</description>
+		</objarg>
+	</objarglist>
+	<methodlist>
+		<method name="bang">
+			<arglist />
+			<digest>
+				Ask the node for its value
+			</digest>
+			<description>
+				A <m>bang</m> is sent to the node as a command.
+			</description>
+		</method>
+		<method name="int">
+			<arglist>
+				<arg name="value" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Send a number to the node
+			</digest>
+			<description>
+				An integer is sent to the node as a command.
+			</description>
+		</method>
+		<method name="float">
+			<arglist>
+				<arg name="value" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Send a number to the node
+			</digest>
+			<description>
+				A float is sent to the node as a command.
+			</description>
+		</method>
+		<method name="list">
+			<arglist>
+				<arg name="value" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Send a list to the node
+			</digest>
+			<description>
+				A list is sent to the node as a command.
+			</description>
+		</method>
+		<method name="anything">
+			<arglist>
+				<arg name="value" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Send a message to the node
+			</digest>
+			<description>
+				Any other message is sent to the node as a command; <m>set value</m> shows a value without sending it and <m>address symbol</m> sets the address.
+			</description>
+		</method>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Report the address
+			</digest>
+			<description>
+				The <m>dump</m> message answers <m>address</m> and the address out the rightmost outlet.
+			</description>
+		</method>
+		<method name="set">
+			<arglist>
+				<arg name="value" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Show a value without sending it
+			</digest>
+			<description>
+				The <m>set</m> message shows a value in the UI object (out of both outlets) without sending it to the node.
+			</description>
+		</method>
+		<method name="address">
+			<arglist>
+				<arg name="address" optional="1" type="symbol" />
+			</arglist>
+			<digest>
+				Set the address of the node
+			</digest>
+			<description>
+				The <m>address</m> message binds the remote to another node.
+			</description>
+		</method>
+	</methodlist>
+	<attributelist>
+		<attribute name="address" get="1" set="1" type="symbol" size="1">
+			<digest>
+				The address of the node
+			</digest>
+			<description>
+				Relative to the model or view of the patcher, or absolute.
+			</description>
+		</attribute>
+		<attribute name="unit" get="1" set="1" type="symbol" size="1">
+			<digest>
+				The unit of the UI object
+			</digest>
+			<description>
+				The unit the UI object works in; empty means the node's own.
+			</description>
+		</attribute>
+		<attribute name="active" get="1" set="1" type="int" size="1">
+			<digest>
+				Whether the remote works
+			</digest>
+			<description>
+				An inactive remote neither sends nor shows.
+			</description>
+		</attribute>
+		<attribute name="freeze" get="1" set="1" type="int" size="1">
+			<digest>
+				Keep node changes from the UI object
+			</digest>
+			<description>
+				A frozen remote shows nothing to the UI object; the UI object can still send.
+			</description>
+		</attribute>
+		<attribute name="highlight" get="1" set="1" type="int" size="1">
+			<digest>
+				Highlight the UI object
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect.
+			</description>
+		</attribute>
+	</attributelist>
+</c74object>

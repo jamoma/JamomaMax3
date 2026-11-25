@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
+<c74object name="j.view" module="" category="Jamoma">
+	<digest>
+		Declare patcher as the view of a model
+	</digest>
+	<description>
+		j.view declares a patcher as the view of a model. It binds to the model named by its argument, or else to the model of the same class (<o>qmetro.model</o> for <o>qmetro.view</o>) in the patcher that contains the view, and follows it when the model comes or goes. A message <m>parameter value</m> sets that parameter of the model.
+	</description>
+	<metadatalist>
+		<metadata name="author">
+			Jamoma
+		</metadata>
+		<metadata name="tag">
+			model
+		</metadata>
+		<metadata name="tag">
+			Jamoma
+		</metadata>
+	</metadatalist>
+	<objarglist>
+		<objarg name="model" optional="1" type="symbol">
+			<digest>
+				The address of the model
+			</digest>
+			<description>
+				An absolute address, or one relative to the model of the patcher that contains the view.
+			</description>
+		</objarg>
+	</objarglist>
+	<methodlist>
+		<method name="anything">
+			<arglist>
+				<arg name="parameter" optional="1" type="list" />
+			</arglist>
+			<digest>
+				Send a value to a parameter of the model
+			</digest>
+			<description>
+				The message <m>parameter value</m> sends the value to the parameter of the model the view is bound to, and repeats the message out the left outlet. While the view has no model nothing is sent and the console says so.
+			</description>
+		</method>
+		<method name="dump">
+			<arglist />
+			<digest>
+				Report the model
+			</digest>
+			<description>
+				The <m>dump</m> message answers <m>model:address</m> and the address of the model while the view is bound, or <m>model:waiting</m> while it is not, out the rightmost outlet.
+			</description>
+		</method>
+		<method name="model:address">
+			<arglist />
+			<digest>
+				Report the model
+			</digest>
+			<description>
+				The <m>model:address</m> message answers like <m>dump</m>.
+			</description>
+		</method>
+	</methodlist>
+	<attributelist>
+		<attribute name="alias" get="1" set="1" type="symbol" size="1">
+			<digest>
+				The alias of the view
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+		<attribute name="description" get="1" set="1" type="symbol" size="1">
+			<digest>
+				A description of the view
+			</digest>
+			<description>
+				A textual description of the view for auto-documentation purposes.
+			</description>
+		</attribute>
+		<attribute name="tags" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Tags of the view
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+		<attribute name="activity" get="1" set="1" type="int" size="1">
+			<digest>
+				Report the activity of the view
+			</digest>
+			<description>
+				Accepted so that old patchers load; it has no effect yet.
+			</description>
+		</attribute>
+	</attributelist>
+</c74object>

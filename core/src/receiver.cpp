@@ -128,7 +128,8 @@ void bind_node(const std::shared_ptr<Receiver::Impl>& impl, const Address& node,
             return;
         }
         const Flight flight(keep.get()); // counted before the generation check, so a destructor that bumps it waits for us
-        if (!keep->active.load() || v.empty()) {
+        // An empty value of the attribute `value` is a bang (only a node of type none outputs one): it is a change like any other.
+        if (!keep->active.load() || (v.empty() && attr != "value")) {
             return;
         }
         {

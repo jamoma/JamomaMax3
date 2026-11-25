@@ -238,3 +238,92 @@ TEST_CASE("context map finds the model of a patcher")
     map.remove(&patcher_one, &b);
     REQUIRE(map.find(&patcher_one) == nullptr);
 }
+
+/** The context map tells observers when a model is registered for a patcher or removed; the handle stops it. */
+TEST_CASE("context map observer hears add and remove")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    jamoma::ContextMap map;
+    int patcher = 0;
+    std::vector<std::string> events;
+    auto handle = map.observe([&events, &patcher, &a](const void* p, Model* m, bool added) {
+        events.push_back(std::string(p == &patcher ? "patcher " : "other ") + (m == &a ? "a " : "?") + (added ? "added" : "removed"));
+    });
+    map.add(&patcher, &a);
+    map.remove(&patcher, &a);
+    map.remove(&patcher, &a); // nothing there: no event
+    REQUIRE(events == std::vector<std::string>{"patcher a added", "patcher a removed"});
+    handle.reset();
+    map.add(&patcher, &a);
+    REQUIRE(events.size() == 2);
+}
+
+/** An observer of the context map may drop its own handle, and the handle may outlive the map. */
+TEST_CASE("context map observer may unregister itself and outlive the map")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    int patcher = 0;
+    int calls = 0;
+    std::shared_ptr<void> survivor;
+    {
+        jamoma::ContextMap map;
+        std::shared_ptr<void> handle;
+        handle = map.observe([&](const void*, Model*, bool) {
+            ++calls;
+            handle.reset();
+        });
+        map.add(&patcher, &a);
+        map.add(&patcher, &a);
+        REQUIRE(calls == 1);
+        survivor = map.observe([](const void*, Model*, bool) {});
+    }
+    REQUIRE_NOTHROW(survivor.reset());
+}
+
+/** The model owns a preset manager for its own address, so everything that knows the model can reach its presets. */
+TEST_CASE("model owns its preset manager")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    w.add("/m/a", 0);
+    w.data[0]->command({2.0});
+    REQUIRE(m.presets().new_preset("one"));
+    REQUIRE(m.presets().presets().at(0).entries.at(0).address.str() == "a");
+    Model second(w.ns, Address::parse("/m")); // becomes /m.1: its manager looks below its own address
+    REQUIRE(second.address() != m.address());
+    REQUIRE(second.presets().new_preset("x"));
+    REQUIRE(second.presets().presets().at(0).entries.empty());
+}
+
+/** The context map lists its registrations in order. */
+TEST_CASE("context map lists its entries")
+{
+    World w;
+    Model a(w.ns, Address::parse("/a"));
+    Model b(w.ns, Address::parse("/b"));
+    int p1 = 0;
+    int p2 = 0;
+    jamoma::ContextMap map;
+    map.add(&p1, &a);
+    map.add(&p2, &b);
+    const auto all = map.all();
+    REQUIRE(all.size() == 2);
+    REQUIRE(all[0].first == &p1);
+    REQUIRE(all[1].second == &b);
+}
+
+/** A view is known by its patcher and the model argument it was given. */
+TEST_CASE("view map keeps the argument of a view")
+{
+    jamoma::ViewMap map;
+    int p = 0;
+    int q = 0;
+    map.add(&p, "/qmetro");
+    REQUIRE(map.find(&p).has_value());
+    REQUIRE(*map.find(&p) == "/qmetro");
+    REQUIRE_FALSE(map.find(&q).has_value());
+    map.remove(&p);
+    REQUIRE_FALSE(map.find(&p).has_value());
+}

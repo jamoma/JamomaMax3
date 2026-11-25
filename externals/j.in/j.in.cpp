@@ -54,6 +54,7 @@ public:
     jamoma_max::dump_outlet data_out{this, "(anything) the data"};     /**< Outlet 0. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};         /**< Outlet 1: the dump outlet. */
 
+    attribute<symbol> tags{this, "tags", ""};        /**< Accepted so that old patchers load (the old object used it to mark a Jitter matrix port); no effect. */
     /** When on, nothing passes. */
     attribute<int> mute{this, "mute", 0, setter{MIN_FUNCTION {
         mute_.store(static_cast<int>(args[0]));

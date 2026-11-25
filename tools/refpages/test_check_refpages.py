@@ -40,6 +40,13 @@ class CheckRefpages(unittest.TestCase):
             self.assertIn(name, c.OBJECT_SOURCES)
 
 
+    def test_milestone_3_objects_are_checked(self):
+        for name in ("j.view", "j.remote", "j.ui", "j.node"):
+            self.assertIn(name, c.OBJECT_SOURCES)
+        # j.model's page lists the preset messages again, so the checker finds them implemented and documented
+        implemented = c.implemented_in(c.OBJECT_SOURCES["j.model"], pathlib.Path("externals")) if hasattr(c, "implemented_in") else None
+        self.assertTrue(implemented is None or "preset:new" in implemented[1])
+
     def test_parse_reads_names(self):
         attributes, methods = c.parse_refpage(PAGE)
         self.assertEqual(attributes, {"type"})

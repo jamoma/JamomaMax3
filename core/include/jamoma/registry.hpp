@@ -40,6 +40,8 @@ public:
 
     /** @return The map from patchers to the models in them. */
     ContextMap& contexts() noexcept { return contexts_; }
+    /** @return The map from patchers to the views in them. */
+    ViewMap& views() noexcept { return views_; }
 
     /**
      * @brief Identifies this load of the library in this process.
@@ -89,6 +91,7 @@ private:
 
     Namespace names_;                        /**< The process-wide namespace tree. */
     ContextMap contexts_;                    /**< The patcher-to-model map. */
+    ViewMap views_;                          /**< The patcher-to-view map. */
     std::uint64_t id_;                       /**< The instance id. */
     std::atomic<bool> loader_attached_{false}; /**< Whether the start-up loader attached. */
     std::atomic<bool> missing_loader_warned_{false}; /**< Whether a caller has claimed the missing-loader warning. */

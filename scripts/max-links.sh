@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
-# Keeps the four links that let Max 9 find this project's packages, so that tests and help patchers open without errors in a Max that you
+# Keeps the three links that let Max 9 find this project's packages, so that tests and help patchers open without errors in a Max that you
 # start yourself. The test runners work with these links in place (they leave existing links alone); scripts/max-smoke.sh moves the Jamoma
 # link aside while it runs and puts it back.
 #
@@ -15,8 +15,10 @@
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PACKAGES="${MAX_PACKAGES_DIR:-$HOME/Documents/Max 9/Packages}"
-NAMES=(Jamoma max-test JamomaIntegrationTests JamomaMax3Tests)
-TARGETS=("$ROOT/package/Jamoma" "${MAX_TEST_DIR:-$HOME/Developer/Jamoma/max-test}" "$ROOT/tests/integration/JamomaIntegrationTests" "$ROOT/tests/max")
+NAMES=(Jamoma max-test JamomaIntegrationTests)
+TARGETS=("$ROOT/package/Jamoma" "${MAX_TEST_DIR:-$HOME/Developer/Jamoma/max-test}" "$ROOT/tests/integration/JamomaIntegrationTests")
+# The package of the own tests was retired (they are in JamomaIntegrationTests now): a link to the old place is taken away by on and off.
+RETIRED_NAME=JamomaMax3Tests; RETIRED_TARGET="$ROOT/tests/max"
 
 mode="${1:-status}"
 case "$mode" in on|off|status) ;; *) echo "usage: $0 on|off|status" >&2; exit 2;; esac
@@ -47,6 +49,9 @@ for i in "${!NAMES[@]}"; do
         esac;;
     esac
 done
+if [[ "$mode" != status && -L "$PACKAGES/$RETIRED_NAME" && "$(readlink "$PACKAGES/$RETIRED_NAME")" == "$RETIRED_TARGET" ]]; then
+    rm "$PACKAGES/$RETIRED_NAME"; echo "removed $RETIRED_NAME (retired: its tests are in JamomaIntegrationTests)"
+fi
 if pgrep -f "Max 9/Max.app/Contents/MacOS/Max" >/dev/null && [[ "$mode" != status ]]; then
     echo "Note: Max 9 is open; quit and reopen it to see the change."
 fi

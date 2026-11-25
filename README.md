@@ -35,8 +35,8 @@ Checks (Max 9 must be closed for the ones that start it):
 
 ```
 ctest --preset macos                                   # core unit tests
-scripts/run-maxtests.sh conformance/m1-tests.txt build/maxtests    # the integration tests of the old package (copied into tests/integration)
-scripts/run-maxtests.sh conformance/own-tests.txt build/maxtests   # own Max tests (tests/max)
+scripts/run-maxtests.sh --all --out build/maxtests                # every Max test (tests/integration: one folder for each external)
+scripts/run-maxtests.sh --dir j.model --out build/maxtests        # the tests of one external
 scripts/check-help.sh                                  # every help patcher opens without missing objects
 python3 tools/refpages/check_refpages.py --package package/Jamoma --externals externals
 ```
@@ -50,3 +50,13 @@ Added: `j.send`, `j.receive`, `j.unit`, and the data `j.in` / `j.out`; the core 
 `Sender`. Differences from the old objects are in `docs/changes.md`; results in `docs/conformance/m2-results.md`.
 The test runner has a quick mode for development, `python3 tools/maxtest/run_maxtests.py --list <list> --out build/x --fast 10` (batches; every test that did not pass is run again alone), and prints a progress bar. Acceptance runs use one test
 per Max launch (`scripts/run-maxtests.sh`).
+
+## Status: milestone 3 (views, presets and the panel)
+
+Added: `j.view`, `j.remote`, `j.ui` (a drawn panel), `j.node`, and the presets of `j.model` (`preset`, `preset:new`, `preset:interpolate`, `preset:read`, `preset:write` and the others; the old text file format, and the XML format in the core).
+Models that appear later, are replaced or go are now followed by `j.send`, `j.receive`, `j.remote` and the data objects, and models nest.
+
+**The old `qmetro` model is fully working.** It was the first test patch of the whole project (`package/Jamoma/patchers/models/data/qmetro`): the model, the view with its `j.ui` panel and the module load with the old help patcher, `data/active` starts and stops the metro (also from the active button of `j.ui`), the trigger button blinks, the time and randomness follow the `j.remote` objects, and the presets (`default` and the ones made in the panel's menu) recall, create and delete. It is part of conformance: the test `qmetro_module`, the help check and the package check run it every time.
+
+The core gained `PresetManager`, `Remote`, `ModelExplorer` and the preset file readers and writers. Differences from the old objects are in `docs/changes.md`;
+results, and what still has to be run on Windows and looked at by eye, are in `docs/conformance/m3-results.md`.
