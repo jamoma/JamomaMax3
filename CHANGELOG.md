@@ -6,6 +6,12 @@ New features and notable changes for each release of JamomaMax3. Everything that
 
 ### New features
 
+- **`j.namespace`** lists what is below an address, for a menu, a table or a `coll`, and keeps a selection of the items.
+- **`j.map`** maps numbers, or the values of one parameter onto another, with the 38 functions of the old function library.
+- **`j.cue`** stores the state of chosen parameters of several models under names and recalls it, with text and XML files and an editor.
+- **`j.textslider`** is a slider that shows a text and, while the mouse is over it, its value.
+- **`preset:edit`** opens the presets of a model in an editor window.
+- **`j.view`: `model:address <address>`** turns a view to another model while the patch runs.
 - **The model `osc_receive`** (with its view and help patcher) receives OSC messages over UDP and sends them to the addresses they name.
 - **Models are named by their argument** without `#1` in the patcher: `osc_receive.model osc_rcv`, or a model in a bpatcher with an argument, registers under that name, as in the old version.
 - **`j.ui`: the messages `preset:name <name>` and `panel`** create a preset of that name, and open the second panel of a view (the subpatcher the outlet feeds), as the menu and the plus button of the header do.

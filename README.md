@@ -51,6 +51,12 @@ Added: `j.send`, `j.receive`, `j.unit`, and the data `j.in` / `j.out`; the core 
 The test runner has a quick mode for development, `python3 tools/maxtest/run_maxtests.py --list <list> --out build/x --fast 10` (batches; every test that did not pass is run again alone), and prints a progress bar. Acceptance runs use one test
 per Max launch (`scripts/run-maxtests.sh`).
 
+## Status: milestone 4 (the old surface)
+
+Added: `j.namespace`, `j.map`, `j.cue`, `j.textslider`, the editor window of `preset:edit`, the second panel and preset names of `j.ui` (whose
+colours, like those of `j.textslider`, follow the Max theme), and the model `osc_receive`. Differences from the old objects are in
+`docs/changes.md`, new features in `CHANGELOG.md`, results in `docs/conformance/m4-results.md`.
+
 ## Status: milestone 3 (views, presets and the panel)
 
 Added: `j.view`, `j.remote`, `j.ui` (a drawn panel), `j.node`, and the presets of `j.model` (`preset`, `preset:new`, `preset:interpolate`, `preset:read`, `preset:write` and the others; the old text file format, and the XML format in the core).
