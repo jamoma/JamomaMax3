@@ -7988,16 +7988,21 @@
 							{
 								"box": {
 									"id": "obj-3",
-									"maxclass": "comment",
-									"text": "[j.cue: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 2,
+									"outlettype": [
+										"",
+										""
+									],
 									"patching_rect": [
 										1291.0,
 										610.0,
-										220.0,
-										20.0
-									]
+										168.0,
+										22.0
+									],
+									"style": "",
+									"text": "j.cue @namespace jcue_filter"
 								}
 							},
 							{
@@ -8453,6 +8458,20 @@
 									],
 									"source": [
 										"obj-62",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-3",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-70",
 										0
 									]
 								}

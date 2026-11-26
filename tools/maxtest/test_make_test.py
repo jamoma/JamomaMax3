@@ -106,6 +106,17 @@ class BlockTests(unittest.TestCase):
         self.assertIn(("quad_c", 0, "quad_a", 0), self.cords)
         self.assertTrue(self.boxes["quad_a"]["text"].startswith("test.assert "))
 
+    def test_an_item_can_go_to_another_receive(self):
+        t = TestPatcher()
+        t.obj("lb", "loadbang", 1, 1)
+        t.obj("m", "j.cue", 1, 2)
+        t.blocks("lb", [{"name": "x", "assert": "Jamoma/Modular/j.cue/x/y", "to": "to_cue", "send": [(7, "to_a"), "recall one"],
+                         "holder": ("float 0.", ("m", 0)), "check": "== 1"}])
+        texts = {e["box"]["id"]: e["box"].get("text") for e in t.boxes}
+        self.assertEqual(texts["x_s0"], "s to_a")
+        self.assertEqual(texts["x_s1"], "s to_cue")
+        self.assertEqual(texts["x_t"], "t b b 7")
+
     def test_no_delay_objects_are_made(self):
         self.assertFalse([b for b in self.boxes.values() if str(b.get("text", "")).startswith("delay")])
 

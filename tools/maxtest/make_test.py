@@ -103,7 +103,7 @@ class TestPatcher:
 
         `start` is the outlet that begins the test (a loadbang, or the end outlet of j.init). Each block is a dictionary with: `name` (the prefix of
         its box ids), `assert` (the assertion name), `to` (the name of the receive that the object under test listens on), `send` (what to send to it,
-        in order: a string becomes a message box, a number comes straight out of the block's trigger), `holder` (object text and the (box, outlet) whose
+        in order: a string becomes a message box, a number comes straight out of the block's trigger; a pair (value, receive) goes to another receive), `holder` (object text and the (box, outlet) whose
         value it holds, for example `("float 0.", ("m", 0))`) and `check` (an object that turns the held value into 1 for a pass).
         No delays are used: Max triggers fire from right to left, so the sends happen in order and the holder is read last.
         """
@@ -113,7 +113,9 @@ class TestPatcher:
         self.obj("term", "test.terminate", 1, 0)
         self.line(("top", 0), "term")
         for index, block in enumerate(blocks):
-            name, items = block["name"], block["send"]
+            name = block["name"]
+            sends = [v if isinstance(v, tuple) else (v, block["to"]) for v in block["send"]]
+            items = [v for v, _ in sends]
             tokens = ["b" if isinstance(v, str) else _number(v) for v in items]
             trigger = f"{name}_t"
             self.obj(trigger, "t " + " ".join(["b"] + tokens[::-1]), 1, len(items) + 1)
@@ -124,7 +126,7 @@ class TestPatcher:
                 if isinstance(item, str):
                     self.msg(f"{name}_m{k}", item)
                     self.line((trigger, outlet), f"{name}_m{k}")
-                self.obj(send, f"s {block['to']}", 1, 0)
+                self.obj(send, f"s {sends[k][1]}", 1, 0)
                 self.line(f"{name}_m{k}" if isinstance(item, str) else (trigger, outlet), send)
             text, source = block["holder"]
             self.obj(f"{name}_h", text, 2, 1)

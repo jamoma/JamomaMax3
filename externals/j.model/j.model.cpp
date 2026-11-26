@@ -34,6 +34,7 @@
 #include "max_atoms.hpp"
 #include "max_context.hpp"
 #include "max_editor.hpp"
+#include "max_files.hpp"
 
 using namespace c74::min;
 
@@ -279,7 +280,7 @@ public:
     /** `preset:read [<file>]`: replaces the presets by those of a text file (a dialog if there is no file). */
     message<> preset_read{this, "preset:read", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        read_file(w.empty() ? ask_for_file(false) : find_file(w[0]));
+        read_file(w.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(w[0]));
         return {};
     }};
 
@@ -292,7 +293,7 @@ public:
     /** `preset:write [<file>]`: writes the presets to a text file (a dialog if there is no file). */
     message<> preset_write{this, "preset:write", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        write_file(w.empty() ? ask_for_file(true) : target_file(w[0]));
+        write_file(w.empty() ? jamoma_max::ask_for_file(true, name_ + ".presets.txt") : jamoma_max::target_file(patcher_, w[0]));
         return {};
     }};
 
@@ -428,70 +429,6 @@ private:
         return {};
     }
 
-    /** @return A path as Max writes it (`Macintosh HD:/Users/me/x.txt`, as opendialog gives it) in the native form of the system; a native path stays as it is. @param name The path. */
-    static std::string native_path(const std::string& name)
-    {
-        char out[c74::max::MAX_PATH_CHARS];
-        if (c74::max::path_nameconform(name.c_str(), out, c74::max::PATH_STYLE_NATIVE, c74::max::PATH_TYPE_BOOT) == 0 && out[0] != '\0') {
-            return out;
-        }
-        return name;
-    }
-
-    /** @return The native path of a file the user named for reading: as given if absolute, else found in the Max search path (empty if not found). @param name The name. */
-    std::string find_file(const std::string& name) const
-    {
-        if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return native_path(name);
-        }
-        char file[c74::max::MAX_FILENAME_CHARS];
-        std::snprintf(file, sizeof file, "%s", name.c_str());
-        short vol = 0;
-        c74::max::t_fourcc type = 0;
-        if (c74::max::locatefile_extended(file, &vol, &type, nullptr, 0) != 0) {
-            return {};
-        }
-        char full[c74::max::MAX_PATH_CHARS];
-        c74::max::path_toabsolutesystempath(vol, file, full);
-        return full;
-    }
-
-    /** @return The native path of a file the user named for writing: as given if absolute, else in the folder of the patcher (empty if that is unknown). @param name The name. */
-    std::string target_file(const std::string& name) const
-    {
-        if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return native_path(name);
-        }
-        c74::max::t_symbol* path = patcher_ == nullptr ? nullptr
-            : c74::max::object_attr_getsym(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher_)), c74::max::gensym("filepath"));
-        std::string folder = path != nullptr && path->s_name != nullptr ? path->s_name : "";
-        const std::size_t slash = folder.find_last_of("/\\");
-        if (slash == std::string::npos) {
-            return {};
-        }
-        return folder.substr(0, slash + 1) + name;
-    }
-
-    /** Asks for a file with the system dialog. @param saving True for a save dialog. @return The native path, or empty if cancelled. */
-    std::string ask_for_file(bool saving)
-    {
-        char file[c74::max::MAX_FILENAME_CHARS] = "";
-        short vol = 0;
-        c74::max::t_fourcc type = 0;
-        if (saving) {
-            std::snprintf(file, sizeof file, "%s.presets.txt", name_.c_str());
-            short binary = 0;
-            if (c74::max::saveas_dialog(file, &vol, &binary) != 0) {
-                return {};
-            }
-        } else if (c74::max::open_dialog(file, &vol, &type, nullptr, 0) != 0) {
-            return {};
-        }
-        char full[c74::max::MAX_PATH_CHARS];
-        c74::max::path_toabsolutesystempath(vol, file, full);
-        return full;
-    }
-
     /** Reads presets from a text file; on any problem nothing changes and the console says why. @param path The native path (empty: report that there is no file). */
     void read_file(const std::string& path)
     {
@@ -563,7 +500,7 @@ private:
             return;
         }
         const std::string named = std::string(static_cast<symbol>(presets.get()).c_str());
-        const std::string path = find_file(named.empty() ? stem + ".presets.txt" : named);
+        const std::string path = jamoma_max::find_file(named.empty() ? stem + ".presets.txt" : named);
         if (path.empty()) {
             return;
         }
