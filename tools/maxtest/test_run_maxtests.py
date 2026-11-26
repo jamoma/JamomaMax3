@@ -130,6 +130,26 @@ class LogTests(unittest.TestCase):
         self.assertFalse(rm.run_complete("[x info] [1] startup"))
 
 
+class ConsoleErrorTests(unittest.TestCase):
+    def test_console_errors_are_the_error_lines_without_their_prefix(self):
+        text = ("[2026-11-26 18:14:35.000000 info] [1] rnbo: args=[error]\n"
+                "[2026-11-26 18:14:36.147476 error] [16263689] nonesuch is not a function (see function/library)\n"
+                "[2026-11-26 18:14:36.200000 error] [16263689] expr: syntax error 1e30\n"
+                "[2026-11-26 18:14:37.000000 info] [1] all fine\n")
+        self.assertEqual(rm.console_errors(text), ["nonesuch is not a function (see function/library)", "expr: syntax error 1e30"])
+
+    def test_a_repeated_error_is_listed_once_with_its_count(self):
+        line = "[2026-11-26 18:14:36.1 error] [1] same thing\n"
+        self.assertEqual(rm.console_errors(line * 3), ["same thing (3 times)"])
+
+    def test_missing_objects_are_not_listed_twice(self):
+        text = "[2026-11-26 18:14:36.1 error] [1] j.cue: No such object\n"
+        self.assertEqual(rm.console_errors(text), [])
+
+    def test_no_errors_give_an_empty_list(self):
+        self.assertEqual(rm.console_errors("[x info] [1] fine"), [])
+
+
 class CrashTests(unittest.TestCase):
     def test_max_gone_before_completion_is_a_crash(self):
         self.assertTrue(rm.crashed_early(max_alive=False, complete=False, seconds_since_launch=30))

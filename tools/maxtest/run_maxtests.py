@@ -10,6 +10,8 @@
 The tests are the `*.maxtest.maxpat` files below `JamomaIntegrationTests/patchers/tests/Modular/<external>/` in --tests (default tests/integration of
 this repository); --dir takes the name of a folder there (`j.model`, `j.parameter/general`). A list has one test patcher per line (paths relative to --tests;
 blank lines and # comments are skipped).
+The errors of the Max console (Max writes them to its log) are printed under the results of the launch that posted them and saved in
+console.tsv; they do not change a verdict (some tests post errors on purpose).
 For each batch of tests it writes a small driver patcher that sends ``;test.master run <name>.maxtest ...``
 (max-test runs them in sequence and records every assertion in an sqlite database), launches Max 9 through
 Launch Services, waits for Max's own log to say the run is complete, asks Max to quit through a UDP message
@@ -103,6 +105,19 @@ def summarize(db_path, after_test_id, wanted) -> dict:
 def missing_objects(log_text: str) -> list:
     """Returns the sorted object names that Max's log reports as 'No such object'."""
     return sorted(set(re.findall(r"\] ([^\s:]+): No such object", log_text)))
+
+
+def console_errors(log_text: str) -> list:
+    """Returns the errors of the Max console as Max's log has them (lines tagged `error]`), in order, each once with its count.
+
+    The log does not say which object posted a message. Lines about missing objects are left out (see missing_objects).
+    """
+    counts = {}
+    for message in re.findall(r"^\[[^\]\n]* error\] \[\d+\] (.*)$", log_text, re.MULTILINE):
+        if "No such object" in message:
+            continue
+        counts[message] = counts.get(message, 0) + 1
+    return [m if n == 1 else f"{m} ({n} times)" for m, n in counts.items()]
 
 
 def run_complete(log_text: str) -> bool:
@@ -216,7 +231,7 @@ class Links:
 
 
 def run_batch(names, workdir, per_test_timeout) -> tuple:
-    """Launches Max once for the given test names; returns ({name: (status, detail)}, crashed)."""
+    """Launches Max once for the given test names; returns ({name: (status, detail)}, crashed, the console errors of the launch)."""
     before = last_test_id(DB_PATH)
     patch = pathlib.Path(workdir) / "driver.maxpat"
     patch.write_text(json.dumps(make_driver(names)), encoding="utf-8")
@@ -246,7 +261,7 @@ def run_batch(names, workdir, per_test_timeout) -> tuple:
     gaps = missing_objects(log)
     if gaps:
         results = {n: (s, d + ("; missing objects: " + ", ".join(gaps) if s != "PASS" else "")) for n, (s, d) in results.items()}
-    return results, crashed
+    return results, crashed, console_errors(log)
 
 
 def main() -> int:
@@ -284,6 +299,7 @@ def main() -> int:
     clear_recovery()
     links = Links()
     rows = []
+    console_lines = []
     crashes = 0
     try:
         links.add("Jamoma", args.package)
@@ -295,15 +311,20 @@ def main() -> int:
             step = args.fast or args.per_launch
             for i in range(0, len(ordered), step):
                 batch = ordered[i:i + step]
-                results, crashed = run_batch(batch, work, args.timeout)
+                results, crashed, errors = run_batch(batch, work, args.timeout)
                 if args.fast:
                     for name in needs_isolated_rerun(results):
-                        again, alone_crashed = run_batch([name], work, args.timeout)
+                        again, alone_crashed, alone_errors = run_batch([name], work, args.timeout)
                         results[name] = again[name]
                         crashed = crashed or alone_crashed
+                        errors += [f"{names[name]} alone: {e}" for e in alone_errors]
                 for name, (status, detail) in results.items():
                     rows.append((names[name], status, detail))
                     print(f"{progress_bar(len(rows), len(ordered))} {status:8} {names[name]}  {detail}", flush=True)
+                for message in errors:
+                    label = "console" if len(batch) == 1 else f"console (one of these {len(batch)} tests)"
+                    print(f"    {label}: {message}", flush=True)
+                    console_lines.append(f"{names[batch[0]] if len(batch) == 1 else 'batch of ' + str(len(batch))}\t{message}\n")
                 crashes = crashes + 1 if crashed else 0
                 if should_abort(crashes):
                     print("ABORT: Max disappeared in two batches in a row; not launching it again. Check the crash reports.", file=sys.stderr)
@@ -313,6 +334,7 @@ def main() -> int:
         if max_running():
             pass
     (args.out / "results.tsv").write_text("".join(f"{a}\t{b}\t{c}\n" for a, b, c in rows), encoding="utf-8")
+    (args.out / "console.tsv").write_text("".join(console_lines), encoding="utf-8")
     passed = sum(1 for _, s, _ in rows if s == "PASS")
     print(f"{passed} of {len(rows)} passed")
     return 0 if passed == len(rows) else 1
