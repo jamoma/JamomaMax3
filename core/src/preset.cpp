@@ -432,6 +432,43 @@ void PresetManager::clear()
     changed();
 }
 
+bool PresetManager::set_entries(std::string_view name, std::vector<PresetEntry> entries, bool make_current)
+{
+    if (name.empty()) {
+        return false;
+    }
+    std::size_t at = presets_.size();
+    for (std::size_t i = 0; i < presets_.size(); ++i) {
+        if (presets_[i].name == name) {
+            at = i;
+            break;
+        }
+    }
+    if (at == presets_.size()) {
+        Preset preset;
+        preset.name = std::string(name);
+        presets_.push_back(std::move(preset));
+    }
+    presets_[at].entries = std::move(entries);
+    if (make_current) {
+        current_ = at;
+    }
+    changed();
+    return true;
+}
+
+bool PresetManager::set_description(std::string_view name, std::string text)
+{
+    for (Preset& p : presets_) {
+        if (p.name == name) {
+            p.description = std::move(text);
+            changed();
+            return true;
+        }
+    }
+    return false;
+}
+
 void PresetManager::replace_all(std::vector<Preset> presets)
 {
     presets_ = std::move(presets);
