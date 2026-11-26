@@ -12,7 +12,8 @@
 
 `obj` adds an object box (text, number of inlets and outlets), `msg` a message box, `line` a cord, `check` a `test.assert` with the name of the assertion
 fed from an outlet (a toggle is put in front by add_toggles), `step_chain` a row of messages that fire one after the other (a delay between them) and a
-`test.terminate` at the end. `save` adds the toggles, lays the patcher out (layout_patcher) and writes it as Max does.
+`test.terminate` at the end (only for tests that must wait for postponed work). `blocks` builds the usual shape: one trigger running a block for each
+assertion, with `receive` for the object under test. `save` adds the toggles, lays the patcher out (layout_patcher) and writes it as Max does.
 """
 
 import json
@@ -22,6 +23,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import add_toggles  # noqa: E402
 import layout_patcher  # noqa: E402
+
+
+def _number(value):
+    """A number as Max writes it in a trigger: `2.` for a whole decimal number."""
+    if isinstance(value, float) and value.is_integer():
+        return f"{int(value)}."
+    return repr(value)
 
 
 class TestPatcher:
@@ -82,6 +90,49 @@ class TestPatcher:
         """A test.assert with this assertion name, fed from an outlet (box id or (box id, outlet))."""
         self.obj(box_id, f"test.assert {name}", 1, 1)
         self.line(feed, box_id)
+
+    def receive(self, name, targets):
+        """A `r name` object whose cord goes to the targets (box id or (box id, inlet)), so that the blocks need no long cords to them."""
+        rid = f"r_{name}"
+        self.obj(rid, f"r {name}", 0, 1)
+        for t in targets:
+            self.line(rid, t)
+
+    def blocks(self, start, blocks):
+        """One trigger that runs a block for each assertion, the first block listed first, and ends the test.
+
+        `start` is the outlet that begins the test (a loadbang, or the end outlet of j.init). Each block is a dictionary with: `name` (the prefix of
+        its box ids), `assert` (the assertion name), `to` (the name of the receive that the object under test listens on), `send` (what to send to it,
+        in order: a string becomes a message box, a number comes straight out of the block's trigger), `holder` (object text and the (box, outlet) whose
+        value it holds, for example `("float 0.", ("m", 0))`) and `check` (an object that turns the held value into 1 for a pass).
+        No delays are used: Max triggers fire from right to left, so the sends happen in order and the holder is read last.
+        """
+        count = len(blocks)
+        self.obj("top", "t " + " ".join(["b"] * (count + 1)), 1, count + 1)
+        self.line(start, "top")
+        self.obj("term", "test.terminate", 1, 0)
+        self.line(("top", 0), "term")
+        for index, block in enumerate(blocks):
+            name, items = block["name"], block["send"]
+            tokens = ["b" if isinstance(v, str) else _number(v) for v in items]
+            trigger = f"{name}_t"
+            self.obj(trigger, "t " + " ".join(["b"] + tokens[::-1]), 1, len(items) + 1)
+            self.line(("top", count - index), trigger)
+            for k, item in enumerate(items):
+                outlet = len(items) - k
+                send = f"{name}_s{k}"
+                if isinstance(item, str):
+                    self.msg(f"{name}_m{k}", item)
+                    self.line((trigger, outlet), f"{name}_m{k}")
+                self.obj(send, f"s {block['to']}", 1, 0)
+                self.line(f"{name}_m{k}" if isinstance(item, str) else (trigger, outlet), send)
+            text, source = block["holder"]
+            self.obj(f"{name}_h", text, 2, 1)
+            self.line((trigger, 0), f"{name}_h")
+            self.line(source, (f"{name}_h", 1))
+            self.obj(f"{name}_c", block["check"], 1, 1)
+            self.line(f"{name}_h", f"{name}_c")
+            self.check(f"{name}_a", block["assert"], feed=f"{name}_c")
 
     def step_chain(self, start, steps, delay=60, prefix="s"):
         """Messages that fire one after the other.

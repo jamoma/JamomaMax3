@@ -60,5 +60,59 @@ class MakeTestTests(unittest.TestCase):
             t.obj("a", "bang")
 
 
+
+def build_blocks():
+    """Two assertion blocks, as the author arranges them."""
+    t = TestPatcher()
+    t.obj("m", "j.map", 1, 2)
+    t.receive("to_map", [("m", 0)])
+    t.obj("lb", "loadbang", 1, 1)
+    t.blocks("lb", [
+        {"name": "quad", "assert": "Jamoma/Modular/j.map/functions/ease_in_quadratic", "to": "to_map",
+         "send": ["function easeInQuadratic", 0.5], "holder": ("float 0.", ("m", 0)), "check": "expr abs($f1 - 0.25) < 0.00001"},
+        {"name": "kept", "assert": "Jamoma/Modular/j.map/functions/kept", "to": "to_map",
+         "send": [0.5], "holder": ("float 0.", ("m", 0)), "check": "== 1"},
+    ])
+    return t
+
+
+class BlockTests(unittest.TestCase):
+    def setUp(self):
+        self.t = build_blocks()
+        self.boxes = {e["box"]["id"]: e["box"] for e in self.t.boxes}
+        self.cords = {(l["patchline"]["source"][0], l["patchline"]["source"][1], l["patchline"]["destination"][0], l["patchline"]["destination"][1])
+                      for l in self.t.lines}
+
+    def test_one_trigger_runs_the_blocks_right_to_left_and_ends_the_test(self):
+        self.assertEqual(self.boxes["top"]["text"], "t b b b")
+        self.assertIn(("lb", 0, "top", 0), self.cords)
+        self.assertIn(("top", 0, "term", 0), self.cords)       # leftmost outlet fires last
+        self.assertIn(("top", 2, "quad_t", 0), self.cords)     # the first block listed runs first
+        self.assertIn(("top", 1, "kept_t", 0), self.cords)
+        self.assertEqual(self.boxes["term"]["text"], "test.terminate")
+
+    def test_the_block_trigger_orders_the_sends_and_reads_last(self):
+        self.assertEqual(self.boxes["quad_t"]["text"], "t b 0.5 b")
+        self.assertIn(("quad_t", 2, "quad_m0", 0), self.cords)  # first: the message
+        self.assertIn(("quad_m0", 0, "quad_s0", 0), self.cords)
+        self.assertEqual(self.boxes["quad_s0"]["text"], "s to_map")
+        self.assertIn(("quad_t", 1, "quad_s1", 0), self.cords)  # then the number, straight from the trigger
+        self.assertIn(("quad_t", 0, "quad_h", 0), self.cords)   # last: read the holder
+        self.assertEqual(self.boxes["kept_t"]["text"], "t b 0.5")
+
+    def test_the_block_ends_in_holder_check_and_assert(self):
+        self.assertIn(("m", 0, "quad_h", 1), self.cords)
+        self.assertIn(("quad_h", 0, "quad_c", 0), self.cords)
+        self.assertIn(("quad_c", 0, "quad_a", 0), self.cords)
+        self.assertTrue(self.boxes["quad_a"]["text"].startswith("test.assert "))
+
+    def test_no_delay_objects_are_made(self):
+        self.assertFalse([b for b in self.boxes.values() if str(b.get("text", "")).startswith("delay")])
+
+    def test_receive_feeds_its_targets(self):
+        r = next(i for i, b in self.boxes.items() if b.get("text") == "r to_map")
+        self.assertIn((r, 0, "m", 0), self.cords)
+
+
 if __name__ == "__main__":
     unittest.main()
