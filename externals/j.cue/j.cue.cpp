@@ -91,6 +91,8 @@ public:
         atoms out;
         for (const auto& n : cues_.cues().names())
             out.push_back(symbol(n));
+        if (out.empty())
+            out.push_back(symbol("")); // an attribute without any value makes Max abort when it is read
         return out;
     }}, setter{MIN_FUNCTION { return atoms{symbol("")}; }}};
 

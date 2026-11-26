@@ -32,6 +32,7 @@
 #include "jamoma/registry.hpp"
 #include "jamoma/ui_grid.hpp"
 #include "max_address.hpp"
+#include "max_attributes.hpp"
 #include "max_context.hpp"
 
 using namespace c74::min;
@@ -78,17 +79,22 @@ public:
     jamoma_max::dump_outlet out{this, "(anything) menu choices and dump"}; /**< The outlet. */
 
     /** The background colour. */
-    attribute<numbers> bgcolor{this, "bgcolor", {0.17, 0.18, 0.20, 1.0}, title{"Background Color"}, style::color};
+    attribute<numbers> bgcolor{this, "bgcolor", {0.17, 0.18, 0.20, 1.0}, title{"Background Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.17, 0.18, 0.20, 1.0}); }}};
     /** The border colour. */
-    attribute<numbers> bordercolor{this, "bordercolor", {0.45, 0.47, 0.50, 1.0}, title{"Border Color"}, style::color};
+    attribute<numbers> bordercolor{this, "bordercolor", {0.45, 0.47, 0.50, 1.0}, title{"Border Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.45, 0.47, 0.50, 1.0}); }}};
     /** The colour of the header. */
-    attribute<numbers> headercolor{this, "headercolor", {0.26, 0.28, 0.32, 1.0}, title{"Header Color"}, style::color};
+    attribute<numbers> headercolor{this, "headercolor", {0.26, 0.28, 0.32, 1.0}, title{"Header Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.26, 0.28, 0.32, 1.0}); }}};
     /** The colour of the text. */
-    attribute<numbers> textcolor{this, "textcolor", {0.92, 0.93, 0.95, 1.0}, title{"Text Color"}, style::color};
+    attribute<numbers> textcolor{this, "textcolor", {0.92, 0.93, 0.95, 1.0}, title{"Text Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.92, 0.93, 0.95, 1.0}); }}};
     /** The tags of the object (accepted so that old patchers load; no effect). */
     attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
-    attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color};
+    attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.35, 0.60, 0.85, 1.0}); }}};
 
     /** Whether the size snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down (on by default, as in the old object). */
     attribute<int> snap{this, "snap", 1, title{"Snap Size to Grid"}, description{"The size of the object is a whole number of units, 150 pixels wide and 35 pixels high"}, range{0, 1}, style::onoff};

@@ -18,6 +18,7 @@
 #include "c74_min.h"
 
 #include "jamoma/slider.hpp"
+#include "max_attributes.hpp"
 #include "max_context.hpp"
 
 using namespace c74::min;
@@ -44,15 +45,20 @@ public:
     outlet<> out{this, "(float) the value"};                        /**< Outlet 0. */
 
     /** The background colour. */
-    attribute<numbers> bgcolor{this, "bgcolor", {0.8, 0.8, 0.8, 0.7}, title{"Background Color"}, style::color};
+    attribute<numbers> bgcolor{this, "bgcolor", {0.8, 0.8, 0.8, 0.7}, title{"Background Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.8, 0.8, 0.8, 0.7}); }}};
     /** The colour of the bar. */
-    attribute<numbers> fgcolor{this, "fgcolor", {0.95, 0.95, 0.95, 1.0}, title{"Foreground Color"}, style::color};
+    attribute<numbers> fgcolor{this, "fgcolor", {0.95, 0.95, 0.95, 1.0}, title{"Foreground Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.95, 0.95, 0.95, 1.0}); }}};
     /** The border colour. */
-    attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 1.0}, title{"Border Color"}, style::color};
+    attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 1.0}, title{"Border Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 1.0}); }}};
     /** The colour of the text. */
-    attribute<numbers> textcolor{this, "textcolor", {0.0, 0.0, 0.0, 1.0}, title{"Text Color"}, style::color};
+    attribute<numbers> textcolor{this, "textcolor", {0.0, 0.0, 0.0, 1.0}, title{"Text Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.0, 0.0, 0.0, 1.0}); }}};
     /** The colour of the line at the end of the bar. */
-    attribute<numbers> knobcolor{this, "knobcolor", {0.7, 0.7, 0.7, 1.0}, title{"Knob Color"}, style::color};
+    attribute<numbers> knobcolor{this, "knobcolor", {0.7, 0.7, 0.7, 1.0}, title{"Knob Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.7, 0.7, 0.7, 1.0}); }}};
 
     /** The range, `low high`; the ends are swapped if the second is smaller. */
     attribute<numbers> range_attribute{this, "range", {0.0, 1.0}, title{"Range"}, setter{MIN_FUNCTION {
@@ -66,7 +72,8 @@ public:
     }}};
 
     /** Where the text starts: pixels from the left and from the top. */
-    attribute<numbers> textpos{this, "textpos", {10.0, 4.0}, title{"Text position"}};
+    attribute<numbers> textpos{this, "textpos", {10.0, 4.0}, title{"Text position"},
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {10.0, 4.0}); }}};
 
     /** The text shown. */
     attribute<symbol> text_attribute{this, "text", "textslider", title{"Displayed Text"}}; // not named text: Min's ui_operator calls the object's text()
