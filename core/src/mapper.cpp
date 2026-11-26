@@ -41,6 +41,7 @@ struct Mapper::Impl {
     End in, out;                                          /**< The bindings. */
     std::function<void(const Value&)> on_return;          /**< The return function. */
     std::function<void(std::string_view, bool)> on_threshold; /**< Told when a threshold is crossed. */
+    std::function<void(std::function<void()>)> dispatcher;   /**< Runs the writing to the output parameter (empty: at once). */
     bool in_down = false, in_up = false, out_down = false, out_up = false;  /**< The state of the four thresholds. */
     std::unique_ptr<Receiver> receiver;                   /**< Follows the input parameter. */
     Sender sender;                                        /**< Writes to the output parameter. */
@@ -92,6 +93,7 @@ void process_value(const std::shared_ptr<Mapper::Impl>& impl, const Value& in)
     std::function<void(const Value&)> on_return;
     std::function<void(std::string_view, bool)> on_threshold;
     std::vector<std::pair<const char*, bool>> events;
+    std::function<void(std::function<void()>)> dispatcher;
     bool send = false;
     {
         std::lock_guard<std::mutex> lock(impl->mutex);
@@ -100,6 +102,7 @@ void process_value(const std::shared_ptr<Mapper::Impl>& impl, const Value& in)
         mapped = impl->map_value_locked(in);
         on_return = impl->on_return;
         on_threshold = impl->on_threshold;
+        dispatcher = impl->dispatcher;
         send = !impl->out.address.empty();
         command = mapped;
         if (impl->settings.ramp > 0) {
@@ -130,8 +133,16 @@ void process_value(const std::shared_ptr<Mapper::Impl>& impl, const Value& in)
         check(first(in), s.input_threshold_down, s.input_threshold_up, impl->in_down, impl->in_up, "input/going/down", "input/going/up");
         check(first(mapped), s.output_threshold_down, s.output_threshold_up, impl->out_down, impl->out_up, "output/going/down", "output/going/up");
     }
-    if (send)
-        impl->sender.send(command);
+    if (send) {
+        auto work = [weak = std::weak_ptr<Mapper::Impl>(impl), command] {
+            if (auto self = weak.lock())
+                self->sender.send(command);
+        };
+        if (dispatcher)
+            dispatcher(std::move(work));
+        else
+            work();
+    }
     if (on_return)
         on_return(mapped);
     if (on_threshold)
@@ -252,6 +263,7 @@ Mapper::~Mapper()
     impl_->out = {};
     impl_->on_return = nullptr;
     impl_->on_threshold = nullptr;
+    impl_->dispatcher = nullptr;
 }
 
 MapperSettings Mapper::settings() const
@@ -301,6 +313,12 @@ void Mapper::set_input_threshold_down(double v) { set_threshold(*impl_, &MapperS
 void Mapper::set_input_threshold_up(double v) { set_threshold(*impl_, &MapperSettings::input_threshold_up, v); }
 void Mapper::set_output_threshold_down(double v) { set_threshold(*impl_, &MapperSettings::output_threshold_down, v); }
 void Mapper::set_output_threshold_up(double v) { set_threshold(*impl_, &MapperSettings::output_threshold_up, v); }
+
+void Mapper::set_send_dispatcher(std::function<void(std::function<void()>)> dispatcher)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->dispatcher = std::move(dispatcher);
+}
 
 void Mapper::set_threshold_callback(std::function<void(std::string_view, bool)> callback)
 {

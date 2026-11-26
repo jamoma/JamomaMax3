@@ -10,6 +10,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
+#include <functional>
 #include <limits>
 #include <string>
 #include <utility>
@@ -327,4 +328,38 @@ TEST_CASE("mapper_ramp_is_added_to_the_command_for_the_output_parameter", "[mapp
     CHECK(out.value() < 1.0);
     out.clock.advance(150.0);
     CHECK(out.value() == Approx(1.0));
+}
+
+TEST_CASE("mapper_hands_the_send_to_the_dispatcher_and_returns_at_once", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Param out(ns, "/to", 0.0, 1.0);
+    Mapper m(ns);
+    m.bind_output(Address::parse("/to"));
+    std::vector<std::function<void()>> waiting;
+    std::vector<Value> seen;
+    m.set_send_dispatcher([&](std::function<void()> work) { waiting.push_back(std::move(work)); });
+    m.set_return([&](const Value& v) { seen.push_back(v); });
+    m.process({0.5});
+    REQUIRE(seen.size() == 1);              // the mapped value is returned on the calling thread, at once
+    CHECK(out.value() == Approx(0.0));      // the parameter is written only when the dispatcher runs the work
+    REQUIRE(waiting.size() == 1);
+    waiting[0]();
+    CHECK(out.value() == Approx(0.5));
+}
+
+TEST_CASE("mapper_work_left_with_the_dispatcher_is_harmless_after_the_mapper_is_gone", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Param out(ns, "/to", 0.0, 1.0);
+    std::vector<std::function<void()>> waiting;
+    {
+        Mapper m(ns);
+        m.bind_output(Address::parse("/to"));
+        m.set_send_dispatcher([&](std::function<void()> work) { waiting.push_back(std::move(work)); });
+        m.process({0.5});
+    }
+    REQUIRE(waiting.size() == 1);
+    CHECK_NOTHROW(waiting[0]());
+    CHECK(out.value() == Approx(0.0));
 }

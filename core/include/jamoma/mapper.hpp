@@ -130,6 +130,11 @@ public:
     /** @brief Sets the function that gets every mapped value (what the data outlet of `j.map` outputs). @param callback The function. */
     void set_return(std::function<void(const Value&)> callback);
     /**
+     * @brief Sets who runs the writing to the output parameter, which belongs to the main thread: process() may be called on any thread.
+     * @param dispatcher Gets the work to run (it does nothing if the mapper is gone by then); without a dispatcher the work runs at once.
+     */
+    void set_send_dispatcher(std::function<void(std::function<void()>)> dispatcher);
+    /**
      * @brief Sets the function that is told when the input or the output crosses a threshold.
      * @param callback Called with `input/going/down`, `input/going/up`, `output/going/down` or `output/going/up` and the new state, each time the state changes.
      */
