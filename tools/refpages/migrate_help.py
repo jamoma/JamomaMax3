@@ -20,6 +20,10 @@ HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.
 
 #: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.
 KNOWN_DATASPACES = {"gain", "time", "position", "temperature"}
+#: Patchers of the package that old help patchers load as a bpatcher: they work, so they are kept.
+PACKAGE_PATCHERS = {"j.maxhelpui"}
+
+
 #: Objects from other packages that the help patchers use and that are not part of this package.
 OTHER_PACKAGE_OBJECTS = {"ambimonitor"}
 
@@ -72,7 +76,7 @@ def migrate_patcher(patcher, implemented, replaced):
     for entry in patcher.get("boxes", []):
         box = entry["box"]
         name = unavailable_name(box) or object_name(box)
-        if name and (name not in implemented or unavailable_name(box)):
+        if name and name not in PACKAGE_PATCHERS and (name not in implemented or unavailable_name(box)):
             gone.add(box["id"])
             replaced.append(name)
             boxes.append(comment_for(box, name))

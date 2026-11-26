@@ -18,3 +18,4 @@ j.node
 j.namespace
 j.map
 j.cue
+j.textslider
