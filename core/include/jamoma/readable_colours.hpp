@@ -3,7 +3,7 @@
 
 /**
  * @file readable_colours.hpp
- * @brief Keeping the text of a slider readable whatever colours it is given (for colours taken from a Max theme).
+ * @brief Colours that stay readable with any Max theme: those of j.textslider and of the panel j.ui.
  *
  * The contrast of two colours is the ratio of the WCAG guidelines (1 for equal colours, 21 for black on white); 4.5 is the usual minimum for
  * small text and 3 for a graphical mark such as a line. Alpha is not taken into account: the colours are treated as opaque.
@@ -57,5 +57,46 @@ JAMOMA_API double contrast_ratio(const Rgba& one, const Rgba& other);
  * @param wanted The colours as given. @param adjustable Which of them may change. @return The colours to draw with.
  */
 JAMOMA_API SliderColours readable_colours(const SliderColours& wanted, const Adjustable& adjustable = Adjustable());
+
+/** The colours of a model panel (j.ui). */
+struct PanelColours {
+    Rgba panel;     /**< The background. */
+    Rgba header;    /**< The strip with the address. */
+    Rgba text;      /**< The title, on the header. */
+    Rgba highlight; /**< The lit button, on the header. */
+    Rgba border;    /**< The border. */
+};
+
+/** Which colours of a panel the user chose; the others are automatic. */
+struct PanelChosen {
+    bool panel = false;     /**< The background. */
+    bool header = false;    /**< The header. */
+    bool text = false;      /**< The title. */
+    bool highlight = false; /**< The lit button. */
+    bool border = false;    /**< The border. */
+};
+
+/** What the automatic colours of a panel are derived from. */
+struct PanelSurroundings {
+    Rgba patcher;   /**< The background of the patcher (opaque). */
+    Rgba text;      /**< The text colour of the theme. */
+    Rgba highlight; /**< The highlight colour of the theme. */
+};
+
+/** The contrast an automatic header keeps with the panel. */
+constexpr double kHeaderSeparation = 1.35;
+
+/**
+ * @brief The colours a panel is drawn with. A colour the user chose is used as it is.
+ *
+ * Objects and comments lie on the panel, so an automatic panel is a faint grey tint of whatever the patcher shows, with a grey border. The automatic
+ * header is the panel (as seen on the patcher) darkened until it stands out (contrast 1.35), or lightened if black is not far enough. The automatic
+ * title is the theme's text colour if it can be read on the header, else black or white; the automatic highlight is the theme's if it can be seen on
+ * the header (contrast 3), else the title colour.
+ *
+ * @param given The colours of the user (only those marked in `chosen` are looked at). @param chosen Which are the user's.
+ * @param around The patcher and theme colours. @return The colours to draw with.
+ */
+JAMOMA_API PanelColours panel_colours(const PanelColours& given, const PanelChosen& chosen, const PanelSurroundings& around);
 
 } // namespace jamoma

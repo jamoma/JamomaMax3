@@ -3,7 +3,7 @@
 
 /**
  * @file readable_colours.cpp
- * @brief The contrast rule of j.textslider.
+ * @brief The colour rules of j.textslider and j.ui.
  */
 
 #include "jamoma/readable_colours.hpp"
@@ -52,6 +52,30 @@ Rgba readable_towards(const Rgba& from, const Rgba& to, const Rgba& text, const 
     return to;
 }
 
+/** @return What is seen when a colour is drawn on an opaque one. @param c The colour. @param below What it is drawn on. */
+Rgba seen_on(const Rgba& c, const Rgba& below)
+{
+    const double a = std::isfinite(c.a) ? std::clamp(c.a, 0.0, 1.0) : 1.0;
+    return {c.r * a + below.r * (1 - a), c.g * a + below.g * (1 - a), c.b * a + below.b * (1 - a), 1};
+}
+
+/** @return The header that belongs to a panel. @param panel The panel as seen (opaque). */
+Rgba header_for(const Rgba& panel)
+{
+    constexpr int kSteps = 200;
+    for (const Rgba& end : {kBlack, kWhite}) {
+        for (int i = 1; i <= kSteps; ++i) {
+            Rgba c = end;
+            c.a = static_cast<double>(i) / kSteps;
+            c = seen_on(c, panel);
+            if (contrast_ratio(c, panel) >= kHeaderSeparation) {
+                return c;
+            }
+        }
+    }
+    return kWhite; // not reached: black or white is far enough from every colour
+}
+
 } // namespace
 
 double contrast_ratio(const Rgba& one, const Rgba& other)
@@ -88,6 +112,29 @@ SliderColours readable_colours(const SliderColours& wanted, const Adjustable& ad
     }
     if (adjustable.knob && contrast_ratio(out.knob, out.track) < kLineContrast) {
         out.knob = out.text;
+    }
+    return out;
+}
+
+PanelColours panel_colours(const PanelColours& given, const PanelChosen& chosen, const PanelSurroundings& around)
+{
+    PanelColours out;
+    out.panel = chosen.panel ? given.panel : Rgba{0.5, 0.5, 0.5, 0.14};
+    out.border = chosen.border ? given.border : Rgba{0.5, 0.5, 0.5, 0.6};
+    const Rgba panel = seen_on(out.panel, around.patcher);
+    out.header = chosen.header ? given.header : header_for(panel);
+    const Rgba header = seen_on(out.header, panel);
+    if (chosen.text) {
+        out.text = given.text;
+    } else if (contrast_ratio(seen_on(around.text, header), header) >= kTextContrast) {
+        out.text = around.text;
+    } else {
+        out.text = contrast_ratio(kBlack, header) > contrast_ratio(kWhite, header) ? kBlack : kWhite;
+    }
+    if (chosen.highlight) {
+        out.highlight = given.highlight;
+    } else {
+        out.highlight = contrast_ratio(seen_on(around.highlight, header), header) >= kLineContrast ? around.highlight : out.text;
     }
     return out;
 }

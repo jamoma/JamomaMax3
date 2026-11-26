@@ -1510,6 +1510,417 @@
 					],
 					"rounded": 15
 				}
+			},
+			{
+				"box": {
+					"id": "obj-95",
+					"maxclass": "newobj",
+					"numinlets": 0,
+					"numoutlets": 0,
+					"patching_rect": [
+						880.0,
+						80.0,
+						64.0,
+						22.0
+					],
+					"fontname": "Arial",
+					"fontsize": 12.0,
+					"text": "p colours",
+					"patcher": {
+						"fileversion": 1,
+						"rect": [
+							0.0,
+							26.0,
+							963.0,
+							576.0
+						],
+						"default_fontsize": 12.0,
+						"default_fontface": 0,
+						"default_fontname": "Arial",
+						"gridonopen": 1,
+						"gridsize": [
+							5.0,
+							5.0
+						],
+						"showontab": 1,
+						"boxes": [
+							{
+								"box": {
+									"args": [
+										"@name",
+										"j.textslider",
+										"@description",
+										"Slider with value and text display"
+									],
+									"bgmode": 1,
+									"id": "obj-100",
+									"maxclass": "bpatcher",
+									"name": "j.maxhelpui.maxpat",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										0.0,
+										0.0,
+										963.0,
+										70.0
+									],
+									"varname": "maxhelpui"
+								}
+							},
+							{
+								"box": {
+									"id": "obj-1",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										90.0,
+										560.0,
+										48.0
+									],
+									"text": "A colour attribute that has its default value is automatic: it follows the colour theme of Max. Change the theme in Max to see it. Where needed the theme colours are adjusted so that the text can be read.",
+									"linecount": 3,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-2",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										150.0,
+										560.0,
+										33.0
+									],
+									"text": "Theme colours used: bgcolor and bordercolor live_control_bg, fgcolor live_selection, textcolor live_control_fg, knobcolor live_value_bar.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-3",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										205.0,
+										250.0,
+										20.0
+									],
+									"text": "Automatic colours:",
+									"linecount": 1,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-4",
+									"maxclass": "newobj",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										620.0,
+										90.0,
+										60.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "loadbang",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-5",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										620.0,
+										120.0,
+										50.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "set 0.6",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-6",
+									"maxclass": "j.textslider",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										230.0,
+										250.0,
+										20.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "automatic"
+								}
+							},
+							{
+								"box": {
+									"id": "obj-7",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										285.0,
+										560.0,
+										20.0
+									],
+									"text": "A colour you set is used as it is. Click the messages:",
+									"linecount": 1,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-8",
+									"maxclass": "j.textslider",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										315.0,
+										250.0,
+										20.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "your colours",
+									"varname": "yours"
+								}
+							},
+							{
+								"box": {
+									"id": "obj-9",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										355.0,
+										160.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "fgcolor 0.8 0.4 0.1 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-10",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										385.0,
+										160.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "bgcolor 0.2 0.2 0.28 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-11",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										415.0,
+										160.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "textcolor 1. 1. 1. 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-12",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										465.0,
+										190.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "fgcolor, bgcolor, textcolor",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-13",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										220.0,
+										460.0,
+										360.0,
+										33.0
+									],
+									"text": "An attribute name without values gives the default back, so the colour is automatic again.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-14",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										510.0,
+										560.0,
+										33.0
+									],
+									"text": "The colours can also be set in the Inspector. It shows the default values, not the colours drawn from the theme.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							}
+						],
+						"lines": [
+							{
+								"patchline": {
+									"source": [
+										"obj-4",
+										0
+									],
+									"destination": [
+										"obj-5",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-5",
+										0
+									],
+									"destination": [
+										"obj-6",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-5",
+										0
+									],
+									"destination": [
+										"obj-8",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-9",
+										0
+									],
+									"destination": [
+										"obj-8",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-10",
+										0
+									],
+									"destination": [
+										"obj-8",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-11",
+										0
+									],
+									"destination": [
+										"obj-8",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-12",
+										0
+									],
+									"destination": [
+										"obj-8",
+										0
+									]
+								}
+							}
+						]
+					}
+				}
 			}
 		],
 		"lines": [
@@ -2284,6 +2695,8 @@
 					]
 				}
 			}
-		]
+		],
+		"showrootpatcherontab": 1,
+		"showontab": 1
 	}
 }

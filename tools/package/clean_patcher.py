@@ -6,7 +6,8 @@
     clean_patcher.py <patcher>...
 
 * Custom colours go: of comments, objects, messages, panels and every other box, and of the patcher backgrounds (subpatchers too). Jamoma objects
-  (`j.…` boxes and bpatchers) keep theirs, except `j.textslider`, which gets its default colours.
+  (`j.…` boxes and bpatchers) keep theirs, except `j.textslider` and
+  `j.ui`, which get their default colours (they follow the Max theme).
 * Every font is Arial; a bold variant (`Lato Black`, `… Heavy`, `… Bold`) becomes Arial with the bold face.
 * Font size 13 becomes 12.
 
@@ -18,7 +19,7 @@ import json
 import sys
 
 #: Jamoma objects whose custom colours go like those of other boxes.
-DEFAULT_COLOURS = {"j.textslider"}
+DEFAULT_COLOURS = {"j.textslider", "j.ui"}
 
 #: Words in a font name that mean bold.
 BOLD = ("bold", "black", "heavy")

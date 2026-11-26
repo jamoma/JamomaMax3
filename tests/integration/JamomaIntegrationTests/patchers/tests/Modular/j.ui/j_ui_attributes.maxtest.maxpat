@@ -86,7 +86,7 @@
       184.4,
       22.0
      ],
-     "text": "js attribute_reads.js target"
+     "text": "js attribute_reads.js target bgcolor bordercolor headercolor textcolor highlightcolor"
     }
    },
    {

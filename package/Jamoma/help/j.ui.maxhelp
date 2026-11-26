@@ -917,19 +917,7 @@
 											{
 												"box": {
 													"background": 1,
-													"bgcolor": [
-														0.93,
-														0.93,
-														0.93,
-														1.0
-													],
 													"fontface": 0,
-													"headercolor": [
-														0.82,
-														0.82,
-														0.82,
-														1.0
-													],
 													"id": "obj-4",
 													"maxclass": "j.ui",
 													"numinlets": 1,
@@ -2122,19 +2110,7 @@
 											{
 												"box": {
 													"background": 1,
-													"bgcolor": [
-														0.93,
-														0.93,
-														0.93,
-														1.0
-													],
 													"fontface": 0,
-													"headercolor": [
-														0.82,
-														0.82,
-														0.82,
-														1.0
-													],
 													"id": "obj-4",
 													"maxclass": "j.ui",
 													"numinlets": 1,
@@ -3083,6 +3059,532 @@
 					},
 					"style": "",
 					"text": "p \"i/o widgets\""
+				}
+			},
+			{
+				"box": {
+					"id": "obj-25",
+					"maxclass": "newobj",
+					"numinlets": 0,
+					"numoutlets": 0,
+					"patching_rect": [
+						380.0,
+						99.0,
+						64.0,
+						22.0
+					],
+					"fontname": "Arial",
+					"fontsize": 12.0,
+					"text": "p colours",
+					"patcher": {
+						"fileversion": 1,
+						"appversion": {
+							"major": 7,
+							"minor": 0,
+							"revision": 5,
+							"architecture": "x86",
+							"modernui": 1
+						},
+						"rect": [
+							0.0,
+							26.0,
+							963.0,
+							576.0
+						],
+						"default_fontsize": 12.0,
+						"default_fontface": 0,
+						"default_fontname": "Arial",
+						"gridonopen": 1,
+						"gridsize": [
+							5.0,
+							5.0
+						],
+						"showontab": 1,
+						"boxes": [
+							{
+								"box": {
+									"id": "obj-1",
+									"maxclass": "jsui",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										4.0,
+										2.0,
+										354.5,
+										55.0
+									],
+									"outlettype": [
+										""
+									],
+									"filename": "helpdetails.js",
+									"jsarguments": [
+										"j.ui"
+									],
+									"border": 0,
+									"ignoreclick": 1,
+									"parameter_enable": 0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-2",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										70.0,
+										620.0,
+										48.0
+									],
+									"text": "Colours left at their default are automatic, so the panel fits every colour theme: a faint grey tint that lets the patcher show through, a header that is darker than the panel, the text colour of the patcher for the title and the highlight of the theme for the active button.",
+									"linecount": 3,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-3",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										125.0,
+										620.0,
+										33.0
+									],
+									"text": "Title and highlight change to a readable colour where needed. The theme colour used for the highlight is live_value_bar.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-4",
+									"maxclass": "newobj",
+									"numinlets": 1,
+									"numoutlets": 2,
+									"patching_rect": [
+										700.0,
+										75.0,
+										110.0,
+										22.0
+									],
+									"outlettype": [
+										"",
+										""
+									],
+									"text": "j.model colours",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-5",
+									"maxclass": "newobj",
+									"numinlets": 1,
+									"numoutlets": 2,
+									"patching_rect": [
+										700.0,
+										110.0,
+										220.0,
+										22.0
+									],
+									"outlettype": [
+										"",
+										""
+									],
+									"text": "j.parameter active @type boolean",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-6",
+									"maxclass": "newobj",
+									"numinlets": 1,
+									"numoutlets": 2,
+									"patching_rect": [
+										700.0,
+										145.0,
+										250.0,
+										22.0
+									],
+									"outlettype": [
+										"",
+										""
+									],
+									"text": "j.parameter gain @type decimal @range 0. 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-7",
+									"maxclass": "j.ui",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										175.0,
+										300.0,
+										105.0
+									],
+									"outlettype": [
+										""
+									],
+									"background": 1
+								}
+							},
+							{
+								"box": {
+									"id": "obj-8",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										40.0,
+										215.0,
+										60.0,
+										20.0
+									],
+									"text": "gain",
+									"linecount": 1,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-9",
+									"maxclass": "flonum",
+									"numinlets": 1,
+									"numoutlets": 2,
+									"patching_rect": [
+										100.0,
+										215.0,
+										60.0,
+										22.0
+									],
+									"outlettype": [
+										"",
+										""
+									],
+									"parameter_enable": 0,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-10",
+									"maxclass": "toggle",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										180.0,
+										214.0,
+										24.0,
+										24.0
+									],
+									"outlettype": [
+										""
+									],
+									"parameter_enable": 0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-11",
+									"maxclass": "button",
+									"numinlets": 1,
+									"numoutlets": 1,
+									"patching_rect": [
+										220.0,
+										214.0,
+										24.0,
+										24.0
+									],
+									"outlettype": [
+										""
+									],
+									"parameter_enable": 0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-12",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										340.0,
+										180.0,
+										300.0,
+										48.0
+									],
+									"text": "The button left of the menu arrow shows data/active of the model. Click it to see the highlight colour.",
+									"linecount": 3,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-13",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										300.0,
+										620.0,
+										33.0
+									],
+									"text": "A colour you set is used as it is, and the automatic colours adapt to it: with a light header, the title turns dark. Click the messages:",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-14",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										345.0,
+										200.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "headercolor 0.9 0.75 0.4 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-15",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										373.0,
+										200.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "bgcolor 0.2 0.45 0.7 0.25",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-16",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										401.0,
+										200.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "bordercolor 0.2 0.45 0.7 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-17",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										429.0,
+										200.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "highlightcolor 0.85 0.2 0.1 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-18",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										457.0,
+										200.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "textcolor 0.35 0.1 0.1 1.",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-19",
+									"maxclass": "message",
+									"numinlets": 2,
+									"numoutlets": 1,
+									"patching_rect": [
+										20.0,
+										495.0,
+										430.0,
+										22.0
+									],
+									"outlettype": [
+										""
+									],
+									"text": "headercolor, bgcolor, bordercolor, highlightcolor, textcolor",
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-20",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										460.0,
+										490.0,
+										330.0,
+										33.0
+									],
+									"text": "An attribute name without values gives the default back, so the colour is automatic again.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							},
+							{
+								"box": {
+									"id": "obj-21",
+									"maxclass": "comment",
+									"numinlets": 1,
+									"numoutlets": 0,
+									"patching_rect": [
+										20.0,
+										535.0,
+										620.0,
+										33.0
+									],
+									"text": "The colours can also be set in the Inspector. It shows the default values, not the colours drawn.",
+									"linecount": 2,
+									"fontname": "Arial",
+									"fontsize": 12.0
+								}
+							}
+						],
+						"lines": [
+							{
+								"patchline": {
+									"source": [
+										"obj-14",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-15",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-16",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-17",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-18",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"source": [
+										"obj-19",
+										0
+									],
+									"destination": [
+										"obj-7",
+										0
+									]
+								}
+							}
+						]
+					}
 				}
 			}
 		],

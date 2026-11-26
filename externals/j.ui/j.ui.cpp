@@ -14,11 +14,16 @@
  * not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then `preset:count <n>`, `presets <name>...` and
  * `preset:current <name>`, on the outlet; this is what the own test reads.
  *
+ * Colours: a colour attribute that has its default is automatic, so that the panel fits every Max theme (jamoma/readable_colours.hpp, `panel_colours`):
+ * a faint grey tint of the patcher with a grey border, a header darker than the panel, the patcher's text colour for the title and the theme's
+ * `live_value_bar` for the lit active button, both replaced where they would be hard to see. A colour the user sets is used as it is.
+ *
  * If the model has the parameter `data/active` (the `data` amenity), a round button sits left of the menu arrow: filled while the model is active, a ring while it is
  * not; a click on it switches the parameter. The button follows the parameter (also when something else changes it). `active 0|1` does the same from a patch (no
  * argument: toggle), and `dump` adds `active <0|1>` when the model has the parameter.
  */
 
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -28,6 +33,7 @@
 
 #include "jamoma/data.hpp"
 #include "jamoma/explorer.hpp"
+#include "jamoma/readable_colours.hpp"
 #include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
 #include "jamoma/ui_grid.hpp"
@@ -78,23 +84,24 @@ public:
 
     jamoma_max::dump_outlet out{this, "(anything) menu choices and dump"}; /**< The outlet. */
 
+    // The default of every colour means "automatic" (see drawing_colours); any other value is the user's and is used as it is.
     /** The background colour. */
-    attribute<numbers> bgcolor{this, "bgcolor", {0.17, 0.18, 0.20, 1.0}, title{"Background Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.17, 0.18, 0.20, 1.0}); }}};
+    attribute<numbers> bgcolor{this, "bgcolor", {0.5, 0.5, 0.5, 0.14}, title{"Background Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.14}); }}};
     /** The border colour. */
-    attribute<numbers> bordercolor{this, "bordercolor", {0.45, 0.47, 0.50, 1.0}, title{"Border Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.45, 0.47, 0.50, 1.0}); }}};
+    attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 0.6}, title{"Border Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.6}); }}};
     /** The colour of the header. */
-    attribute<numbers> headercolor{this, "headercolor", {0.26, 0.28, 0.32, 1.0}, title{"Header Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.26, 0.28, 0.32, 1.0}); }}};
+    attribute<numbers> headercolor{this, "headercolor", {0.3, 0.3, 0.3, 1.0}, title{"Header Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.3, 0.3, 0.3, 1.0}); }}};
     /** The colour of the text. */
-    attribute<numbers> textcolor{this, "textcolor", {0.92, 0.93, 0.95, 1.0}, title{"Text Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.92, 0.93, 0.95, 1.0}); }}};
+    attribute<numbers> textcolor{this, "textcolor", {0.85, 0.85, 0.85, 1.0}, title{"Text Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0}); }}};
     /** The tags of the object (accepted so that old patchers load; no effect). */
     attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
-    attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.35, 0.60, 0.85, 1.0}); }}};
+    attribute<numbers> highlightcolor{this, "highlightcolor", {0.594, 0.721, 0.928, 1.0}, title{"Highlight Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0}); }}};
 
     /** Whether the size snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down (on by default, as in the old object). */
     attribute<int> snap{this, "snap", 1, title{"Snap Size to Grid"}, description{"The size of the object is a whole number of units, 150 pixels wide and 35 pixels high"}, range{0, 1}, style::onoff};
@@ -153,14 +160,73 @@ private:
     static constexpr double kHeader = 22.0; /**< The height of the header. */
     static constexpr double kActiveRadius = 6.5; /**< The radius of the active button. */
 
-    /** @return The colour of an attribute. @param values Its four numbers. */
-    static c74::max::t_jrgba rgba(const numbers& values)
+    /** @param g The graphics context. @param c A colour. */
+    static void colour(c74::max::t_jgraphics* g, const jamoma::Rgba& c) { c74::max::jgraphics_set_source_rgba(g, c.r, c.g, c.b, c.a); }
+
+    /**
+     * @param value A colour attribute. @param fallback Its default.
+     * @param[out] chosen Set to true if the value is not the default, i.e. the user's. @return The colour of the attribute.
+     */
+    static jamoma::Rgba attribute_colour(const numbers& value, const jamoma::Rgba& fallback, bool& chosen)
     {
-        c74::max::t_jrgba c{0.5, 0.5, 0.5, 1.0};
-        if (values.size() >= 4) {
-            c = {values[0], values[1], values[2], values[3]};
+        const jamoma::Rgba given{value.size() > 0 ? value[0] : fallback.r, value.size() > 1 ? value[1] : fallback.g,
+                                 value.size() > 2 ? value[2] : fallback.b, value.size() > 3 ? value[3] : fallback.a};
+        chosen = std::fabs(given.r - fallback.r) >= 1e-4 || std::fabs(given.g - fallback.g) >= 1e-4
+                 || std::fabs(given.b - fallback.b) >= 1e-4 || std::fabs(given.a - fallback.a) >= 1e-4;
+        return given;
+    }
+
+    /** @return A colour of the current Max theme. @param name Its name. @param fallback Used if the theme has none. */
+    static jamoma::Rgba theme_colour(const char* name, const jamoma::Rgba& fallback)
+    {
+        c74::max::t_jrgba on{}, off{};
+        if (c74::max::jcolor_getcolor(c74::max::gensym(name), &on, &off) != 0) {
+            return fallback;
         }
-        return c;
+        return {on.red, on.green, on.blue, on.alpha};
+    }
+
+    /** @return The patcher the panel is in, or null. */
+    c74::max::t_object* own_patcher() const
+    {
+        c74::max::t_object* patcher = nullptr;
+        c74::max::object_obex_lookup(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(maxobj())), c74::max::gensym("#P"), &patcher);
+        return patcher;
+    }
+
+    /**
+     * A colour of the patcher, as Max has it from the theme or the patcher's own settings.
+     * @param patcher The patcher (may be null). @param name The attribute of the patcher. @param fallback Used if it cannot be read. @return The colour.
+     */
+    static jamoma::Rgba patcher_colour(c74::max::t_object* patcher, const char* name, const jamoma::Rgba& fallback)
+    {
+        c74::max::t_jrgba c{};
+        if (patcher == nullptr || c74::max::object_attr_getjrgba(patcher, c74::max::gensym(name), &c) != 0) {
+            return fallback;
+        }
+        return {c.red, c.green, c.blue, c.alpha};
+    }
+
+    /**
+     * @param view The patcher view that is drawn.
+     * @return The colours to draw with now: the user's, and for the others those derived from the patcher and the Max theme.
+     */
+    jamoma::PanelColours drawing_colours(c74::max::t_object* view)
+    {
+        jamoma::PanelColours given;
+        jamoma::PanelChosen chosen;
+        given.panel = attribute_colour(bgcolor.get(), {0.5, 0.5, 0.5, 0.14}, chosen.panel);
+        given.border = attribute_colour(bordercolor.get(), {0.5, 0.5, 0.5, 0.6}, chosen.border);
+        given.header = attribute_colour(headercolor.get(), {0.3, 0.3, 0.3, 1.0}, chosen.header);
+        given.text = attribute_colour(textcolor.get(), {0.85, 0.85, 0.85, 1.0}, chosen.text);
+        given.highlight = attribute_colour(highlightcolor.get(), {0.594, 0.721, 0.928, 1.0}, chosen.highlight);
+        c74::max::t_object* patcher = own_patcher();
+        const bool locked = view != nullptr && c74::max::object_attr_getlong(view, c74::max::gensym("locked")) != 0;
+        const jamoma::PanelSurroundings around{
+            patcher_colour(patcher, locked ? "locked_bgcolor" : "editing_bgcolor", {0.235, 0.235, 0.235, 1.0}),
+            patcher_colour(patcher, "textcolor", {0.85, 0.85, 0.85, 1.0}),
+            theme_colour("live_value_bar", {0.594, 0.721, 0.928, 1.0})};
+        return jamoma::panel_colours(given, chosen, around);
     }
 
     /** Looks for the model again and points the explorer at it. */
@@ -240,18 +306,15 @@ private:
         c74::max::t_jgraphics* g = t;
         const double w = t.width();
         const double h = t.height();
-        c74::max::t_jrgba bg = rgba(bgcolor.get());
-        c74::max::t_jrgba border = rgba(bordercolor.get());
-        c74::max::t_jrgba header = rgba(headercolor.get());
-        c74::max::t_jrgba text = rgba(textcolor.get());
-        c74::max::jgraphics_set_source_jrgba(g, &bg);
+        const jamoma::PanelColours colours = drawing_colours(t.view());
+        colour(g, colours.panel);
         c74::max::jgraphics_rectangle(g, 0, 0, w, h);
         c74::max::jgraphics_fill(g);
         if (w >= 40 && h >= 2 * kHeader / 2) {
-            c74::max::jgraphics_set_source_jrgba(g, &header);
+            colour(g, colours.header);
             c74::max::jgraphics_rectangle(g, 0, 0, w, h < kHeader ? h : kHeader);
             c74::max::jgraphics_fill(g);
-            c74::max::jgraphics_set_source_jrgba(g, &text);
+            colour(g, colours.text);
             c74::max::jgraphics_select_font_face(g, "Arial", c74::max::JGRAPHICS_FONT_SLANT_NORMAL, c74::max::JGRAPHICS_FONT_WEIGHT_NORMAL);
             c74::max::jgraphics_set_font_size(g, 12.0);
             const std::string title = model_.empty() ? "waiting for a model:address" : model_;
@@ -264,20 +327,19 @@ private:
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
                 if (active_data() != nullptr) { // the active button: filled while the model is on, a ring while it is off
-                    c74::max::t_jrgba lit = rgba(highlightcolor.get());
                     c74::max::jgraphics_set_line_width(g, 1.5);
                     c74::max::jgraphics_arc(g, active_centre(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
                     if (is_active()) {
-                        c74::max::jgraphics_set_source_jrgba(g, &lit);
+                        colour(g, colours.highlight);
                         c74::max::jgraphics_fill(g);
                     } else {
-                        c74::max::jgraphics_set_source_jrgba(g, &text);
+                        colour(g, colours.text);
                         c74::max::jgraphics_stroke(g);
                     }
                 }
             }
         }
-        c74::max::jgraphics_set_source_jrgba(g, &border);
+        colour(g, colours.border);
         c74::max::jgraphics_set_line_width(g, 1.0);
         c74::max::jgraphics_rectangle(g, 0.5, 0.5, w - 1.0, h - 1.0);
         c74::max::jgraphics_stroke(g);
