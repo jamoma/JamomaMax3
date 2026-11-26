@@ -159,10 +159,13 @@ def send_quit(port=QUIT_PORT) -> None:
     socket.socket(socket.AF_INET, socket.SOCK_DGRAM).sendto(packet, ("127.0.0.1", port))
 
 
-def read_log() -> str:
-    """The text of Max's current log file."""
+def read_log(newer_than: float = 0.0, path=None) -> str:
+    """The text of Max's current log file; empty if it was last written before `newer_than` (the log of an earlier launch, before Max starts a new one)."""
+    log = path if path is not None else SUPPORT / "Logs/Max.log"
     try:
-        return (SUPPORT / "Logs/Max.log").read_text(errors="replace")
+        if log.stat().st_mtime < newer_than:
+            return ""
+        return log.read_text(errors="replace")
     except OSError:
         return ""
 
@@ -239,12 +242,12 @@ def run_batch(names, workdir, per_test_timeout) -> tuple:
     launched = time.time()
     deadline = launched + per_test_timeout * len(names) + 15
     crashed = False
-    while time.time() < deadline and not run_complete(read_log()):
-        if crashed_early(max_running(), run_complete(read_log()), time.time() - launched):
+    while time.time() < deadline and not run_complete(read_log(launched)):
+        if crashed_early(max_running(), run_complete(read_log(launched)), time.time() - launched):
             crashed = True
             break
         time.sleep(1)
-    log = read_log()
+    log = read_log(launched)
     send_quit()
     for _ in range(30):
         if not max_running():

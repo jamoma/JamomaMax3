@@ -6,6 +6,8 @@ import json
 import sqlite3
 import tempfile
 import unittest
+import pathlib
+import os
 
 import run_maxtests as rm
 
@@ -148,6 +150,25 @@ class ConsoleErrorTests(unittest.TestCase):
 
     def test_no_errors_give_an_empty_list(self):
         self.assertEqual(rm.console_errors("[x info] [1] fine"), [])
+
+
+class ReadLogTests(unittest.TestCase):
+    def test_the_log_of_an_earlier_launch_counts_as_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            log = pathlib.Path(d) / "Max.log"
+            log.write_text("integration tests complete")
+            os.utime(log, (1000.0, 1000.0))
+            self.assertEqual(rm.read_log(newer_than=2000.0, path=log), "")
+
+    def test_the_log_written_after_the_launch_is_read(self):
+        with tempfile.TemporaryDirectory() as d:
+            log = pathlib.Path(d) / "Max.log"
+            log.write_text("new run")
+            os.utime(log, (3000.0, 3000.0))
+            self.assertEqual(rm.read_log(newer_than=2000.0, path=log), "new run")
+
+    def test_a_missing_log_is_empty(self):
+        self.assertEqual(rm.read_log(newer_than=0.0, path=pathlib.Path("/nonexistent/Max.log")), "")
 
 
 class CrashTests(unittest.TestCase):
