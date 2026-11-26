@@ -52,19 +52,34 @@ public:
     // The default of every colour means "follow the Max theme" (see theme_colour); any other value is the user's and is used as it is.
     /** The background colour. */
     attribute<numbers> bgcolor{this, "bgcolor", {0.172, 0.172, 0.172, 1.0}, title{"Background Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.172, 0.172, 0.172, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.172, 0.172, 0.172, 1.0});
+        }}};
     /** The colour of the bar. */
     attribute<numbers> fgcolor{this, "fgcolor", {0.199, 0.347, 0.529, 1.0}, title{"Foreground Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.199, 0.347, 0.529, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.199, 0.347, 0.529, 1.0});
+        }}};
     /** The border colour. */
     attribute<numbers> bordercolor{this, "bordercolor", {0.35, 0.35, 0.35, 1.0}, title{"Border Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.35, 0.35, 0.35, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.35, 0.35, 0.35, 1.0});
+        }}};
     /** The colour of the text. */
     attribute<numbers> textcolor{this, "textcolor", {0.85, 0.85, 0.85, 1.0}, title{"Text Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0});
+        }}};
     /** The colour of the line at the end of the bar. */
     attribute<numbers> knobcolor{this, "knobcolor", {0.594, 0.721, 0.928, 1.0}, title{"Knob Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0});
+        }}};
 
     /** The range, `low high`; the ends are swapped if the second is smaller. */
     attribute<numbers> range_attribute{this, "range", {0.0, 1.0}, title{"Range"}, setter{MIN_FUNCTION {
@@ -79,13 +94,17 @@ public:
 
     /** Where the text starts: pixels from the left and from the top. */
     attribute<numbers> textpos{this, "textpos", {10.0, 4.0}, title{"Text position"},
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {10.0, 4.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {10.0, 4.0});
+        }}};
 
     /** The text shown. */
-    attribute<symbol> text_attribute{this, "text", "textslider", title{"Displayed Text"}}; // not named text: Min's ui_operator calls the object's text()
+    attribute<symbol> text_attribute{this, "text", "textslider", title{"Displayed Text"},
+        setter{MIN_FUNCTION { refresh(); return args; }}}; // not named text: Min's ui_operator calls the object's text()
 
     /** The unit shown after the value. */
-    attribute<symbol> unit{this, "unit", "", title{"Displayed Unit"}};
+    attribute<symbol> unit{this, "unit", "", title{"Displayed Unit"}, setter{MIN_FUNCTION { refresh(); return args; }}};
 
     /** Which movement of the mouse moves the value: horizontal, vertical or both (the larger one). */
     attribute<symbol> tracking{this, "tracking", "horizontal", title{"Mouse Tracking"}, range{"horizontal", "vertical", "both"}};
@@ -94,7 +113,8 @@ public:
     attribute<int> clickjump{this, "clickjump", 1, title{"Jump to Value on Mouse Down"}, style::onoff};
 
     /** Whether the value is shown while the mouse is over the box. */
-    attribute<int> showvalue{this, "showvalue", 1, title{"Shows Value while editing & hovering"}, style::onoff};
+    attribute<int> showvalue{this, "showvalue", 1, title{"Shows Value while editing & hovering"}, style::onoff,
+        setter{MIN_FUNCTION { refresh(); return args; }}};
 
     /** The value of Control and a double click. */
     attribute<double> defaultvalue{this, "defaultvalue", 0.0, title{"Default value"}};

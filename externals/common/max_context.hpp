@@ -129,19 +129,53 @@ inline std::optional<std::string> patcher_class(const void* patcher)
 }
 
 /**
+ * @brief The first argument of the bpatcher a patcher is loaded in, if it is a name (the old objects took the address of a model or view from it).
+ * @param patcher The patcher (as patcher_of gives it).
+ * @return The argument, or nothing if the patcher is not in a bpatcher, the bpatcher has no arguments, or the first one is not a symbol or is an attribute.
+ */
+inline std::optional<std::string> bpatcher_argument(const void* patcher)
+{
+    if (patcher == nullptr) {
+        return std::nullopt;
+    }
+    auto* box = static_cast<c74::max::t_object*>(c74::max::object_attr_getobj(
+        const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher)), c74::max::gensym("box")));
+    if (box == nullptr || c74::max::object_classname(box) != c74::max::gensym("bpatcher")) {
+        return std::nullopt;
+    }
+    long count = 0;
+    c74::max::t_atom* values = nullptr;
+    if (c74::max::object_attr_getvalueof(box, c74::max::gensym("args"), &count, &values) != 0 || values == nullptr) {
+        return std::nullopt;
+    }
+    std::optional<std::string> result;
+    if (count > 0 && c74::max::atom_gettype(values) == c74::max::A_SYM) {
+        const std::string first = c74::max::atom_getsym(values)->s_name;
+        if (!first.empty() && first[0] != '@') {
+            result = first;
+        }
+    }
+    c74::max::sysmem_freeptr(values);
+    return result;
+}
+
+/**
  * @brief The address of the model a view patcher is bound to, if there is one now.
  *
- * With a model argument: an absolute address is used as it is, a relative one is taken below the model of the patcher that contains the view
- * (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
+ * With a model argument (that of j.view, else the first argument of the view's bpatcher): an absolute address is used as it is, a relative one is
+ * taken below the model of the patcher that contains the view (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
  * finds `qmetro.model`). The answer is worked out from what exists now, so it follows models coming and going.
  * @param view_patcher The patcher of the view.
  * @return The address of the model, or nothing while there is none (the view is waiting).
  */
 inline std::optional<std::string> view_model_address(const void* view_patcher)
 {
-    const std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
+    std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
     if (!argument) {
         return std::nullopt;
+    }
+    if (argument->empty()) {
+        argument = bpatcher_argument(view_patcher).value_or(std::string());
     }
     const void* container = parent_patcher(view_patcher);
     std::string address;

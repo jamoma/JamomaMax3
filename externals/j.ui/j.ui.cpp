@@ -49,6 +49,7 @@ class j_ui : public c74::min::object<j_ui>, public c74::min::ui_operator<300, 70
     std::unique_ptr<jamoma::ModelExplorer> explorer_;  /**< What is below the model. */
     jamoma_max::Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;                   /**< Follows the model coming and going. */
+    jamoma_max::Settle settle_;                        /**< Redraws once for a burst of attribute changes. */
     std::string model_;                                /**< The address of the model the panel is bound to (empty: waiting). */
     std::unique_ptr<jamoma::Receiver> active_watch_;   /**< Follows `data/active` of the model so that the button shows its value. */
 
@@ -87,21 +88,36 @@ public:
     // The default of every colour means "automatic" (see drawing_colours); any other value is the user's and is used as it is.
     /** The background colour. */
     attribute<numbers> bgcolor{this, "bgcolor", {0.5, 0.5, 0.5, 0.14}, title{"Background Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.14}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.14});
+        }}};
     /** The border colour. */
     attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 0.6}, title{"Border Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.6}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.6});
+        }}};
     /** The colour of the header. */
     attribute<numbers> headercolor{this, "headercolor", {0.3, 0.3, 0.3, 1.0}, title{"Header Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.3, 0.3, 0.3, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.3, 0.3, 0.3, 1.0});
+        }}};
     /** The colour of the text. */
     attribute<numbers> textcolor{this, "textcolor", {0.85, 0.85, 0.85, 1.0}, title{"Text Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0});
+        }}};
     /** The tags of the object (accepted so that old patchers load; no effect). */
     attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
     attribute<numbers> highlightcolor{this, "highlightcolor", {0.594, 0.721, 0.928, 1.0}, title{"Highlight Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0}); }}};
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0});
+        }}};
 
     /** Whether the size snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down (on by default, as in the old object). */
     attribute<int> snap{this, "snap", 1, title{"Snap Size to Grid"}, description{"The size of the object is a whole number of units, 150 pixels wide and 35 pixels high"}, range{0, 1}, style::onoff};
@@ -159,6 +175,15 @@ public:
 private:
     static constexpr double kHeader = 22.0; /**< The height of the header. */
     static constexpr double kActiveRadius = 6.5; /**< The radius of the active button. */
+
+    /** Asks for a redraw once the new value of an attribute is stored (Max itself redraws only for some colour attributes). */
+    void refresh()
+    {
+        if (c74::min::dummy() || maxobj() == nullptr) {
+            return;
+        }
+        settle_.request(maxobj(), alive_.weak(), [this] { redraw(); });
+    }
 
     /** @param g The graphics context. @param c A colour. */
     static void colour(c74::max::t_jgraphics* g, const jamoma::Rgba& c) { c74::max::jgraphics_set_source_rgba(g, c.r, c.g, c.b, c.a); }
