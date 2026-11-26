@@ -107,6 +107,12 @@ public:
     bool move(std::string_view name_or_index, std::size_t position);
     /** @brief The first name of the form `<stem> <n>` (n from 1) that no preset has. @param stem The text before the number. @return The name. */
     std::string free_name(std::string_view stem) const;
+    /**
+     * @brief The name a new preset gets when somebody asks for a name: that name without the spaces around it if no preset has it, else numbered
+     *        (`<name> <n>`); `preset <n>` if nothing is left of it.
+     * @param wanted The name asked for. @return A name no preset has.
+     */
+    std::string unused_name(std::string_view wanted) const;
     /** @brief Removes every preset. */
     void clear();
     /**

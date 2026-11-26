@@ -32,13 +32,33 @@
 				Sets the parameter <m>data/active</m> of the model (the <m>data</m> amenity) to 1 or 0, as a click on the active button does; without an argument it switches to the other state. Nothing happens if the model has no such parameter.
 			</description>
 		</method>
+		<method name="panel">
+			<arglist />
+			<digest>
+				Open the second panel
+			</digest>
+			<description>
+				If the outlet feeds an inlet of a subpatcher, sends <m>bang</m> out of the outlet, gives the subpatcher the address of the model as its title and opens it, as a click on the button with the plus sign does. Otherwise nothing happens.
+			</description>
+		</method>
+		<method name="preset:name">
+			<arglist>
+				<arg name="name" optional="0" type="symbol" />
+			</arglist>
+			<digest>
+				Create a preset of that name
+			</digest>
+			<description>
+				Creates a preset of the model with this name; a name that is taken is numbered, an empty one becomes <m>preset</m> and a number. The menu item Create New Preset asks for the name in a dialog.
+			</description>
+		</method>
 		<method name="dump">
 			<arglist />
 			<digest>
 				Report the state
 			</digest>
 			<description>
-				The <m>dump</m> message answers <m>model:address</m> and the address (or <m>model:waiting</m>), <m>preset:count</m> and the number of presets, <m>presets</m> and their names and <m>preset:current</m> and the current preset, out the outlet. If the model has the parameter <m>data/active</m>, <m>active</m> and 0 or 1 follow the address.
+				The <m>dump</m> message answers <m>model:address</m> and the address (or <m>model:waiting</m>), <m>preset:count</m> and the number of presets, <m>presets</m> and their names and <m>preset:current</m> and the current preset, out the outlet. If the model has the parameter <m>data/active</m>, <m>active</m> and 0 or 1 follow the address. <m>panel</m> 1 follows if there is a second panel.
 			</description>
 		</method>
 		<method name="paint">

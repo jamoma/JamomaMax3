@@ -425,6 +425,17 @@ std::string PresetManager::free_name(std::string_view stem) const
     }
 }
 
+std::string PresetManager::unused_name(std::string_view wanted) const
+{
+    const std::size_t first = wanted.find_first_not_of(" \t");
+    if (first == std::string_view::npos) {
+        return free_name("preset");
+    }
+    const std::string name(wanted.substr(first, wanted.find_last_not_of(" \t") - first + 1));
+    const bool taken = std::any_of(presets_.begin(), presets_.end(), [&name](const Preset& p) { return p.name == name; });
+    return taken ? free_name(name) : name;
+}
+
 void PresetManager::clear()
 {
     presets_.clear();

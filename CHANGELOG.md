@@ -6,6 +6,7 @@ New features and notable changes for each release of JamomaMax3. Everything that
 
 ### New features
 
+- **`j.ui`: the messages `preset:name <name>` and `panel`** create a preset of that name, and open the second panel of a view (the subpatcher the outlet feeds), as the menu and the plus button of the header do.
 - **`j.ui` fits the colour theme of Max.** Left at their defaults, its colours are automatic: a faint panel that lets the patcher show through, a header that stands out from it, and a title and active button that stay readable on every theme. A colour you set yourself is used as it is. The help patchers of `j.ui` and `j.textslider` have a new tab, colours, that shows how this works.
 - **`j.textslider` follows the colour theme of Max.** A colour that is left at its default takes the theme's colour for that part (track and border, bar, text, line), and these are adjusted where needed so that the text stays readable on every theme. A colour you set yourself is used as it is.
 - **`j.ui`: the attribute `snap`** (default 1) decides whether the size of the object snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down, at least one unit in each direction. This is how the old `j.ui` behaved, always; with `@snap 0` the object can now have any size.

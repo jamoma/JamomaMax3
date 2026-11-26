@@ -7,12 +7,16 @@
  *
  * The panel shows the address of the model it is bound to (the model of its patcher, or the one a j.view in it is bound to), or
  * `waiting for a model:address`. A click on the address opens a menu of the parameters, messages and returns below the model; a choice is sent out of
- * the outlet as `model:reference/open <address>`. The menu arrow opens the utilities and presets menu: Create New Preset (stores `preset <n>`, the next
- * free number), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
+ * the outlet as `model:reference/open <address>`. The menu arrow opens the utilities and presets menu: Create New Preset (asks for the name; a taken name is numbered,
+ * an empty one becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
  * (Load / Save Presets File, Edit, Open Reference / Help / Internal) are sent out of the outlet as the old messages (`preset:read`, `preset:write/again`,
  * `preset:write`, `preset:edit`, `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. The text is drawn,
  * not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then `preset:count <n>`, `presets <name>...` and
  * `preset:current <name>`, on the outlet; this is what the own test reads.
+ *
+ * If the outlet feeds an inlet of a subpatcher (a second panel of the view), a round button with a plus sign is shown in the header; a click on it,
+ * or the message `panel`, sends `bang` out of the outlet, gives the subpatcher the address of the model as its title and opens it. `dump` then
+ * adds `panel 1`. A cord made later shows the button at the next redraw (for instance when the patcher is locked).
  *
  * Colours: a colour attribute that has its default is automatic, so that the panel fits every Max theme (jamoma/readable_colours.hpp, `panel_colours`):
  * a faint grey tint of the patcher with a grey border, a header darker than the panel, the patcher's text colour for the title and the theme's
@@ -148,6 +152,8 @@ public:
         if (e.y() < kHeader) {
             if (e.x() > e.target().width() - kHeader) {
                 open_utilities_menu(e);
+            } else if (on_panel_button(e.x(), e.target().width())) {
+                open_panel();
             } else if (on_active_button(e.x(), e.target().width())) {
                 switch_active(-1);
             } else {
@@ -160,6 +166,28 @@ public:
     /** `active [0|1]`: switches the model on or off through its parameter `data/active` (no argument: the other way round). Does nothing without the parameter. */
     message<> active{this, "active", MIN_FUNCTION {
         switch_active(args.empty() ? -1 : (static_cast<double>(args[0]) != 0.0 ? 1 : 0));
+        return {};
+    }};
+
+    /** `panel`: what a click on the panel button does; nothing if the outlet feeds no subpatcher. */
+    message<> panel{this, "panel", MIN_FUNCTION {
+        open_panel();
+        return {};
+    }};
+
+    /** `preset:name <name>`: creates a preset of that name (see the file description); nothing without a name. */
+    message<> preset_name{this, "preset:name", MIN_FUNCTION {
+        if (args.empty()) {
+            return {};
+        }
+        std::string wanted;
+        for (const atom& a : args) {
+            const std::string word = a.type() == message_type::int_argument     ? std::to_string(static_cast<long long>(a))
+                                     : a.type() == message_type::float_argument ? std::to_string(static_cast<double>(a))
+                                                                                : std::string(static_cast<symbol>(a).c_str());
+            wanted += (wanted.empty() ? "" : " ") + word;
+        }
+        create_preset(wanted);
         return {};
     }};
 
@@ -315,6 +343,64 @@ private:
         return width > kHeader * 2 && active_data() != nullptr && x >= active_centre(width) - 10.0 && x <= active_centre(width) + 10.0;
     }
 
+    /** @return The subpatcher an inlet of which the outlet feeds (the second panel), or null. */
+    c74::max::t_object* panel_patcher() const
+    {
+        c74::max::t_object* patcher = own_patcher();
+        if (patcher == nullptr) {
+            return nullptr;
+        }
+        const void* self = maxobj();
+        for (c74::max::t_object* line = c74::max::jpatcher_get_firstline(patcher); line != nullptr; line = c74::max::jpatchline_get_nextline(line)) {
+            c74::max::t_object* from = c74::max::jpatchline_get_box1(line);
+            c74::max::t_object* to = c74::max::jpatchline_get_box2(line);
+            if (from == nullptr || to == nullptr || c74::max::jbox_get_object(from) != self) {
+                continue;
+            }
+            c74::max::t_object* target = c74::max::jbox_get_object(to);
+            if (target != nullptr
+                && (c74::max::object_classname(target) == c74::max::gensym("jpatcher") || c74::max::object_classname(target) == c74::max::gensym("patcher"))) {
+                return target;
+            }
+        }
+        return nullptr;
+    }
+
+    /** Sends `bang` (so that the patch can prepare), titles the second panel with the address of the model and opens it. */
+    void open_panel()
+    {
+        if (panel_patcher() == nullptr) {
+            return;
+        }
+        c74::max::outlet_bang(out.max_outlet());
+        c74::max::t_object* second = panel_patcher(); // the bang may have changed the patcher
+        if (second == nullptr) {
+            return;
+        }
+        if (!model_.empty()) {
+            c74::max::object_attr_setsym(second, c74::max::gensym("title"), c74::max::gensym(model_.c_str()));
+        }
+        c74::max::object_method(second, c74::max::gensym("vis"));
+    }
+
+    /** Creates a preset of the model with the wanted name, or one that is free. @param wanted The name asked for. */
+    void create_preset(const std::string& wanted)
+    {
+        if (jamoma::Model* m = model()) {
+            m->presets().new_preset(m->presets().unused_name(wanted));
+            redraw();
+        }
+    }
+
+    /** @return The x position of the middle of the panel button: left of the active button, if there is one. @param width The width of the panel. */
+    double panel_centre(double width) const { return active_centre(width) - (active_data() != nullptr ? 20.0 : 0.0); }
+
+    /** @return True if a click at x is on the panel button. @param x The position. @param width The width of the panel. */
+    bool on_panel_button(double x, double width) const
+    {
+        return width > kHeader * 2 && x >= panel_centre(width) - 10.0 && x < panel_centre(width) + 10.0 && panel_patcher() != nullptr;
+    }
+
     /** @return The model the panel is bound to, or null. */
     jamoma::Model* model() const
     {
@@ -351,6 +437,18 @@ private:
                 c74::max::jgraphics_line_to(g, w - 12.0, 15.0);
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
+                if (panel_patcher() != nullptr) { // the button of the second panel: a ring with a plus sign
+                    const double x = panel_centre(w), y = kHeader / 2.0;
+                    colour(g, colours.text);
+                    c74::max::jgraphics_set_line_width(g, 1.5);
+                    c74::max::jgraphics_arc(g, x, y, kActiveRadius, 0.0, JGRAPHICS_2PI);
+                    c74::max::jgraphics_stroke(g);
+                    c74::max::jgraphics_move_to(g, x - 3.5, y);
+                    c74::max::jgraphics_line_to(g, x + 3.5, y);
+                    c74::max::jgraphics_move_to(g, x, y - 3.5);
+                    c74::max::jgraphics_line_to(g, x, y + 3.5);
+                    c74::max::jgraphics_stroke(g);
+                }
                 if (active_data() != nullptr) { // the active button: filled while the model is on, a ring while it is off
                     c74::max::jgraphics_set_line_width(g, 1.5);
                     c74::max::jgraphics_arc(g, active_centre(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
@@ -440,7 +538,15 @@ private:
         } else if (m == nullptr) {
             return;
         } else if (choice == 100) {
-            m->presets().new_preset(m->presets().free_name("preset"));
+            const char* name = nullptr;
+            const long answer = c74::max::jdialog_showtext("Provide a name for this Preset", "Ch\xc3\xa2teau de Preset", 0, &name);
+            const std::string wanted = name != nullptr ? name : "";
+            if (name != nullptr) {
+                c74::max::sysmem_freeptr(const_cast<char*>(name));
+            }
+            if (answer == 1) {
+                create_preset(wanted); // looks the model up again: the dialog runs its own event loop
+            }
         } else if (choice == 101 && m->presets().current()) {
             m->presets().update(std::to_string(*m->presets().current() + 1));
         } else if (choice == 102 && m->presets().current()) {
@@ -467,6 +573,11 @@ private:
             return;
         }
         send_symbol("model:address", model_);
+        if (panel_patcher() != nullptr) {
+            c74::max::t_atom one;
+            c74::max::atom_setlong(&one, 1);
+            c74::max::outlet_anything(out.max_outlet(), c74::max::gensym("panel"), 1, &one);
+        }
         if (active_data() != nullptr) {
             c74::max::t_atom on;
             c74::max::atom_setlong(&on, is_active() ? 1 : 0);

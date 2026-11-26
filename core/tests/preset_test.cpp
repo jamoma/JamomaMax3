@@ -377,3 +377,20 @@ TEST_CASE("interpolate with a nan position does nothing")
     REQUIRE_FALSE(report.found);
     REQUIRE(r.number("a") == 10.0);
 }
+
+/** The name a new preset gets from a wish: the wish if no preset has it, else numbered; `preset <n>` for an empty one. */
+TEST_CASE("a new preset name is the wanted one or a free numbered one", "[preset]")
+{
+    jamoma::Namespace names;
+    jamoma::PresetManager presets(names, jamoma::Address::parse("/m"));
+    CHECK(presets.unused_name("Alpha") == "Alpha");
+    CHECK(presets.unused_name("  My Preset ") == "My Preset");
+    CHECK(presets.unused_name("") == "preset 1");
+    CHECK(presets.unused_name("   ") == "preset 1");
+    REQUIRE(presets.new_preset("Alpha"));
+    CHECK(presets.unused_name("Alpha") == "Alpha 1");
+    REQUIRE(presets.new_preset("Alpha 1"));
+    CHECK(presets.unused_name("Alpha") == "Alpha 2");
+    REQUIRE(presets.new_preset("preset 1"));
+    CHECK(presets.unused_name("") == "preset 2");
+}
