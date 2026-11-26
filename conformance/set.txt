@@ -7,6 +7,11 @@ Jamoma/patchers/models/data/qmetro/qmetro.view.maxpat
 Jamoma/patchers/models/data/qmetro/qmetro.module.maxpat
 Jamoma/patchers/models/data/qmetro/qmetro.model.maxhelp
 
+# Second real model: osc_receive (model, view, help patcher; milestone 4)
+Jamoma/patchers/models/data/osc/osc_receive.model.maxpat
+Jamoma/patchers/models/data/osc/osc_receive.view.maxpat
+Jamoma/patchers/models/data/osc/osc_receive.model.maxhelp
+
 # Help patchers of the eight in-scope objects
 Jamoma/help/j.model.maxhelp
 Jamoma/help/j.view.maxhelp
