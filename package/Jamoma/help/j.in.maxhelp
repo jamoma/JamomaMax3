@@ -390,11 +390,22 @@
                             {
                                 "box": {
                                     "id": "obj-5",
-                                    "maxclass": "comment",
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 847.0, 269.0, 350.0, 20.0 ],
-                                    "text": "[j.namespace: not in this version yet]"
+                                    "numoutlets": 3,
+                                    "outlettype": [
+                                        "",
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        847.0,
+                                        269.0,
+                                        350.0,
+                                        22.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.namespace @address /without_amenities @format jit.cellblock"
                                 }
                             },
                             {
@@ -818,6 +829,48 @@
                                 "patchline": {
                                     "destination": [ "obj-6", 0 ],
                                     "source": [ "obj-8", 0 ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-11",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-17",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-7",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-5",
+                                        0
+                                    ]
                                 }
                             }
                         ],

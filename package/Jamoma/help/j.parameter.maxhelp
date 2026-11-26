@@ -1407,11 +1407,22 @@
                             {
                                 "box": {
                                     "id": "obj-3",
-                                    "maxclass": "comment",
+                                    "linecount": 2,
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 931.5, 600.0, 220.0, 20.0 ],
-                                    "text": "[j.map: not in this version yet]"
+                                    "numoutlets": 2,
+                                    "outlettype": [
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        931.5,
+                                        600.0,
+                                        115.0,
+                                        35.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.map @input /from @output /to"
                                 }
                             },
                             {
@@ -1592,11 +1603,23 @@
                             {
                                 "box": {
                                     "id": "obj-11",
-                                    "maxclass": "comment",
+                                    "linecount": 3,
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 377.0, 650.0, 220.0, 20.0 ],
-                                    "text": "[j.namespace: not in this version yet]"
+                                    "numoutlets": 3,
+                                    "outlettype": [
+                                        "",
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        377.0,
+                                        650.0,
+                                        97.0,
+                                        49.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.namespace @format umenu @sort priority"
                                 }
                             },
                             {
@@ -2112,6 +2135,34 @@
                                 "patchline": {
                                     "destination": [ "obj-3", 0 ],
                                     "source": [ "obj-83", 0 ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-11",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-10",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-12",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-11",
+                                        0
+                                    ]
                                 }
                             }
                         ]

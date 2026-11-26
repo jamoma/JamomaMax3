@@ -2,348 +2,246 @@
 <?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
 <c74object name="j.textslider" module="" category="Jamoma">
 	<digest>
-		TEXT_HERE
+		Slider with a text and a value display
 	</digest>
 	<description>
-		TEXT_HERE
+		A horizontal slider that shows a text and, while the mouse is over it, its value. A click or a drag changes the value; with the Command key the values are whole numbers, with the Shift key the drag is fine, and a double click with the Control key gives <m>defaultvalue</m>. Its colors follow the Max theme unless you set them.
 	</description>
 	<metadatalist>
 		<metadata name="author">
 			Jamoma
 		</metadata>
 		<metadata name="tag">
+			user interface
+		</metadata>
+		<metadata name="tag">
 			Jamoma
 		</metadata>
 	</metadatalist>
 	<inletlist>
-		<inlet id="0" type="INLET_TYPE">
+		<inlet id="0" type="int/float">
 			<digest>
-				Input
+				Values and messages
 			</digest>
 			<description>
-				TEXT_HERE
+				Numbers, set and bang.
 			</description>
 		</inlet>
 	</inletlist>
 	<outletlist>
-		<outlet id="0" type="OUTLET_TYPE">
+		<outlet id="0" type="float">
 			<digest>
-				Output
+				The value
 			</digest>
 			<description>
-				TEXT_HERE
+				The value of the slider, a decimal number.
 			</description>
 		</outlet>
 	</outletlist>
 	<objarglist>
-		<objarg id="0" name="OBJARG_NAME" type="OBJARG_TYPE" optional="0">
-			<digest>
-				TEXT_HERE
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-		</objarg>
 	</objarglist>
 	<methodlist>
 		<method name="bang">
 			<arglist />
 			<digest>
-				TEXT_HERE
+				Output the value
 			</digest>
 			<description>
-				TEXT_HERE
+				Sends the value out of the outlet.
 			</description>
 		</method>
 		<method name="int">
 			<arglist>
-				<arg name="ARG_NAME_0" type="int" optional="0" />
+				<arg name="value" optional="0" type="int" />
 			</arglist>
 			<digest>
-				TEXT_HERE
+				Set and output the value
 			</digest>
 			<description>
-				TEXT_HERE
+				Keeps the number, sends it out of the outlet (as a decimal number) and draws it. A value outside the range is output as it is and drawn at the end of the slider.
 			</description>
 		</method>
 		<method name="float">
 			<arglist>
-				<arg name="ARG_NAME_0" type="float" optional="0" />
+				<arg name="value" optional="0" type="float" />
 			</arglist>
 			<digest>
-				TEXT_HERE
+				Set and output the value
 			</digest>
 			<description>
-				TEXT_HERE
+				As <m>int</m>.
 			</description>
 		</method>
 		<method name="set">
 			<arglist>
-				<arg name="ARG_NAME_0" type="float" optional="0" />
+				<arg name="value" optional="0" type="float" />
 			</arglist>
 			<digest>
-				TEXT_HERE
+				Set the value without output
 			</digest>
 			<description>
-				TEXT_HERE
+				Keeps the number and draws it, without sending it out.
+			</description>
+		</method>
+		<method name="paint">
+			<arglist />
+			<digest>
+				Draw the slider
+			</digest>
+			<description>
+				Sent by Max when the slider is drawn.
+			</description>
+		</method>
+		<method name="mousedown">
+			<arglist />
+			<digest>
+				Start a change
+			</digest>
+			<description>
+				A click; with <m>clickjump</m> on, the value moves to the position of the mouse.
+			</description>
+		</method>
+		<method name="mousedrag">
+			<arglist />
+			<digest>
+				Change the value
+			</digest>
+			<description>
+				A drag moves the value.
 			</description>
 		</method>
 		<method name="mousedoubleclick">
-			<digest>Double click</digest>
-			<description>With Control held: the default value.</description>
-		</method>
-		<method name="mousedown">
-			<digest>Click</digest>
-			<description>Jumps to the value under the pointer (clickjump) and starts a drag; Command rounds to a whole number.</description>
-		</method>
-		<method name="mousedrag">
-			<digest>Drag</digest>
-			<description>Moves the value, horizontally, vertically or both (tracking); Command makes whole numbers, Shift is fine.</description>
+			<arglist />
+			<digest>
+				Give the default value
+			</digest>
+			<description>
+				A double click with the Control key gives <m>defaultvalue</m>.
+			</description>
 		</method>
 		<method name="mouseenter">
-			<digest>Pointer over the box</digest>
-			<description>Shows the value instead of the text (showvalue).</description>
+			<arglist />
+			<digest>
+				Show the value
+			</digest>
+			<description>
+				The mouse arrives: the value is shown if <m>showvalue</m> is on.
+			</description>
 		</method>
 		<method name="mouseleave">
-			<digest>Pointer leaves the box</digest>
-			<description>Shows the text again.</description>
-		</method>
-		<method name="paint">
-			<digest>Draw</digest>
-			<description>Draws the slider.</description>
+			<arglist />
+			<digest>
+				Show the text
+			</digest>
+			<description>
+				The mouse leaves: the text is shown.
+			</description>
 		</method>
 	</methodlist>
 	<attributelist>
 		<attribute name="bgcolor" get="1" set="1" type="float" size="4">
 			<digest>
-				Background Color
+				Background color
 			</digest>
 			<description>
-				TEXT_HERE
+				The color of the background. At its default it follows the Max theme (<m>live_control_bg</m>); a color you set is used as it is, and the attribute name without values gives the default back.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Color" />
-				<attribute name="defaultname" get="1" set="1" type="float" size="4" value="0.8 0.8 0.8 0.7" />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Background Color" />
-				<attribute name="paint" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="rgba" />
-			</attributelist>
-		</attribute>
-		<attribute name="bordercolor" get="1" set="1" type="float" size="4">
-			<digest>
-				Border Color
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Color" />
-				<attribute name="defaultname" get="1" set="1" type="float" size="4" value="0.5 0.5 0.5 1." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Border Color" />
-				<attribute name="paint" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="rgba" />
-			</attributelist>
-		</attribute>
-		<attribute name="clickjump" get="1" set="1" type="int" size="1">
-			<digest>
-				Jump to Value on Mouse Down
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Jump to Value on Mouse Down" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="onoff" />
-			</attributelist>
-		</attribute>
-		<attribute name="defaultvalue" get="1" set="1" type="float" size="1">
-			<digest>
-				Default value
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="float" size="1" value="0." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Default value" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-			</attributelist>
 		</attribute>
 		<attribute name="fgcolor" get="1" set="1" type="float" size="4">
 			<digest>
-				Foreground Color
+				Foreground color
 			</digest>
 			<description>
-				TEXT_HERE
+				The color of the bar. At its default it follows the Max theme (<m>live_selection</m>, adjusted so that the text can be read on it); a color you set is used as it is, and the attribute name without values gives the default back.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Color" />
-				<attribute name="defaultname" get="1" set="1" type="float" size="4" value="0.95 0.95 0.95 1." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Foreground Color" />
-				<attribute name="paint" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="rgba" />
-			</attributelist>
+		</attribute>
+		<attribute name="bordercolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Border color
+			</digest>
+			<description>
+				The color of the border. At its default it follows the Max theme (<m>live_control_bg</m>); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="textcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Text color
+			</digest>
+			<description>
+				The color of the text. At its default it follows the Max theme (<m>live_control_fg</m>, or black or white where that is hard to read); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
 		</attribute>
 		<attribute name="knobcolor" get="1" set="1" type="float" size="4">
 			<digest>
-				Knob Color
+				Knob color
 			</digest>
 			<description>
-				TEXT_HERE
+				The color of the line at the end of the bar. At its default it follows the Max theme (<m>live_value_bar</m>, or the text color where that is hard to see); a color you set is used as it is, and the attribute name without values gives the default back.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Color" />
-				<attribute name="defaultname" get="1" set="1" type="float" size="4" value="0.7 0.7 0.7 1." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Knob Color" />
-				<attribute name="paint" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="rgba" />
-			</attributelist>
 		</attribute>
 		<attribute name="range" get="1" set="1" type="float" size="2">
 			<digest>
 				Range
 			</digest>
 			<description>
-				TEXT_HERE
+				The lowest and highest value of the slider (default 0 1); the two are swapped if the second is smaller.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="float" size="2" value="0. 1." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Range" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-			</attributelist>
-		</attribute>
-		<attribute name="showvalue" get="1" set="1" type="int" size="1">
-			<digest>
-				Shows Value while editing &amp;amp; hovering
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Shows Value while editing &amp; hovering" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="onoff" />
-			</attributelist>
 		</attribute>
 		<attribute name="text" get="1" set="1" type="symbol" size="1">
 			<digest>
-				Displayed Text
+				Displayed text
 			</digest>
 			<description>
-				TEXT_HERE
+				The text shown on the slider.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="symbol" size="1" value="textslider" />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Displayed Text" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-			</attributelist>
-		</attribute>
-		<attribute name="textcolor" get="1" set="1" type="float" size="4">
-			<digest>
-				Text Color
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Color" />
-				<attribute name="defaultname" get="1" set="1" type="float" size="4" value="0. 0. 0. 1." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Text Color" />
-				<attribute name="paint" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="rgba" />
-			</attributelist>
 		</attribute>
 		<attribute name="textpos" get="1" set="1" type="float" size="2">
 			<digest>
 				Text position
 			</digest>
 			<description>
-				TEXT_HERE
+				Where the text starts: pixels from the left and from the top (default 10 4).
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="float" size="2" value="10. 4." />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Text position" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-			</attributelist>
-		</attribute>
-		<attribute name="tracking" get="1" set="1" type="symbol" size="1">
-			<digest>
-				Mouse Tracking
-			</digest>
-			<description>
-				TEXT_HERE
-			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="symbol" size="1" value="horizontal" />
-				<attribute name="enumvals" get="1" set="1" type="atom" size="3">
-					<enumlist>
-						<enum name="horizontal">
-							<digest>
-								TEXT_HERE
-							</digest>
-							<description>
-								TEXT_HERE
-							</description>
-						</enum>
-						<enum name="vertical">
-							<digest>
-								TEXT_HERE
-							</digest>
-							<description>
-								TEXT_HERE
-							</description>
-						</enum>
-						<enum name="both">
-							<digest>
-								TEXT_HERE
-							</digest>
-							<description>
-								TEXT_HERE
-							</description>
-						</enum>
-					</enumlist>
-				</attribute>
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Mouse Tracking" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-				<attribute name="style" get="1" set="1" type="symbol" size="1" value="enum" />
-			</attributelist>
 		</attribute>
 		<attribute name="unit" get="1" set="1" type="symbol" size="1">
 			<digest>
-				Displayed Unit
+				Displayed unit
 			</digest>
 			<description>
-				TEXT_HERE
+				The unit shown after the value.
 			</description>
-			<attributelist>
-				<attribute name="category" get="1" set="1" type="atom" size="1" value="Jamoma" />
-				<attribute name="default" get="1" set="1" type="symbol" size="1" value="" />
-				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Displayed Unit" />
-				<attribute name="save" get="1" set="1" type="int" size="1" value="1" />
-			</attributelist>
+		</attribute>
+		<attribute name="showvalue" get="1" set="1" type="int" size="1">
+			<digest>
+				Show the value
+			</digest>
+			<description>
+				When on (the default), the value is shown instead of the text while the mouse is over the slider.
+			</description>
+		</attribute>
+		<attribute name="tracking" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Mouse tracking
+			</digest>
+			<description>
+				Which movement of the mouse moves the value: <m>horizontal</m> (the default), <m>vertical</m> or <m>both</m> (the larger one).
+			</description>
+		</attribute>
+		<attribute name="clickjump" get="1" set="1" type="int" size="1">
+			<digest>
+				Jump to the value on a click
+			</digest>
+			<description>
+				When on (the default), a click moves the value to the position of the mouse.
+			</description>
+		</attribute>
+		<attribute name="defaultvalue" get="1" set="1" type="float" size="1">
+			<digest>
+				Default value
+			</digest>
+			<description>
+				The value that a double click with the Control key gives (default 0).
+			</description>
 		</attribute>
 	</attributelist>
-	<examplelist>
-		<example caption="" img="" />
-	</examplelist>
-	<seealsolist>
-		<seealso name="bogus">
-			TEXT_HERE
-		</seealso>
-	</seealsolist>
 </c74object>

@@ -1409,11 +1409,22 @@
                             {
                                 "box": {
                                     "id": "obj-3",
-                                    "maxclass": "comment",
+                                    "linecount": 2,
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 931.5, 600.0, 220.0, 20.0 ],
-                                    "text": "[j.map: not in this version yet]"
+                                    "numoutlets": 2,
+                                    "outlettype": [
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        931.5,
+                                        600.0,
+                                        115.0,
+                                        35.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.map @input /from @output /to"
                                 }
                             },
                             {
