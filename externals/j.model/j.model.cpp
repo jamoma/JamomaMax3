@@ -33,6 +33,7 @@
 #include "jamoma/registry.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_editor.hpp"
 
 using namespace c74::min;
 
@@ -50,6 +51,7 @@ class j_model : public c74::min::object<j_model> {
     std::shared_ptr<void> init_watch_;         /**< Recalls the default preset whenever the model has been initialised (a parent model may do it). */
     bool in_default_ = false;                  /**< True while the default preset is recalled (it must not start itself again). */
     std::string last_file_;                    /**< The presets file used last. */
+    jamoma_max::TextEditor editor_;            /**< The editor window of `preset:edit`. */
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
@@ -123,6 +125,9 @@ public:
     inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
     jamoma_max::dump_outlet results_out{this, "(anything) parameter changes: the name of the parameter and its value"}; /**< Outlet 0: every change of a parameter below the model, with the name (relative to the model) in front. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};              /**< Outlet 1: the dump outlet. */
+
+    /** @return The text editor window of the model (the Max method edclose reaches it). */
+    jamoma_max::TextEditor& editor() { return editor_; }
 
     /** Initialises the model: sends the default value through every parameter below it. */
     message<> init{this, "init", MIN_FUNCTION {
@@ -294,6 +299,32 @@ public:
     /** `preset:write/again`: writes to the file used last. */
     message<> preset_write_again{this, "preset:write/again", MIN_FUNCTION {
         write_file(last_file_);
+        return {};
+    }};
+
+    /** `preset:edit`: opens a text editor window with the presets in the text form of the presets file; closing it replaces the presets by the edited text. */
+    message<> preset_edit{this, "preset:edit", MIN_FUNCTION {
+        if (!model_) {
+            return {};
+        }
+        editor_.open(maxobj(), name_ + " presets", jamoma::write_presets_text(model_->presets().presets()),
+                     [this](const std::string& text) { apply_presets_text(text, "preset:edit"); });
+        return {};
+    }};
+
+    /**
+     * `preset:edit/apply <text>`: what closing the editor window does, for a patch or a test: the words are joined with spaces and the two
+     * characters `\n` stand for a line break.
+     */
+    message<> preset_edit_apply{this, "preset:edit/apply", MIN_FUNCTION {
+        std::string text;
+        for (const std::string& w : words(args)) {
+            text += (text.empty() ? "" : " ") + w;
+        }
+        for (std::size_t at = text.find("\\n"); at != std::string::npos; at = text.find("\\n", at + 1)) {
+            text.replace(at, 2, "\n");
+        }
+        apply_presets_text(text, "preset:edit/apply");
         return {};
     }};
 
@@ -475,17 +506,28 @@ private:
         }
         std::stringstream text;
         text << in.rdbuf();
-        jamoma::ReadResult result = jamoma::read_presets_text(text.str());
+        if (apply_presets_text(text.str(), "preset:read " + path)) {
+            last_file_ = path;
+            presets = symbol(path);
+        }
+    }
+
+    /**
+     * Replaces the presets by those of a text; on any problem nothing changes and the console says why.
+     * @param text The text of a presets file. @param label What to call the source in console messages. @return True if presets were read.
+     */
+    bool apply_presets_text(const std::string& text, const std::string& label)
+    {
+        jamoma::ReadResult result = jamoma::read_presets_text(text);
         for (const std::string& problem : result.problems) {
-            c74::max::object_warn(maxobj(), "preset:read %s: %s", path.c_str(), problem.c_str());
+            c74::max::object_warn(maxobj(), "%s: %s", label.c_str(), problem.c_str());
         }
         if (result.presets.empty() || !model_) {
-            c74::max::object_error(maxobj(), "preset:read: %s holds no presets; nothing changed", path.c_str());
-            return;
+            c74::max::object_error(maxobj(), "%s: no presets in the text; nothing changed", label.c_str());
+            return false;
         }
         model_->presets().replace_all(std::move(result.presets));
-        last_file_ = path;
-        presets = symbol(path);
+        return true;
     }
 
     /** Writes the presets to a text file. @param path The native path (empty: report that there is no file). */
@@ -689,4 +731,9 @@ private:
 
 };
 
-MIN_EXTERNAL(j_model);
+/** Class setup, called by Max: the Min wrapper, then the method Min does not offer (the editor window of preset:edit sends it when it closes). @param r Max's class registry. */
+void ext_main(void* r)
+{
+    c74::min::wrap_as_max_external<j_model>("j_model", __FILE__, r);
+    jamoma_max::add_edclose_method<j_model>("j.model");
+}
