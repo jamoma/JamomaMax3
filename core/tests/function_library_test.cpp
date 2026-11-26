@@ -33,6 +33,7 @@ std::unique_ptr<Function> make(const char* name) {
 
 } // namespace
 
+/** Function names lists every old function. */
 TEST_CASE("function_names_lists_every_old_function", "[function]") {
     const auto names = jamoma::function_names();
     CHECK(names.size() == 38);
@@ -43,12 +44,14 @@ TEST_CASE("function_names_lists_every_old_function", "[function]") {
     CHECK(std::find(names.begin(), names.end(), "cosine") == names.end()); // the 0.5.7 library had it; the one the package is compatible with has not
 }
 
+/** Function unknown name is null. */
 TEST_CASE("function_unknown_name_is_null", "[function]") {
     CHECK_FALSE(Function::create("sawtooth"));
     CHECK_FALSE(Function::create("Linear"));
     CHECK_FALSE(Function::create(""));
 }
 
+/** Function endpoints are zero and one. */
 TEST_CASE("function_endpoints_are_zero_and_one", "[function]") {
     for (const auto& name : jamoma::function_names()) {
         if (name == "lowpass")
@@ -60,6 +63,7 @@ TEST_CASE("function_endpoints_are_zero_and_one", "[function]") {
     }
 }
 
+/** Function known values. */
 TEST_CASE("function_known_values", "[function]") {
     const double pi = 3.14159265358979323846;
     CHECK(make("linear")->apply(0.3) == Approx(0.3));
@@ -94,6 +98,7 @@ TEST_CASE("function_known_values", "[function]") {
     CHECK(log2->apply(0.5) == Approx(std::log(1.5) / std::log(2.0)));
 }
 
+/** Function power symmetries. */
 TEST_CASE("function_power_symmetries", "[function]") {
     auto pw = make("power");
     CHECK(pw->get("powerValue") == Value{1.0});
@@ -107,6 +112,7 @@ TEST_CASE("function_power_symmetries", "[function]") {
     CHECK(pw->get("symmetry") == Value{"point"});
 }
 
+/** Function tanh default is symmetric. */
 TEST_CASE("function_tanh_default_is_symmetric", "[function]") {
     auto t = make("tanh");
     CHECK(t->get("offset") == Value{0.0});
@@ -115,6 +121,7 @@ TEST_CASE("function_tanh_default_is_symmetric", "[function]") {
     CHECK(t->apply(0.25) + t->apply(0.75) == Approx(1.0));
 }
 
+/** Function lowpass keeps state until reset. */
 TEST_CASE("function_lowpass_keeps_state_until_reset", "[function]") {
     auto lp = make("lowpass");
     CHECK(lp->get("coefficient") == Value{0.75});
@@ -124,6 +131,7 @@ TEST_CASE("function_lowpass_keeps_state_until_reset", "[function]") {
     CHECK(lp->apply(1.0) == Approx(0.25));
 }
 
+/** Function freehand follows its points. */
 TEST_CASE("function_freehand_follows_its_points", "[function]") {
     auto fh = make("freehand");
     CHECK(fh->apply(0.3) == Approx(0.3)); // an empty curve is the identity
@@ -138,6 +146,7 @@ TEST_CASE("function_freehand_follows_its_points", "[function]") {
     CHECK(fh->apply(1.0) == Approx(0.9)); // after the last point: its y
 }
 
+/** Function freehand refuses a malformed curve. */
 TEST_CASE("function_freehand_refuses_a_malformed_curve", "[function]") {
     auto fh = make("freehand");
     REQUIRE(fh->set("curveList", {0.0, 0.0, "linear", 1.0, 1.0, "linear"}));
@@ -146,6 +155,7 @@ TEST_CASE("function_freehand_refuses_a_malformed_curve", "[function]") {
     CHECK(fh->apply(0.5) == Approx(0.5)); // the old curve stays
 }
 
+/** Function unknown or wrong parameter is refused. */
 TEST_CASE("function_unknown_or_wrong_parameter_is_refused", "[function]") {
     auto e = make("exponential");
     CHECK_FALSE(e->set("nosuchparameter", {1.0}));
@@ -156,6 +166,7 @@ TEST_CASE("function_unknown_or_wrong_parameter_is_refused", "[function]") {
     CHECK(make("power")->parameter_names() == std::vector<std::string>{"powerValue", "symmetry"});
 }
 
+/** Function base is limited and one is identity. */
 TEST_CASE("function_base_is_limited_and_one_is_identity", "[function]") {
     auto e = make("exponential");
     REQUIRE(e->set("base", {1.0}));
@@ -169,6 +180,7 @@ TEST_CASE("function_base_is_limited_and_one_is_identity", "[function]") {
     CHECK(l->apply(0.3) == Approx(0.3));
 }
 
+/** Function nan and infinity stay finite and in range. */
 TEST_CASE("function_nan_and_infinity_stay_finite_and_in_range", "[function]") {
     const double nan = std::numeric_limits<double>::quiet_NaN();
     const double inf = std::numeric_limits<double>::infinity();

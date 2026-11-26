@@ -35,7 +35,8 @@ class j_textslider : public c74::min::object<j_textslider>, public c74::min::ui_
     std::atomic<double> value_{0.0};   /**< The value last given (not limited to the range). */
     std::atomic<bool> over_{false};    /**< Whether the mouse is over the box. */
     double anchor_ = 0.0;              /**< The value the drag moves. */
-    double last_x_ = 0.0, last_y_ = 0.0;  /**< Where the pointer was at the last drag step. */
+    double last_x_ = 0.0;              /**< Where the pointer was across at the last drag step. */
+    double last_y_ = 0.0;              /**< Where the pointer was down at the last drag step. */
     jamoma_max::Alive alive_;          /**< Lets deferred calls see that the object is gone. */
     jamoma_max::Settle settle_;        /**< Redraws once for a burst of values. */
 

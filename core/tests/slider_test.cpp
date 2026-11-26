@@ -16,6 +16,7 @@
 
 using Catch::Approx;
 
+/** Normalised places the value in the range. */
 TEST_CASE("slider_normalised_places_the_value_in_the_range", "[slider]")
 {
     CHECK(jamoma::slider_normalised(0.0, 0.0, 1.0) == Approx(0.0));
@@ -26,6 +27,7 @@ TEST_CASE("slider_normalised_places_the_value_in_the_range", "[slider]")
     CHECK(jamoma::slider_normalised(7.0, 3.0, 3.0) == Approx(0.5));
 }
 
+/** Click picks the value under the pointer. */
 TEST_CASE("slider_click_picks_the_value_under_the_pointer", "[slider]")
 {
     CHECK(jamoma::slider_value_at(1.0, 102.0, 0.0, 100.0) == Approx(0.0)); // one pixel of border
@@ -35,6 +37,7 @@ TEST_CASE("slider_click_picks_the_value_under_the_pointer", "[slider]")
     CHECK(jamoma::slider_value_at(5.0, 102.0, 4.0, 4.0) == Approx(4.0));
 }
 
+/** Drag moves proportionally and is limited. */
 TEST_CASE("slider_drag_moves_proportionally_and_is_limited", "[slider]")
 {
     CHECK(jamoma::slider_drag(0.0, 50.0, 102.0, 0.0, 100.0, 1.0) == Approx(50.0)); // 50 pixels of 100: half the range
@@ -44,6 +47,7 @@ TEST_CASE("slider_drag_moves_proportionally_and_is_limited", "[slider]")
     CHECK(jamoma::slider_drag(50.0, -1000.0, 102.0, 0.0, 100.0, 1.0) == Approx(0.0));
 }
 
+/** Extremes never give anything that is not finite. */
 TEST_CASE("slider_extremes_never_give_anything_that_is_not_finite", "[slider]")
 {
     const double nan = std::numeric_limits<double>::quiet_NaN();
@@ -61,6 +65,7 @@ TEST_CASE("slider_extremes_never_give_anything_that_is_not_finite", "[slider]")
     CHECK(std::isfinite(jamoma::slider_drag(0.0, 5.0, 100.0, 0.0, 1.0, 0.0)));
 }
 
+/** Value text has three decimals and the unit. */
 TEST_CASE("slider_value_text_has_three_decimals_and_the_unit", "[slider]")
 {
     CHECK(jamoma::slider_value_text(0.5, "") == "0.500");

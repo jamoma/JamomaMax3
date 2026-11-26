@@ -50,6 +50,7 @@ struct Param {
 
 } // namespace
 
+/** Linear default is identity. */
 TEST_CASE("mapper_linear_default_is_identity", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -60,6 +61,7 @@ TEST_CASE("mapper_linear_default_is_identity", "[mapper]")
     CHECK(m.function() == "linear");
 }
 
+/** Scales between ranges. */
 TEST_CASE("mapper_scales_between_ranges", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -73,6 +75,7 @@ TEST_CASE("mapper_scales_between_ranges", "[mapper]")
     CHECK(m.map(20) == Approx(1.0));
 }
 
+/** Does not clip by default and clipmodes clip the input. */
 TEST_CASE("mapper_does_not_clip_by_default_and_clipmodes_clip_the_input", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -93,6 +96,7 @@ TEST_CASE("mapper_does_not_clip_by_default_and_clipmodes_clip_the_input", "[mapp
     CHECK(m.map(2.0) == Approx(100.0));
 }
 
+/** Uses the function. */
 TEST_CASE("mapper_uses_the_function", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -108,6 +112,7 @@ TEST_CASE("mapper_uses_the_function", "[mapper]")
     CHECK(m.function_parameters() == std::vector<std::string>{"powerValue", "symmetry"});
 }
 
+/** Inverse flips the curve in any output range. */
 TEST_CASE("mapper_inverse_flips_the_curve_in_any_output_range", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -122,6 +127,7 @@ TEST_CASE("mapper_inverse_flips_the_curve_in_any_output_range", "[mapper]")
     CHECK(m.map(0.5) == Approx(20.0));
 }
 
+/** Reversed ranges reverse. */
 TEST_CASE("mapper_reversed_ranges_reverse", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -139,6 +145,7 @@ TEST_CASE("mapper_reversed_ranges_reverse", "[mapper]")
     CHECK(m.map(0.25) == Approx(0.75));
 }
 
+/** Equal input limits never divide by zero. */
 TEST_CASE("mapper_equal_input_limits_never_divide_by_zero", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -154,6 +161,7 @@ TEST_CASE("mapper_equal_input_limits_never_divide_by_zero", "[mapper]")
         CHECK(m.map(x) == Approx(2.0)); // clipped to the single value, which is the low end of the output
 }
 
+/** Nan and infinity give finite numbers. */
 TEST_CASE("mapper_nan_and_infinity_give_finite_numbers", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -173,6 +181,7 @@ TEST_CASE("mapper_nan_and_infinity_give_finite_numbers", "[mapper]")
     CHECK(m.settings().output_min == Approx(2.0));
 }
 
+/** Input index picks one item of a list. */
 TEST_CASE("mapper_input_index_picks_one_item_of_a_list", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -188,6 +197,7 @@ TEST_CASE("mapper_input_index_picks_one_item_of_a_list", "[mapper]")
     CHECK(m.map(Value{0.0, 0.5}).size() == 2);
 }
 
+/** Tells when a threshold is crossed. */
 TEST_CASE("mapper_tells_when_a_threshold_is_crossed", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -218,6 +228,7 @@ TEST_CASE("mapper_tells_when_a_threshold_is_crossed", "[mapper]")
     CHECK(events[0] == std::make_pair(std::string("output/going/up"), false));
 }
 
+/** Maps lists and passes symbols through. */
 TEST_CASE("mapper_maps_lists_and_passes_symbols_through", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -230,6 +241,7 @@ TEST_CASE("mapper_maps_lists_and_passes_symbols_through", "[mapper]")
     CHECK(out[2].as_double() == Approx(10.0));
 }
 
+/** Samples match map and leave the state alone. */
 TEST_CASE("mapper_samples_match_map_and_leave_the_state_alone", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -249,6 +261,7 @@ TEST_CASE("mapper_samples_match_map_and_leave_the_state_alone", "[mapper]")
         CHECK(lin[i] == Approx(static_cast<double>(i) / 10.0));
 }
 
+/** Inactive process does nothing. */
 TEST_CASE("mapper_inactive_process_does_nothing", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -263,6 +276,7 @@ TEST_CASE("mapper_inactive_process_does_nothing", "[mapper]")
     CHECK(m.map(0.5) == Approx(0.5)); // map() itself still works
 }
 
+/** Follows the range of bound parameters. */
 TEST_CASE("mapper_follows_the_range_of_bound_parameters", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -284,6 +298,7 @@ TEST_CASE("mapper_follows_the_range_of_bound_parameters", "[mapper]")
     CHECK(m.settings().input_max == Approx(8.0));
 }
 
+/** Sends what the input parameter outputs to the output parameter. */
 TEST_CASE("mapper_sends_what_the_input_parameter_outputs_to_the_output_parameter", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -304,6 +319,7 @@ TEST_CASE("mapper_sends_what_the_input_parameter_outputs_to_the_output_parameter
     CHECK(seen.empty());
 }
 
+/** Binds a parameter that appears later. */
 TEST_CASE("mapper_binds_a_parameter_that_appears_later", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -315,6 +331,7 @@ TEST_CASE("mapper_binds_a_parameter_that_appears_later", "[mapper]")
     CHECK(m.settings().input_max == Approx(5.0));
 }
 
+/** Ramp is added to the command for the output parameter. */
 TEST_CASE("mapper_ramp_is_added_to_the_command_for_the_output_parameter", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -330,6 +347,7 @@ TEST_CASE("mapper_ramp_is_added_to_the_command_for_the_output_parameter", "[mapp
     CHECK(out.value() == Approx(1.0));
 }
 
+/** Hands the send to the dispatcher and returns at once. */
 TEST_CASE("mapper_hands_the_send_to_the_dispatcher_and_returns_at_once", "[mapper]")
 {
     jamoma::Namespace ns;
@@ -348,6 +366,7 @@ TEST_CASE("mapper_hands_the_send_to_the_dispatcher_and_returns_at_once", "[mappe
     CHECK(out.value() == Approx(0.5));
 }
 
+/** Work left with the dispatcher is harmless after the mapper is gone. */
 TEST_CASE("mapper_work_left_with_the_dispatcher_is_harmless_after_the_mapper_is_gone", "[mapper]")
 {
     jamoma::Namespace ns;

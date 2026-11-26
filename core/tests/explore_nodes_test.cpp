@@ -62,6 +62,7 @@ std::vector<std::string> v(std::initializer_list<const char*> items) { return {i
 
 } // namespace
 
+/** Descendants lists every object below relative to the address. */
 TEST_CASE("explore_descendants_lists_every_object_below_relative_to_the_address", "[explore]")
 {
     auto t = sample();
@@ -70,6 +71,7 @@ TEST_CASE("explore_descendants_lists_every_object_below_relative_to_the_address"
     CHECK(r.items == v({"audio/gain", "audio/mute", "freq", "q"})); // /m/audio has no object: not an item; alphabetic is the default
 }
 
+/** Depth limits the levels. */
 TEST_CASE("explore_depth_limits_the_levels", "[explore]")
 {
     auto t = sample();
@@ -80,6 +82,7 @@ TEST_CASE("explore_depth_limits_the_levels", "[explore]")
     CHECK(jamoma::explore(t->ns, Address::parse("/m"), o).items.size() == 4);
 }
 
+/** Children lists direct nodes with an object. */
 TEST_CASE("explore_children_lists_direct_nodes_with_an_object", "[explore]")
 {
     auto t = sample();
@@ -89,6 +92,7 @@ TEST_CASE("explore_children_lists_direct_nodes_with_an_object", "[explore]")
     CHECK(jamoma::explore(t->ns, Address::parse("/"), o).items == v({"m"})); // the name part only, repetitions removed: m and m.1 are one
 }
 
+/** Brothers lists the instances of the same name. */
 TEST_CASE("explore_brothers_lists_the_instances_of_the_same_name", "[explore]")
 {
     auto t = sample();
@@ -99,6 +103,7 @@ TEST_CASE("explore_brothers_lists_the_instances_of_the_same_name", "[explore]")
     CHECK(jamoma::explore(t->ns, Address::parse("/freq"), o).items.empty());
 }
 
+/** Attributes lists the attributes of the node. */
 TEST_CASE("explore_attributes_lists_the_attributes_of_the_node", "[explore]")
 {
     auto t = sample();
@@ -113,6 +118,7 @@ TEST_CASE("explore_attributes_lists_the_attributes_of_the_node", "[explore]")
     CHECK(jamoma::explore(t->ns, Address::parse("/m/audio"), o).items.empty()); // a node without object has none
 }
 
+/** Sort priority then name. */
 TEST_CASE("explore_sort_priority_then_name", "[explore]")
 {
     auto t = sample();
@@ -123,6 +129,7 @@ TEST_CASE("explore_sort_priority_then_name", "[explore]")
     CHECK(jamoma::explore(t->ns, Address::parse("/m"), o).items == v({"audio/gain", "audio/mute", "freq", "q"}));
 }
 
+/** Nonexistent address finds nothing. */
 TEST_CASE("explore_nonexistent_address_finds_nothing", "[explore]")
 {
     auto t = sample();
@@ -132,6 +139,7 @@ TEST_CASE("explore_nonexistent_address_finds_nothing", "[explore]")
     CHECK(jamoma::explore(t->ns, Address(), {}).found); // the empty address is the root
 }
 
+/** Is stable while nodes come and go. */
 TEST_CASE("explore_is_stable_while_nodes_come_and_go", "[explore]")
 {
     auto t = sample();
@@ -151,6 +159,7 @@ TEST_CASE("explore_is_stable_while_nodes_come_and_go", "[explore]")
     churn.join();
 }
 
+/** Item keys are absolute addresses. */
 TEST_CASE("explore_item_keys_are_absolute_addresses", "[explore]")
 {
     CHECK(jamoma::item_key(ExploreOutput::Descendants, Address::parse("/m"), "audio/gain") == "/m/audio/gain");
@@ -161,6 +170,7 @@ TEST_CASE("explore_item_keys_are_absolute_addresses", "[explore]")
     CHECK(jamoma::item_key(ExploreOutput::Brothers, Address::parse("/m.1"), "0") == "/m");
 }
 
+/** Format none lists items in one message. */
 TEST_CASE("explore_format_none_lists_items_in_one_message", "[explore]")
 {
     const auto m = jamoma::format_items(ExploreFormat::None, ExploreOutput::Descendants, Address::parse("/m"), v({"a", "b"}));
@@ -168,12 +178,14 @@ TEST_CASE("explore_format_none_lists_items_in_one_message", "[explore]")
     CHECK(jamoma::format_items(ExploreFormat::None, ExploreOutput::Descendants, Address::parse("/m"), {}).empty());
 }
 
+/** Format umenu. */
 TEST_CASE("explore_format_umenu", "[explore]")
 {
     const auto m = jamoma::format_items(ExploreFormat::Umenu, ExploreOutput::Descendants, Address::parse("/m"), v({"a", "b"}));
     CHECK(m == std::vector<OutMessage>{{"clear", {}}, {"append", Value{"a"}}, {"append", Value{"b"}}});
 }
 
+/** Format umenu prefix depends on the output. */
 TEST_CASE("explore_format_umenu_prefix_depends_on_the_output", "[explore]")
 {
     auto prefix = [](ExploreOutput o, const char* address) {
@@ -191,6 +203,7 @@ TEST_CASE("explore_format_umenu_prefix_depends_on_the_output", "[explore]")
     CHECK(prefix(ExploreOutput::Attributes, "/") == "/:");
 }
 
+/** Format jit cellblock and coll. */
 TEST_CASE("explore_format_jit_cellblock_and_coll", "[explore]")
 {
     const auto cell = jamoma::format_items(ExploreFormat::JitCellblock, ExploreOutput::Descendants, Address::parse("/m"), v({"a", "b"}));
@@ -199,6 +212,7 @@ TEST_CASE("explore_format_jit_cellblock_and_coll", "[explore]")
     CHECK(coll == std::vector<OutMessage>{{"clear", {}}, {"store", Value{"a", 0}}, {"store", Value{"b", 0}}});
 }
 
+/** Format selection. */
 TEST_CASE("explore_format_selection", "[explore]")
 {
     const std::vector<bool> flags{true, false};
@@ -210,6 +224,7 @@ TEST_CASE("explore_format_selection", "[explore]")
     CHECK(jamoma::format_selection(ExploreFormat::Coll, flags).empty());
 }
 
+/** Selection is shared by name. */
 TEST_CASE("explore_selection_is_shared_by_name", "[explore]")
 {
     auto a = jamoma::Selection::named("shared_test");
@@ -222,6 +237,7 @@ TEST_CASE("explore_selection_is_shared_by_name", "[explore]")
     a->clear();
 }
 
+/** Selection toggle set all and selected. */
 TEST_CASE("explore_selection_toggle_set_all_and_selected", "[explore]")
 {
     auto s = jamoma::Selection::named("toggle_test");

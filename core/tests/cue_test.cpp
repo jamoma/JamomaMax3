@@ -55,6 +55,7 @@ struct Rig {
 
 } // namespace
 
+/** Store and recall round trip. */
 TEST_CASE("cue_store_and_recall_round_trip", "[cue]")
 {
     Rig r;
@@ -74,6 +75,7 @@ TEST_CASE("cue_store_and_recall_round_trip", "[cue]")
     CHECK(cues.cues().names() == std::vector<std::string>{"one"});
 }
 
+/** Store skips what cannot be stored and says so. */
 TEST_CASE("cue_store_skips_what_cannot_be_stored_and_says_so", "[cue]")
 {
     Rig r;
@@ -85,6 +87,7 @@ TEST_CASE("cue_store_skips_what_cannot_be_stored_and_says_so", "[cue]")
     CHECK_FALSE(cues.store("", {"/a/freq"}).stored);
 }
 
+/** Store again replaces and keeps the place. */
 TEST_CASE("cue_store_again_replaces_and_keeps_the_place", "[cue]")
 {
     Rig r;
@@ -99,6 +102,7 @@ TEST_CASE("cue_store_again_replaces_and_keeps_the_place", "[cue]")
     CHECK(r.at(0) == Approx(7.0));
 }
 
+/** Recall from an address runs only lines below it. */
 TEST_CASE("cue_recall_from_an_address_runs_only_lines_below_it", "[cue]")
 {
     Rig r;
@@ -114,6 +118,7 @@ TEST_CASE("cue_recall_from_an_address_runs_only_lines_below_it", "[cue]")
     CHECK_FALSE(cues.recall("missing").found);
 }
 
+/** Recall skips missing nodes and reports them. */
 TEST_CASE("cue_recall_skips_missing_nodes_and_reports_them", "[cue]")
 {
     Rig r;
@@ -129,6 +134,7 @@ TEST_CASE("cue_recall_skips_missing_nodes_and_reports_them", "[cue]")
     CHECK(r.at(0) == Approx(100.0));
 }
 
+/** Recall while nodes are deleted. */
 TEST_CASE("cue_recall_while_nodes_are_deleted", "[cue]")
 {
     Rig r;
@@ -148,6 +154,7 @@ TEST_CASE("cue_recall_while_nodes_are_deleted", "[cue]")
     churn.join();
 }
 
+/** Ramp and description. */
 TEST_CASE("cue_ramp_and_description", "[cue]")
 {
     Rig r;
@@ -171,6 +178,7 @@ TEST_CASE("cue_ramp_and_description", "[cue]")
     CHECK_FALSE(cues.description("nothing").has_value());
 }
 
+/** Text matches the old sample and round trips. */
 TEST_CASE("cue_text_matches_the_old_sample_and_round_trips", "[cue]")
 {
     Rig r;
@@ -203,6 +211,7 @@ TEST_CASE("cue_text_matches_the_old_sample_and_round_trips", "[cue]")
     CHECK(written.find("/a/freq 440.5") != std::string::npos);
 }
 
+/** Text keeps the description. */
 TEST_CASE("cue_text_keeps_the_description", "[cue]")
 {
     Rig r;
@@ -214,6 +223,7 @@ TEST_CASE("cue_text_keeps_the_description", "[cue]")
     CHECK(again.description("one") == std::string("a note"));
 }
 
+/** Write xml then read is identical. */
 TEST_CASE("cue_write_xml_then_read_is_identical", "[cue]")
 {
     Rig r;
@@ -232,6 +242,7 @@ TEST_CASE("cue_write_xml_then_read_is_identical", "[cue]")
     CHECK(again.ramp("two") == 500.0);
 }
 
+/** Read damaged files keep what they can. */
 TEST_CASE("cue_read_damaged_files_keep_what_they_can", "[cue]")
 {
     Rig r;
@@ -271,6 +282,7 @@ TEST_CASE("cue_read_damaged_files_keep_what_they_can", "[cue]")
     }
 }
 
+/** Recall reports an unknown parameter at recall not at read. */
 TEST_CASE("cue_recall_reports_an_unknown_parameter_at_recall_not_at_read", "[cue]")
 {
     Rig r;
@@ -281,6 +293,7 @@ TEST_CASE("cue_recall_reports_an_unknown_parameter_at_recall_not_at_read", "[cue
     CHECK(report.skipped.size() == 1);
 }
 
+/** Many cues stay fast. */
 TEST_CASE("cue_many_cues_stay_fast", "[cue]")
 {
     Rig r;
@@ -296,6 +309,7 @@ TEST_CASE("cue_many_cues_stay_fast", "[cue]")
     CHECK(elapsed < 10.0);
 }
 
+/** Edit text round trip and an empty edit changes nothing. */
 TEST_CASE("cue_edit_text_round_trip_and_an_empty_edit_changes_nothing", "[cue]")
 {
     Rig r;
@@ -309,6 +323,7 @@ TEST_CASE("cue_edit_text_round_trip_and_an_empty_edit_changes_nothing", "[cue]")
     CHECK(cues.cues().names().size() == 2); // nothing changed
 }
 
+/** Rename to an existing name fails. */
 TEST_CASE("cue_rename_to_an_existing_name_fails", "[cue]")
 {
     Rig r;
@@ -319,6 +334,7 @@ TEST_CASE("cue_rename_to_an_existing_name_fails", "[cue]")
     CHECK(cues.cues().names() == std::vector<std::string>{"one", "two"});
 }
 
+/** New at a position moves the cue there. */
 TEST_CASE("cue_new_at_a_position_moves_the_cue_there", "[cue]")
 {
     Rig r;
@@ -330,6 +346,7 @@ TEST_CASE("cue_new_at_a_position_moves_the_cue_there", "[cue]")
     CHECK(cues.cues().current() == std::optional<std::size_t>(0));
 }
 
+/** Update refreshes the values of the lines of a cue. */
 TEST_CASE("cue_update_refreshes_the_values_of_the_lines_of_a_cue", "[cue]")
 {
     Rig r;
@@ -353,6 +370,7 @@ TEST_CASE("cue_update_refreshes_the_values_of_the_lines_of_a_cue", "[cue]")
     CHECK_FALSE(cues.update("3"));
 }
 
+/** Append adds a line and makes the cue if needed. */
 TEST_CASE("cue_append_adds_a_line_and_makes_the_cue_if_needed", "[cue]")
 {
     Rig r;
@@ -369,6 +387,7 @@ TEST_CASE("cue_append_adds_a_line_and_makes_the_cue_if_needed", "[cue]")
     CHECK(r.at(1) == Approx(3.5));
 }
 
+/** Optimize removes values that repeat the state before. */
 TEST_CASE("cue_optimize_removes_values_that_repeat_the_state_before", "[cue]")
 {
     Rig r;
@@ -388,6 +407,7 @@ TEST_CASE("cue_optimize_removes_values_that_repeat_the_state_before", "[cue]")
     cues.optimize({"one", "missing", "three"}); // a name that does not exist is skipped, nothing crashes
 }
 
+/** Recall next and previous follow the current cue. */
 TEST_CASE("cue_recall_next_and_previous_follow_the_current_cue", "[cue]")
 {
     Rig r;
@@ -408,6 +428,7 @@ TEST_CASE("cue_recall_next_and_previous_follow_the_current_cue", "[cue]")
     CHECK_FALSE(cues.recall_previous().found);
 }
 
+/** Recall next without a current cue starts at the first. */
 TEST_CASE("cue_recall_next_without_a_current_cue_starts_at_the_first", "[cue]")
 {
     Rig r;
@@ -418,6 +439,7 @@ TEST_CASE("cue_recall_next_without_a_current_cue_starts_at_the_first", "[cue]")
     CHECK(r.at(0) == Approx(7.0));
 }
 
+/** Address is the parent the cue stores from and recalls relative to. */
 TEST_CASE("cue_address_is_the_parent_the_cue_stores_from_and_recalls_relative_to", "[cue]")
 {
     Rig r;

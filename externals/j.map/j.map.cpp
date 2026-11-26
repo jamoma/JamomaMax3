@@ -35,7 +35,8 @@ using namespace c74::min;
 class j_map : public c74::min::object<j_map> {
     // State comes before the attributes: Min runs every attribute setter with its default while constructing them.
     jamoma::Mapper mapper_{jamoma::Registry::instance().names()};  /**< The mapper. */
-    std::string input_text_, output_text_;                         /**< The addresses as written. */
+    std::string input_text_;                                       /**< The input address as written. */
+    std::string output_text_;                                      /**< The output address as written. */
     std::vector<std::pair<std::string, atoms>> creation_;          /**< The attributes given at creation (`reset` applies them again). */
     bool ready_ = false;                                           /**< True once the patcher has loaded and the addresses may be resolved. */
     jamoma_max::Alive alive_;                                      /**< Lets deferred calls see that the object is gone. */

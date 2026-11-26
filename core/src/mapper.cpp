@@ -38,11 +38,15 @@ struct Mapper::Impl {
     mutable std::mutex mutex;                             /**< Guards everything below except the callbacks' own calls. */
     MapperSettings settings;                              /**< The settings. */
     std::unique_ptr<Function> function;                   /**< The function. */
-    End in, out;                                          /**< The bindings. */
+    End in;                                               /**< The binding of the input. */
+    End out;                                              /**< The binding of the output. */
     std::function<void(const Value&)> on_return;          /**< The return function. */
     std::function<void(std::string_view, bool)> on_threshold; /**< Told when a threshold is crossed. */
     std::function<void(std::function<void()>)> dispatcher;   /**< Runs the writing to the output parameter (empty: at once). */
-    bool in_down = false, in_up = false, out_down = false, out_up = false;  /**< The state of the four thresholds. */
+    bool in_down = false;                                 /**< Whether the input is below the lower input threshold. */
+    bool in_up = false;                                   /**< Whether the input is above the upper input threshold. */
+    bool out_down = false;                                /**< Whether the output is below the lower output threshold. */
+    bool out_up = false;                                  /**< Whether the output is above the upper output threshold. */
     std::unique_ptr<Receiver> receiver;                   /**< Follows the input parameter. */
     Sender sender;                                        /**< Writes to the output parameter. */
 
