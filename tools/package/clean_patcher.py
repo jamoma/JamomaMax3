@@ -6,7 +6,7 @@
     clean_patcher.py <patcher>...
 
 * Custom colours go: of comments, objects, messages, panels and every other box, and of the patcher backgrounds (subpatchers too). Jamoma objects
-  (`j.…` boxes and bpatchers) keep theirs.
+  (`j.…` boxes and bpatchers) keep theirs, except `j.textslider`, which gets its default colours.
 * Every font is Arial; a bold variant (`Lato Black`, `… Heavy`, `… Bold`) becomes Arial with the bold face.
 * Font size 13 becomes 12.
 
@@ -16,6 +16,9 @@ to be run through it without being asked.
 
 import json
 import sys
+
+#: Jamoma objects whose custom colours go like those of other boxes.
+DEFAULT_COLOURS = {"j.textslider"}
 
 #: Words in a font name that mean bold.
 BOLD = ("bold", "black", "heavy")
@@ -54,7 +57,7 @@ def clean(patcher) -> None:
     _fonts(patcher, "default_fontname", "default_fontsize")
     for entry in patcher.get("boxes", []):
         box = entry["box"]
-        if not _is_jamoma(box):
+        if not _is_jamoma(box) or box.get("maxclass") in DEFAULT_COLOURS:
             _drop_colours(box)
         _fonts(box, "fontname", "fontsize")
         if "patcher" in box:

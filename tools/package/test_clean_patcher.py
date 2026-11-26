@@ -34,11 +34,16 @@ class ColourTests(unittest.TestCase):
 
     def test_jamoma_objects_keep_their_colours(self):
         c = [0.1, 0.2, 0.3, 1.0]
-        p = cleaned(box("newobj", "j.parameter a", color=c), box("j.textslider", bgcolor=c, knobcolor=c),
+        p = cleaned(box("newobj", "j.parameter a", color=c), box("j.ui", bgcolor=c, headercolor=c),
                     box("bpatcher", name="j.maxhelpui.maxpat", bgcolor=c))
         self.assertEqual(p["boxes"][0]["box"]["color"], c)
-        self.assertEqual(p["boxes"][1]["box"]["knobcolor"], c)
+        self.assertEqual(p["boxes"][1]["box"]["headercolor"], c)
         self.assertEqual(p["boxes"][2]["box"]["bgcolor"], c)
+
+    def test_textsliders_get_the_default_colours(self):
+        c = [0.6, 0.0, 0.4, 0.7]
+        p = cleaned(box("j.textslider", bordercolor=c, knobcolor=c, range=[0.0, 127.0]))
+        self.assertEqual(p["boxes"][0]["box"], {"id": "obj-1", "maxclass": "j.textslider", "range": [0.0, 127.0]})
 
     def test_patcher_backgrounds_become_the_default_also_in_subpatchers(self):
         c = [0.5, 0.5, 0.5, 1.0]

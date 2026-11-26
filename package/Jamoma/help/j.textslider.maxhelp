@@ -1023,12 +1023,6 @@
 			},
 			{
 				"box": {
-					"bordercolor": [
-						0.619608,
-						0.0,
-						0.360784,
-						0.701961
-					],
 					"id": "obj-1",
 					"maxclass": "j.textslider",
 					"numinlets": 1,
