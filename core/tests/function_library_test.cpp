@@ -9,6 +9,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -33,9 +34,13 @@ std::unique_ptr<Function> make(const char* name) {
 } // namespace
 
 TEST_CASE("function_names_lists_every_old_function", "[function]") {
-    const std::vector<std::string> expected{"cosine", "crossFadeIn", "crossFadeOut", "exponential", "freehand", "linear",
-                                            "logarithm", "lowpass", "power", "smoothPolynomial", "tanh"};
-    CHECK(jamoma::function_names() == expected);
+    const auto names = jamoma::function_names();
+    CHECK(names.size() == 38);
+    CHECK(std::is_sorted(names.begin(), names.end()));
+    for (const char* n : {"linear", "exponential", "logarithm", "power", "tanh", "smoothPolynomial", "lowpass", "freehand", "easeInBack", "easeOutBounce",
+                          "easeInOutCircular", "easeInCubic", "easeOutElastic", "easeInOutExponential", "easeInQuadratic", "easeOutQuartic", "easeInQuintic", "easeInOutSine"})
+        CHECK(std::find(names.begin(), names.end(), n) != names.end());
+    CHECK(std::find(names.begin(), names.end(), "cosine") == names.end()); // the 0.5.7 library had it; the one the package is compatible with has not
 }
 
 TEST_CASE("function_unknown_name_is_null", "[function]") {
@@ -58,9 +63,26 @@ TEST_CASE("function_endpoints_are_zero_and_one", "[function]") {
 TEST_CASE("function_known_values", "[function]") {
     const double pi = 3.14159265358979323846;
     CHECK(make("linear")->apply(0.3) == Approx(0.3));
-    CHECK(make("cosine")->apply(0.25) == Approx(0.5 - 0.5 * std::cos(pi * 0.25)));
-    CHECK(make("crossFadeIn")->apply(0.5) == Approx(std::sin(pi / 4)));
-    CHECK(make("crossFadeOut")->apply(0.5) == Approx(1.0 - std::sin(pi / 4)));
+    CHECK(make("easeInQuadratic")->apply(0.5) == Approx(0.25));
+    CHECK(make("easeOutQuadratic")->apply(0.5) == Approx(0.75));
+    CHECK(make("easeInOutQuadratic")->apply(0.25) == Approx(0.125));
+    CHECK(make("easeInCubic")->apply(0.5) == Approx(0.125));
+    CHECK(make("easeOutCubic")->apply(0.5) == Approx(0.875));
+    CHECK(make("easeInOutCubic")->apply(0.75) == Approx(0.5 * std::pow(2 * 0.75 - 2, 3) + 1));
+    CHECK(make("easeInQuartic")->apply(0.5) == Approx(0.0625));
+    CHECK(make("easeOutQuintic")->apply(0.5) == Approx(1 - 0.03125));
+    CHECK(make("easeInSine")->apply(0.5) == Approx(std::sin(-0.25 * pi) + 1));
+    CHECK(make("easeOutSine")->apply(0.5) == Approx(std::sin(0.25 * pi)));
+    CHECK(make("easeInOutSine")->apply(0.5) == Approx(0.5));
+    CHECK(make("easeInCircular")->apply(0.5) == Approx(1 - std::sqrt(0.75)));
+    CHECK(make("easeOutCircular")->apply(0.5) == Approx(std::sqrt(0.75)));
+    CHECK(make("easeInBack")->apply(0.5) == Approx(0.125 - 0.5));
+    CHECK(make("easeOutBounce")->apply(0.5) == Approx(0.71875));
+    CHECK(make("easeInBounce")->apply(0.5) == Approx(1 - 0.71875));
+    CHECK(make("easeInExponential")->apply(0.5) == Approx(std::pow(2, -5)));
+    CHECK(make("easeOutExponential")->apply(0.5) == Approx(1 - std::pow(2, -5)));
+    CHECK(make("easeInElastic")->apply(0.5) == Approx(std::sin(3.25 * pi) * std::pow(2, -5)));
+    CHECK(make("easeOutElastic")->apply(0.5) == Approx(std::sin(-9.75 * pi) * std::pow(2, -5) + 1));
     CHECK(make("smoothPolynomial")->apply(0.5) == Approx(0.5));
     CHECK(make("smoothPolynomial")->apply(0.25) == Approx(0.25 * 0.25 * 0.25 * (0.25 * (6 * 0.25 - 15) + 10)));
 
@@ -110,7 +132,7 @@ TEST_CASE("function_freehand_follows_its_points", "[function]") {
     CHECK(fh->apply(0.5) == Approx(1.0));
     CHECK(fh->apply(0.75) == Approx(0.5));
     CHECK(fh->apply(1.0) == Approx(0.0));
-    REQUIRE(fh->set("curveList", {0.2, 0.3, "linear", 0.8, 0.9, "cosine"}));
+    REQUIRE(fh->set("curveList", {0.2, 0.3, "linear", 0.8, 0.9, "easeInOutSine"}));
     CHECK(fh->apply(0.0) == Approx(0.3)); // before the first point: its y
     CHECK(fh->apply(0.5) == Approx(0.3 + 0.6 * 0.5)); // cosine halfway
     CHECK(fh->apply(1.0) == Approx(0.9)); // after the last point: its y
@@ -159,6 +181,8 @@ TEST_CASE("function_nan_and_infinity_stay_finite_and_in_range", "[function]") {
         }
     }
     CHECK(make("linear")->apply(nan) == Approx(0.0));
-    CHECK(make("linear")->apply(inf) == Approx(1.0));
+    CHECK(make("linear")->apply(inf) == Approx(0.0)); // not finite: 0
     CHECK(make("linear")->apply(-inf) == Approx(0.0));
+    CHECK(make("linear")->apply(2.0) == Approx(2.0)); // outside 0..1 is not clipped
+    CHECK(make("linear")->apply(-1.0) == Approx(-1.0));
 }

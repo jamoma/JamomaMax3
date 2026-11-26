@@ -5,9 +5,10 @@
  * @file function_library.hpp
  * @brief The function library of `j.map`: curves from 0..1 to 0..1 that shape a mapping.
  *
- * The eleven functions of the old Jamoma function library, with the same names, parameters (named, as the old attributes were)
- * and formulas. A function is made by name; it has named parameters; applying it to a number in 0..1 gives the shaped number.
- * Input outside 0..1 is clipped to it (NaN gives 0), so the result is always finite. `lowpass` is a filter and keeps its state
+ * The 38 functions of the Jamoma function library (JamomaCore `FunctionLib`): `linear`, `exponential`, `logarithm`, `power`, `tanh`, `smoothPolynomial`, `lowpass`, `freehand`
+ * and the thirty easing functions (`easeIn`, `easeOut` and `easeInOut` of Back, Bounce, Circular, Cubic, Elastic, Exponential, Quadratic, Quartic, Quintic, Sine), with the same
+ * names, parameters (named, as the old attributes were) and formulas. A function is made by name; it has named parameters; applying it to a number in 0..1 gives the shaped number.
+ * Input outside 0..1 is not clipped (as in the old library, a mapper that does not clip passes it through the curve); NaN counts as 0 and a result that is not finite is 0, so the result is always finite. `lowpass` is a filter and keeps its state
  * between calls; the others have none.
  */
 
@@ -23,7 +24,7 @@
 
 namespace jamoma {
 
-/** @return The names of the functions, in the order j.map lists them: cosine, crossFadeIn, crossFadeOut, exponential, freehand, linear, logarithm, lowpass, power, smoothPolynomial, tanh. */
+/** @return The names of the functions, in alphabetical order (the old library listed them in the order of its hash table). */
 JAMOMA_API std::vector<std::string> function_names();
 
 /** @brief One function of the library, with its parameters. */
@@ -59,7 +60,7 @@ public:
     virtual bool set(std::string_view parameter, const Value& value);
     /**
      * @brief Shapes a number.
-     * @param x The input; limited to 0..1, NaN counts as 0.
+     * @param x The input (normally 0..1); NaN counts as 0.
      * @return The shaped number (finite).
      */
     double apply(double x);

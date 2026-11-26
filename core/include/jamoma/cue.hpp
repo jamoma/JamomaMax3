@@ -45,10 +45,11 @@ public:
     /**
      * @brief Stores the current values of some parameters under a name (a cue of that name is replaced), and makes it the current cue.
      * @param name The cue name.
-     * @param keys Absolute addresses of parameters (the keys of a Selection).
+     * @param keys Absolute addresses of parameters (the keys of a Selection); with an address set, only those at or below it are stored.
+     * @param position Where the cue goes in the list (0 is the first place); by default a new cue goes last and an existing one stays where it is.
      * @return What was stored and what was skipped.
      */
-    StoreReport store(std::string_view name, const std::vector<std::string>& keys);
+    StoreReport store(std::string_view name, const std::vector<std::string>& keys, std::optional<std::size_t> position = std::nullopt);
     /**
      * @brief Recalls a cue: sends every line to its parameter, in order. Lines whose parameter does not exist (any more) are reported, not errors.
      * @param name_or_index The name, or a 1-based position as text.
@@ -56,6 +57,29 @@ public:
      * @return The report (as PresetManager::recall).
      */
     RecallReport recall(std::string_view name_or_index, const Address& start = Address());
+
+    /** @brief Refreshes the value of every line of a cue from its parameter (a line whose parameter is gone is left as it is; ramps stay). @param name_or_index The cue (a name or a position counted from 1). @return False if there is no such cue. */
+    bool update(std::string_view name_or_index);
+    /**
+     * @brief Appends a line to a cue, making the cue if there is none of that name.
+     * @param name The cue name.
+     * @param line An absolute address followed by the value (and optionally `ramp <ms>`).
+     * @return False if the name is empty or the line does not start with an absolute address.
+     */
+    bool append(std::string_view name, const Value& line);
+    /**
+     * @brief Removes from each cue the lines whose value is the same as the state the cues before it left: the first cue stays as it is.
+     * @param names The cues, in the order they are played; names that do not exist are skipped.
+     */
+    void optimize(const std::vector<std::string>& names);
+    /** @brief Recalls the cue after the current one (the first one if there is no current cue); nothing happens after the last. @return The report; not found if there is no such cue. */
+    RecallReport recall_next();
+    /** @brief Recalls the cue before the current one; nothing happens before the first (or without a current cue). @return The report; not found if there is no such cue. */
+    RecallReport recall_previous();
+    /** @brief Sets the parent node the cues store from and recall relative to; the root (the default) means all. @param address The address. */
+    void set_address(const Address& address) { address_ = address; }
+    /** @return The parent node of the cues. */
+    const Address& address() const noexcept { return address_; }
 
     /** @brief Gives every line of a cue the ramp time, replacing any ramp it had. @param name The cue. @param ms Milliseconds; zero or less removes the ramp. @return False if there is no such cue. */
     bool set_ramp(std::string_view name, double ms);
@@ -86,6 +110,7 @@ public:
 
 private:
     Namespace& ns_;          /**< The namespace. */
+    Address address_;        /**< The parent node of the cues (empty: the root). */
     PresetManager manager_;  /**< The cues. */
 };
 

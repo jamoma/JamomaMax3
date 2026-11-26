@@ -11,6 +11,8 @@
 
 #include <cmath>
 #include <limits>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "jamoma/data.hpp"
@@ -70,25 +72,35 @@ TEST_CASE("mapper_scales_between_ranges", "[mapper]")
     CHECK(m.map(20) == Approx(1.0));
 }
 
-TEST_CASE("mapper_clips_outside_the_input_range", "[mapper]")
+TEST_CASE("mapper_does_not_clip_by_default_and_clipmodes_clip_the_input", "[mapper]")
 {
     jamoma::Namespace ns;
     Mapper m(ns);
     m.set_output_min(0);
     m.set_output_max(100);
-    CHECK(m.map(-5.0) == Approx(0.0));
-    CHECK(m.map(7.0) == Approx(100.0));
+    CHECK(m.settings().clipmode == jamoma::MapperClip::None);
+    CHECK(m.map(-0.5) == Approx(-50.0)); // the old default: the value goes through the function as it is
+    CHECK(m.map(2.0) == Approx(200.0));
+    m.set_clipmode(jamoma::MapperClip::Low);
+    CHECK(m.map(-0.5) == Approx(0.0));
+    CHECK(m.map(2.0) == Approx(200.0));
+    m.set_clipmode(jamoma::MapperClip::High);
+    CHECK(m.map(-0.5) == Approx(-50.0));
+    CHECK(m.map(2.0) == Approx(100.0));
+    m.set_clipmode(jamoma::MapperClip::Both);
+    CHECK(m.map(-0.5) == Approx(0.0));
+    CHECK(m.map(2.0) == Approx(100.0));
 }
 
 TEST_CASE("mapper_uses_the_function", "[mapper]")
 {
     jamoma::Namespace ns;
     Mapper m(ns);
-    REQUIRE(m.set_function("cosine"));
+    REQUIRE(m.set_function("easeInOutSine"));
     CHECK(m.map(0.5) == Approx(0.5));
-    CHECK(m.map(0.25) == Approx(0.5 - 0.5 * std::cos(3.14159265358979323846 * 0.25)));
+    CHECK(m.map(0.25) == Approx(0.5 * (1 - std::cos(3.14159265358979323846 * 0.25))));
     CHECK_FALSE(m.set_function("sawtooth"));
-    CHECK(m.function() == "cosine"); // the previous function stays
+    CHECK(m.function() == "easeInOutSine"); // the previous function stays
     REQUIRE(m.set_function("power"));
     REQUIRE(m.set_function_parameter("powerValue", {2.0}));
     CHECK(m.map(0.5) == Approx(std::pow(0.5, 4.0)));
@@ -126,7 +138,7 @@ TEST_CASE("mapper_reversed_ranges_reverse", "[mapper]")
     CHECK(m.map(0.25) == Approx(0.75));
 }
 
-TEST_CASE("mapper_equal_input_limits_give_the_output_minimum", "[mapper]")
+TEST_CASE("mapper_equal_input_limits_never_divide_by_zero", "[mapper]")
 {
     jamoma::Namespace ns;
     Mapper m(ns);
@@ -134,11 +146,14 @@ TEST_CASE("mapper_equal_input_limits_give_the_output_minimum", "[mapper]")
     m.set_input_max(5);
     m.set_output_min(2);
     m.set_output_max(8);
+    CHECK(m.map(5.0) == Approx(2.0));
+    CHECK(m.map(5.5) == Approx(2.0 + 6.0 * 0.5)); // the old arithmetic: a = 1 when the limits are equal
+    m.set_clipmode(jamoma::MapperClip::Both);
     for (double x : {-3.0, 5.0, 9.0})
-        CHECK(m.map(x) == Approx(2.0));
+        CHECK(m.map(x) == Approx(2.0)); // clipped to the single value, which is the low end of the output
 }
 
-TEST_CASE("mapper_nan_and_infinity_give_finite_numbers_in_range", "[mapper]")
+TEST_CASE("mapper_nan_and_infinity_give_finite_numbers", "[mapper]")
 {
     jamoma::Namespace ns;
     Mapper m(ns);
@@ -147,10 +162,59 @@ TEST_CASE("mapper_nan_and_infinity_give_finite_numbers_in_range", "[mapper]")
     const double nan = std::numeric_limits<double>::quiet_NaN();
     const double inf = std::numeric_limits<double>::infinity();
     CHECK(m.map(nan) == Approx(2.0));
-    CHECK(m.map(inf) == Approx(8.0));
+    CHECK(std::isfinite(m.map(inf)));
+    CHECK(std::isfinite(m.map(-inf)));
+    m.set_clipmode(jamoma::MapperClip::Both);
+    CHECK(m.map(inf) == Approx(8.0)); // clipped like any large number
     CHECK(m.map(-inf) == Approx(2.0));
-    m.set_output_min(nan); // a hostile limit never makes the output NaN
+    m.set_output_min(nan); // a hostile limit is ignored: the output never becomes NaN
     CHECK(std::isfinite(m.map(0.5)));
+    CHECK(m.settings().output_min == Approx(2.0));
+}
+
+TEST_CASE("mapper_input_index_picks_one_item_of_a_list", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Mapper m(ns);
+    m.set_output_max(10);
+    m.set_input_index(2);
+    const Value one = m.map(Value{0.0, 0.5, 1.0});
+    REQUIRE(one.size() == 1);
+    CHECK(one[0].as_double() == Approx(5.0));
+    m.set_input_index(9); // beyond the list: every item
+    CHECK(m.map(Value{0.0, 0.5}).size() == 2);
+    m.set_input_index(0);
+    CHECK(m.map(Value{0.0, 0.5}).size() == 2);
+}
+
+TEST_CASE("mapper_tells_when_a_threshold_is_crossed", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Mapper m(ns);
+    std::vector<std::pair<std::string, bool>> events;
+    m.set_threshold_callback([&](std::string_view name, bool state) { events.emplace_back(std::string(name), state); });
+    m.process({0.5}); // between the thresholds 0 and 1: nothing
+    CHECK(events.empty());
+    m.process({0.0}); // at the low threshold: the input and the output (linear) are going down
+    REQUIRE(events.size() == 2);
+    CHECK(events[0] == std::make_pair(std::string("input/going/down"), true));
+    CHECK(events[1] == std::make_pair(std::string("output/going/down"), true));
+    events.clear();
+    m.process({0.0}); // no change: no message
+    CHECK(events.empty());
+    m.process({0.5});
+    REQUIRE(events.size() == 2);
+    CHECK(events[0] == std::make_pair(std::string("input/going/down"), false));
+    events.clear();
+    m.process({1.0});
+    REQUIRE(events.size() == 2);
+    CHECK(events[0] == std::make_pair(std::string("input/going/up"), true));
+    CHECK(events[1] == std::make_pair(std::string("output/going/up"), true));
+    events.clear();
+    m.set_input_threshold_up(0.8);
+    m.process({0.9}); // the input is still up (0.9 >= 0.8); the output (threshold 1) is not any more
+    REQUIRE(events.size() == 1);
+    CHECK(events[0] == std::make_pair(std::string("output/going/up"), false));
 }
 
 TEST_CASE("mapper_maps_lists_and_passes_symbols_through", "[mapper]")
@@ -209,8 +273,11 @@ TEST_CASE("mapper_follows_the_range_of_bound_parameters", "[mapper]")
     CHECK(m.settings().input_min == Approx(10.0));
     CHECK(m.settings().input_max == Approx(20.0));
     CHECK(m.settings().output_max == Approx(100.0));
+    CHECK(m.settings().input_threshold_down == Approx(10.0));
+    CHECK(m.settings().input_threshold_up == Approx(20.0));
     in.data.set_attribute("range", {0.0, 4.0});
     CHECK(m.settings().input_max == Approx(4.0));
+    CHECK(m.settings().input_threshold_up == Approx(4.0));
     m.set_input_max(8.0); // by hand: the range is not followed any more
     in.data.set_attribute("range", {0.0, 2.0});
     CHECK(m.settings().input_max == Approx(8.0));

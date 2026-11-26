@@ -318,3 +318,118 @@ TEST_CASE("cue_rename_to_an_existing_name_fails", "[cue]")
     CHECK_FALSE(cues.cues().rename("one", "two"));
     CHECK(cues.cues().names() == std::vector<std::string>{"one", "two"});
 }
+
+TEST_CASE("cue_new_at_a_position_moves_the_cue_there", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.store("a", {"/a/freq"});
+    cues.store("b", {"/a/q"});
+    CHECK(cues.store("c", {"/b/gain"}, 0).stored); // position 0 is the first place (the Max message counts from 1)
+    CHECK(cues.cues().names() == std::vector<std::string>{"c", "a", "b"});
+    CHECK(cues.cues().current() == std::optional<std::size_t>(0));
+}
+
+TEST_CASE("cue_update_refreshes_the_values_of_the_lines_of_a_cue", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.store("one", {"/a/freq", "/b/gain"});
+    cues.set_ramp("one", 100.0);
+    cues.store("two", {"/a/q"});
+    r.data[0]->command({5.0});
+    r.data[2]->command({-1.0});
+    CHECK(cues.update("one"));
+    const auto& entries = cues.cues().presets().at(0).entries;
+    CHECK(entries.at(0).value.at(0).as_double() == Approx(5.0));
+    CHECK(entries.at(1).value.at(0).as_double() == Approx(-1.0));
+    CHECK(entries.at(0).value.at(1).as_symbol() == "ramp"); // the ramp of every line stays
+    CHECK(cues.cues().presets().at(1).entries.at(0).value.at(0).as_double() == Approx(1.5)); // another cue is not touched
+    r.data[1]->command({77.0});
+    CHECK(cues.update("2")); // by position, counted from 1
+    CHECK(cues.cues().presets().at(1).entries.at(0).value.at(0).as_double() == Approx(77.0));
+    CHECK_FALSE(cues.update("nothing"));
+    CHECK_FALSE(cues.update("0"));
+    CHECK_FALSE(cues.update("3"));
+}
+
+TEST_CASE("cue_append_adds_a_line_and_makes_the_cue_if_needed", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    CHECK(cues.append("made", Value{"/a/freq", 42.0}));
+    REQUIRE(cues.cues().names() == std::vector<std::string>{"made"});
+    CHECK(cues.append("made", Value{"/a/q", 3.5, "ramp", 200}));
+    CHECK(cues.cues().presets().at(0).entries.size() == 2);
+    CHECK(cues.cues().presets().at(0).entries.at(0).address.str() == "a/freq");
+    CHECK_FALSE(cues.append("made", Value{"not/an/address", 1.0}));
+    CHECK_FALSE(cues.append("made", Value{}));
+    cues.recall("made");
+    CHECK(r.at(0) == Approx(42.0));
+    CHECK(r.at(1) == Approx(3.5));
+}
+
+TEST_CASE("cue_optimize_removes_values_that_repeat_the_state_before", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.append("one", Value{"/a/freq", 1.0});
+    cues.append("one", Value{"/a/q", 2.0});
+    cues.append("two", Value{"/a/freq", 1.0});   // repeats cue one
+    cues.append("two", Value{"/a/q", 3.0});
+    cues.append("three", Value{"/a/freq", 9.0});
+    cues.append("three", Value{"/a/q", 3.0});     // repeats cue two (q = 3)
+    cues.optimize({"one", "two", "three"});
+    CHECK(cues.cues().presets().at(0).entries.size() == 2);       // the first cue stays as it is
+    REQUIRE(cues.cues().presets().at(1).entries.size() == 1);
+    CHECK(cues.cues().presets().at(1).entries.at(0).address.str() == "a/q");
+    REQUIRE(cues.cues().presets().at(2).entries.size() == 1);
+    CHECK(cues.cues().presets().at(2).entries.at(0).address.str() == "a/freq");
+    cues.optimize({"one", "missing", "three"}); // a name that does not exist is skipped, nothing crashes
+}
+
+TEST_CASE("cue_recall_next_and_previous_follow_the_current_cue", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.append("a", Value{"/a/freq", 1.0});
+    cues.append("b", Value{"/a/freq", 2.0});
+    cues.append("c", Value{"/a/freq", 3.0});
+    cues.recall("a");
+    CHECK(cues.recall_next().found);
+    CHECK(r.at(0) == Approx(2.0));
+    CHECK(cues.recall_next().found);
+    CHECK(r.at(0) == Approx(3.0));
+    CHECK_FALSE(cues.recall_next().found);   // after the last: nothing, and the current cue stays
+    CHECK(r.at(0) == Approx(3.0));
+    CHECK(cues.recall_previous().found);
+    CHECK(r.at(0) == Approx(2.0));
+    cues.recall("a");
+    CHECK_FALSE(cues.recall_previous().found);
+}
+
+TEST_CASE("cue_recall_next_without_a_current_cue_starts_at_the_first", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.read_text("CUE a\n/a/freq 7\nCUE b\n/a/freq 8\n");
+    CHECK_FALSE(cues.cues().current().has_value());
+    CHECK(cues.recall_next().found);
+    CHECK(r.at(0) == Approx(7.0));
+}
+
+TEST_CASE("cue_address_is_the_parent_the_cue_stores_from_and_recalls_relative_to", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.set_address(Address::parse("/a"));
+    CHECK(cues.address().str() == "/a");
+    const auto s = cues.store("p", {"/a/freq", "/a/q", "/b/gain"});
+    CHECK(s.stored);
+    CHECK(s.skipped == std::vector<std::string>{"/b/gain"}); // not below the address
+    r.data[0]->command({0.0});
+    r.data[1]->command({0.0});
+    CHECK(cues.recall("p", Address::parse("freq")).applied == 1); // a relative start is taken from the address
+    CHECK(r.at(0) == Approx(100.0));
+    CHECK(r.at(1) == Approx(0.0));
+}

@@ -13,6 +13,7 @@
 #include <charconv>
 #include <cmath>
 #include <cstdlib>
+#include <map>
 
 #include "jamoma/data.hpp"
 #include "jamoma/preset_files.hpp"
@@ -143,16 +144,22 @@ std::string replace_all(std::string text, const std::string& token, const std::s
 
 CueList::CueList(Namespace& ns) : ns_(ns), manager_(ns, root()) {}
 
-StoreReport CueList::store(std::string_view name, const std::vector<std::string>& keys)
+StoreReport CueList::store(std::string_view name, const std::vector<std::string>& keys, std::optional<std::size_t> position)
 {
     StoreReport report;
     if (name.empty())
         return report;
     std::vector<PresetEntry> entries;
+    const auto& parent = address_.path();
     for (const std::string& key : keys) {
         bool ok = false;
         if (key.size() > 1 && key[0] == '/' && key.find(':') == std::string::npos) {
             const Address address = Address::parse(key);
+            const auto& path = address.path();
+            if (path.size() < parent.size() || !std::equal(parent.begin(), parent.end(), path.begin())) {
+                report.skipped.push_back(key);
+                continue;
+            }
             Value value;
             ns_.read_object(address, [&](Object& object) {
                 if (const auto* data = dynamic_cast<Data*>(&object))
@@ -167,11 +174,14 @@ StoreReport CueList::store(std::string_view name, const std::vector<std::string>
             report.skipped.push_back(key);
     }
     report.stored = manager_.set_entries(name, std::move(entries));
+    if (report.stored && position)
+        manager_.move(name, *position);
     return report;
 }
 
-RecallReport CueList::recall(std::string_view name_or_index, const Address& start)
+RecallReport CueList::recall(std::string_view name_or_index, const Address& given)
 {
+    const Address start = !given.path().empty() && !given.absolute() ? address_.append(given) : given;
     if (start.path().empty())
         return manager_.recall(name_or_index);
     RecallReport report = manager_.output(name_or_index);
@@ -196,6 +206,114 @@ RecallReport CueList::recall(std::string_view name_or_index, const Address& star
     }
     report.entries.clear();
     return report;
+}
+
+/** @param presets The cues. @param key A cue name, or a position counted from 1. @return The index of the cue, or nothing. */
+static std::optional<std::size_t> index_of(const std::vector<Preset>& presets, std::string_view key)
+{
+    for (std::size_t i = 0; i < presets.size(); ++i)
+        if (presets[i].name == key)
+            return i;
+    if (!key.empty() && std::all_of(key.begin(), key.end(), [](char c) { return std::isdigit(static_cast<unsigned char>(c)) != 0; })) {
+        const unsigned long n = std::strtoul(std::string(key).c_str(), nullptr, 10);
+        if (n >= 1 && n <= presets.size())
+            return static_cast<std::size_t>(n - 1);
+    }
+    return std::nullopt;
+}
+
+bool CueList::update(std::string_view name_or_index)
+{
+    const auto index = index_of(manager_.presets(), name_or_index);
+    if (!index)
+        return false;
+    const Preset& p = manager_.presets().at(*index);
+    std::vector<PresetEntry> entries = p.entries;
+    for (PresetEntry& e : entries) {
+        Value value;
+        ns_.read_object(absolute_of(e.address), [&](Object& object) {
+            if (const auto* data = dynamic_cast<Data*>(&object))
+                value = data->value();
+        });
+        if (value.empty())
+            continue; // the parameter is gone: the line stays as it is
+        if (const auto ramp = ramp_of(e.value)) {
+            value.push_back("ramp");
+            value.push_back(*ramp);
+        }
+        e.value = std::move(value);
+    }
+    const std::string name = p.name;
+    const auto current = manager_.current();
+    return manager_.set_entries(name, std::move(entries), current && *current == *index);
+}
+
+bool CueList::append(std::string_view name, const Value& line)
+{
+    if (name.empty() || line.empty() || !line[0].is_symbol())
+        return false;
+    const std::string target = line[0].as_symbol();
+    if (target.size() < 2 || target[0] != '/')
+        return false;
+    PresetEntry entry;
+    entry.address = relative_of(Address::parse(target));
+    entry.value.assign(line.begin() + 1, line.end());
+    std::vector<PresetEntry> entries;
+    bool was_current = true;
+    for (const Preset& p : manager_.presets()) {
+        if (p.name == name) {
+            entries = p.entries;
+            const auto current = manager_.current();
+            was_current = current && manager_.presets().at(*current).name == name;
+        }
+    }
+    entries.push_back(std::move(entry));
+    return manager_.set_entries(name, std::move(entries), was_current);
+}
+
+void CueList::optimize(const std::vector<std::string>& names)
+{
+    std::map<std::string, Value> state;
+    bool first = true;
+    for (const std::string& name : names) {
+        const Preset* cue = nullptr;
+        for (const Preset& p : manager_.presets())
+            if (p.name == name)
+                cue = &p;
+        if (!cue)
+            continue;
+        std::vector<PresetEntry> kept;
+        for (const PresetEntry& e : cue->entries) {
+            const auto it = state.find(e.address.str());
+            if (first || it == state.end() || it->second != e.value)
+                kept.push_back(e);
+        }
+        for (const PresetEntry& e : cue->entries)
+            state[e.address.str()] = e.value;
+        if (!first && kept.size() != cue->entries.size()) {
+            const auto current = manager_.current();
+            const bool was_current = current && manager_.presets().at(*current).name == name;
+            manager_.set_entries(name, std::move(kept), was_current);
+        }
+        first = false;
+    }
+}
+
+RecallReport CueList::recall_next()
+{
+    const auto current = manager_.current();
+    const std::size_t next = current ? *current + 1 : 0;
+    if (next >= manager_.presets().size())
+        return RecallReport();
+    return manager_.recall(manager_.presets().at(next).name);
+}
+
+RecallReport CueList::recall_previous()
+{
+    const auto current = manager_.current();
+    if (!current || *current == 0)
+        return RecallReport();
+    return manager_.recall(manager_.presets().at(*current - 1).name);
 }
 
 bool CueList::set_ramp(std::string_view name, double ms)

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <map>
+#include <optional>
 #include <utility>
 
 namespace jamoma {
@@ -268,6 +270,72 @@ private:
     std::vector<Point> points_; /**< The points, in the order given. */
 };
 
+
+/** @param f A number in 0..1. @return The bounce curve that the three bounce functions are made of (ease out). */
+double bounce(double f)
+{
+    if (f < 4 / 11.0)
+        return (121 * f * f) / 16.0;
+    if (f < 8 / 11.0)
+        return (363 / 40.0 * f * f) - (99 / 10.0 * f) + 17 / 5.0;
+    if (f < 9 / 10.0)
+        return (4356 / 361.0 * f * f) - (35442 / 1805.0 * f) + 16061 / 1805.0;
+    return (54 / 5.0 * f * f) - (513 / 25.0 * f) + 268 / 25.0;
+}
+
+/** @param f A number. @return The back curve that the three back functions are made of (ease in, for f in 0..1). */
+double back(double f) { return f * f * f - f * std::sin(f * kPi); }
+
+/**
+ * @brief The easing functions of the old library (Robert Penner's equations as written in the old TT*EaseIn/Out/InOutFunction classes).
+ * @param name A function name such as `easeInOutCubic`.
+ * @return Its formula, or nothing if the name is not an easing function.
+ */
+std::optional<std::function<double(double)>> easing_formula(std::string_view name)
+{
+    using F = std::function<double(double)>;
+    static const std::map<std::string, F, std::less<>> table = {
+        {"easeInBack", [](double x) { return back(x); }},
+        {"easeOutBack", [](double x) { return 1 - back(1 - x); }},
+        {"easeInOutBack", [](double x) { return x < 0.5 ? 0.5 * back(2 * x) : 0.5 * (1 - back(1 - (2 * x - 1))) + 0.5; }},
+        {"easeInBounce", [](double x) { return 1 - bounce(1 - x); }},
+        {"easeOutBounce", [](double x) { return bounce(x); }},
+        {"easeInOutBounce", [](double x) { return x < 0.5 ? 0.5 * (1 - bounce(1 - 2 * x)) : 0.5 * bounce(x * 2 - 1) + 0.5; }},
+        {"easeInCircular", [](double x) { return 1 - std::sqrt(1 - x * x); }},
+        {"easeOutCircular", [](double x) { return std::sqrt((2 - x) * x); }},
+        {"easeInOutCircular", [](double x) { return x < 0.5 ? 0.5 * (1 - std::sqrt(1 - 4 * x * x)) : 0.5 * (std::sqrt(-((2 * x) - 3) * ((2 * x) - 1)) + 1); }},
+        {"easeInCubic", [](double x) { return x * x * x; }},
+        {"easeOutCubic", [](double x) { const double f = x - 1; return f * f * f + 1; }},
+        {"easeInOutCubic", [](double x) { if (x < 0.5) return 4 * x * x * x; const double f = 2 * x - 2; return 0.5 * f * f * f + 1; }},
+        {"easeInElastic", [](double x) { return std::sin(6.5 * kPi * x) * std::pow(2, 10 * (x - 1)); }},
+        {"easeOutElastic", [](double x) { return std::sin(-6.5 * kPi * (x + 1)) * std::pow(2, -10 * x) + 1; }},
+        {"easeInOutElastic", [](double x) {
+             return x < 0.5 ? 0.5 * std::sin(6.5 * kPi * (2 * x)) * std::pow(2, 10 * ((2 * x) - 1))
+                            : 0.5 * (std::sin(-6.5 * kPi * ((2 * x - 1) + 1)) * std::pow(2, -10 * (2 * x - 1)) + 2); }},
+        {"easeInExponential", [](double x) { return x == 0.0 ? x : std::pow(2, 10 * (x - 1)); }},
+        {"easeOutExponential", [](double x) { return x == 1.0 ? x : 1 - std::pow(2, -10 * x); }},
+        {"easeInOutExponential", [](double x) {
+             if (x == 0.0 || x == 1.0) return x;
+             return x < 0.5 ? 0.5 * std::pow(2, (20 * x) - 10) : -0.5 * std::pow(2, (-20 * x) + 10) + 1; }},
+        {"easeInQuadratic", [](double x) { return x * x; }},
+        {"easeOutQuadratic", [](double x) { return -(x * (x - 2)); }},
+        {"easeInOutQuadratic", [](double x) { return x < 0.5 ? 2 * x * x : (-2 * x * x) + (4 * x) - 1; }},
+        {"easeInQuartic", [](double x) { return x * x * x * x; }},
+        {"easeOutQuartic", [](double x) { const double f = x - 1; return f * f * f * (1 - x) + 1; }},
+        {"easeInOutQuartic", [](double x) { if (x < 0.5) return 8 * x * x * x * x; const double f = x - 1; return -8 * f * f * f * f + 1; }},
+        {"easeInQuintic", [](double x) { return x * x * x * x * x; }},
+        {"easeOutQuintic", [](double x) { const double f = x - 1; return f * f * f * f * f + 1; }},
+        {"easeInOutQuintic", [](double x) { if (x < 0.5) return 16 * x * x * x * x * x; const double f = 2 * x - 2; return 0.5 * f * f * f * f * f + 1; }},
+        {"easeInSine", [](double x) { return std::sin((x - 1) * kPi * 0.5) + 1; }},
+        {"easeOutSine", [](double x) { return std::sin(x * kPi * 0.5); }},
+        {"easeInOutSine", [](double x) { return 0.5 * (1 - std::cos(x * kPi)); }},
+    };
+    const auto it = table.find(name);
+    if (it == table.end())
+        return std::nullopt;
+    return it->second;
+}
+
 } // namespace
 
 Function::~Function() = default;
@@ -280,24 +348,24 @@ void Function::reset() {}
 double Function::apply(double x) {
     if (std::isnan(x))
         x = 0.0;
-    x = std::clamp(x, 0.0, 1.0);
     const double y = calculate(x);
     return std::isfinite(y) ? y : 0.0;
 }
 
 std::vector<std::string> function_names() {
-    return {"cosine", "crossFadeIn", "crossFadeOut", "exponential", "freehand", "linear", "logarithm", "lowpass", "power", "smoothPolynomial", "tanh"};
+    std::vector<std::string> names{"exponential", "freehand", "linear", "logarithm", "lowpass", "power", "smoothPolynomial", "tanh"};
+    for (const char* family : {"Back", "Bounce", "Circular", "Cubic", "Elastic", "Exponential", "Quadratic", "Quartic", "Quintic", "Sine"})
+        for (const char* kind : {"easeIn", "easeInOut", "easeOut"})
+            names.push_back(std::string(kind) + family);
+    std::sort(names.begin(), names.end());
+    return names;
 }
 
 std::unique_ptr<Function> Function::create(std::string_view name) {
     if (name == "linear")
         return std::make_unique<Plain>("linear", [](double x) { return x; });
-    if (name == "cosine")
-        return std::make_unique<Plain>("cosine", [](double x) { return -0.5 * std::cos(x * kPi) + 0.5; });
-    if (name == "crossFadeIn")
-        return std::make_unique<Plain>("crossFadeIn", [](double x) { return std::sin(x * kPi * 0.5); });
-    if (name == "crossFadeOut")
-        return std::make_unique<Plain>("crossFadeOut", [](double x) { return 1.0 - std::sin((1.0 - x) * kPi * 0.5); });
+    if (const auto easing = easing_formula(name))
+        return std::make_unique<Plain>(std::string(name), *easing);
     if (name == "smoothPolynomial")
         return std::make_unique<Plain>("smoothPolynomial", [](double x) { return x * x * x * (x * (6 * x - 15) + 10); });
     if (name == "exponential" || name == "logarithm")

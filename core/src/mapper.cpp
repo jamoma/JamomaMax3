@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cmath>
 #include <mutex>
+#include <optional>
+#include <utility>
 
 #include "jamoma/data.hpp"
 #include "jamoma/function_library.hpp"
@@ -38,23 +40,45 @@ struct Mapper::Impl {
     std::unique_ptr<Function> function;                   /**< The function. */
     End in, out;                                          /**< The bindings. */
     std::function<void(const Value&)> on_return;          /**< The return function. */
+    std::function<void(std::string_view, bool)> on_threshold; /**< Told when a threshold is crossed. */
+    bool in_down = false, in_up = false, out_down = false, out_up = false;  /**< The state of the four thresholds. */
     std::unique_ptr<Receiver> receiver;                   /**< Follows the input parameter. */
     Sender sender;                                        /**< Writes to the output parameter. */
 
-    /** @brief The law, with the lock held. @param x The input. @return The output. */
+    /** @brief The law, with the lock held. @param x The input. @return The output (finite). */
     double map_locked(double x)
     {
         const MapperSettings& s = settings;
-        const double lo_out = std::min(s.output_min, s.output_max), hi_out = std::max(s.output_min, s.output_max);
         if (std::isnan(x))
-            return std::clamp(s.output_min, lo_out, hi_out);
-        x = std::clamp(x, std::min(s.input_min, s.input_max), std::max(s.input_min, s.input_max));
+            return s.output_min;
+        const double lo = std::min(s.input_min, s.input_max), hi = std::max(s.input_min, s.input_max);
+        if (s.clipmode == MapperClip::Low || s.clipmode == MapperClip::Both)
+            x = std::max(x, lo);
+        if (s.clipmode == MapperClip::High || s.clipmode == MapperClip::Both)
+            x = std::min(x, hi);
         const double a = s.input_min == s.input_max ? 1.0 : 1.0 / (s.input_max - s.input_min);
         const double t = a * x - a * s.input_min;
         double f = function->apply(t);
         if (s.inverse)
             f = 1.0 - f;
-        return std::clamp(s.output_min + (s.output_max - s.output_min) * f, lo_out, hi_out);
+        const double y = s.output_min + (s.output_max - s.output_min) * f;
+        return std::isfinite(y) ? y : s.output_min;
+    }
+
+    /** @brief Maps a value: every number, or only the item that `input_index` picks out of a list; the lock must be held. @param in The input. @return The output. */
+    Value map_value_locked(const Value& in)
+    {
+        Value out;
+        const unsigned index = settings.input_index;
+        if (index > 0 && index <= in.size()) {
+            const Atom& a = in[index - 1];
+            out.push_back(a.is_number() ? Atom(map_locked(a.as_double())) : a);
+            return out;
+        }
+        out.reserve(in.size());
+        for (const Atom& a : in)
+            out.push_back(a.is_number() ? Atom(map_locked(a.as_double())) : a);
+        return out;
     }
 };
 
@@ -66,26 +90,53 @@ void process_value(const std::shared_ptr<Mapper::Impl>& impl, const Value& in)
     Value mapped;
     Value command;
     std::function<void(const Value&)> on_return;
+    std::function<void(std::string_view, bool)> on_threshold;
+    std::vector<std::pair<const char*, bool>> events;
     bool send = false;
     {
         std::lock_guard<std::mutex> lock(impl->mutex);
         if (!impl->settings.active)
             return;
-        mapped.reserve(in.size());
-        for (const Atom& a : in)
-            mapped.push_back(a.is_number() ? Atom(impl->map_locked(a.as_double())) : a);
+        mapped = impl->map_value_locked(in);
         on_return = impl->on_return;
+        on_threshold = impl->on_threshold;
         send = !impl->out.address.empty();
         command = mapped;
         if (impl->settings.ramp > 0) {
             command.push_back("ramp");
             command.push_back(impl->settings.ramp);
         }
+        // the thresholds: the first number of the input and of the output
+        const auto first = [](const Value& v) -> std::optional<double> {
+            for (const Atom& a : v)
+                if (a.is_number())
+                    return a.as_double();
+            return std::nullopt;
+        };
+        const auto check = [&](const std::optional<double>& value, double down, double up, bool& is_down, bool& is_up, const char* down_name, const char* up_name) {
+            if (!value)
+                return;
+            const bool now_down = *value <= down, now_up = *value >= up;
+            if (now_down != is_down) {
+                is_down = now_down;
+                events.emplace_back(down_name, now_down);
+            }
+            if (now_up != is_up) {
+                is_up = now_up;
+                events.emplace_back(up_name, now_up);
+            }
+        };
+        const MapperSettings& s = impl->settings;
+        check(first(in), s.input_threshold_down, s.input_threshold_up, impl->in_down, impl->in_up, "input/going/down", "input/going/up");
+        check(first(mapped), s.output_threshold_down, s.output_threshold_up, impl->out_down, impl->out_up, "output/going/down", "output/going/up");
     }
     if (send)
         impl->sender.send(command);
     if (on_return)
         on_return(mapped);
+    if (on_threshold)
+        for (const auto& e : events)
+            on_threshold(e.first, e.second);
 }
 
 /** @param v A candidate limit. @return True if it may be used (finite). */
@@ -120,6 +171,8 @@ void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, bool o
                 lo = range[0].as_double();
             if (end.follow || hi == 1.0)
                 hi = range[1].as_double();
+            (is_input ? self->settings.input_threshold_down : self->settings.output_threshold_down) = lo;
+            (is_input ? self->settings.input_threshold_up : self->settings.output_threshold_up) = hi;
         }
     };
     std::shared_ptr<void> handle;
@@ -139,6 +192,8 @@ void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, bool o
                     std::lock_guard<std::mutex> lock(self->mutex);
                     (is_input ? self->settings.input_min : self->settings.output_min) = range[0].as_double();
                     (is_input ? self->settings.input_max : self->settings.output_max) = range[1].as_double();
+                    (is_input ? self->settings.input_threshold_down : self->settings.output_threshold_down) = range[0].as_double();
+                    (is_input ? self->settings.input_threshold_up : self->settings.output_threshold_up) = range[1].as_double();
                 }
             });
         }
@@ -196,6 +251,7 @@ Mapper::~Mapper()
     impl_->in = {};
     impl_->out = {};
     impl_->on_return = nullptr;
+    impl_->on_threshold = nullptr;
 }
 
 MapperSettings Mapper::settings() const
@@ -219,6 +275,38 @@ void Mapper::set_input_min(double v) { set_limit(*impl_, true, &MapperSettings::
 void Mapper::set_input_max(double v) { set_limit(*impl_, true, &MapperSettings::input_max, v); }
 void Mapper::set_output_min(double v) { set_limit(*impl_, false, &MapperSettings::output_min, v); }
 void Mapper::set_output_max(double v) { set_limit(*impl_, false, &MapperSettings::output_max, v); }
+
+void Mapper::set_clipmode(MapperClip mode)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->settings.clipmode = mode;
+}
+
+void Mapper::set_input_index(unsigned index)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->settings.input_index = index;
+}
+
+/** @brief Sets a threshold if usable. @param impl State. @param field The threshold. @param v The value. */
+static void set_threshold(Mapper::Impl& impl, double MapperSettings::*field, double v)
+{
+    if (!usable(v))
+        return;
+    std::lock_guard<std::mutex> lock(impl.mutex);
+    impl.settings.*field = v;
+}
+
+void Mapper::set_input_threshold_down(double v) { set_threshold(*impl_, &MapperSettings::input_threshold_down, v); }
+void Mapper::set_input_threshold_up(double v) { set_threshold(*impl_, &MapperSettings::input_threshold_up, v); }
+void Mapper::set_output_threshold_down(double v) { set_threshold(*impl_, &MapperSettings::output_threshold_down, v); }
+void Mapper::set_output_threshold_up(double v) { set_threshold(*impl_, &MapperSettings::output_threshold_up, v); }
+
+void Mapper::set_threshold_callback(std::function<void(std::string_view, bool)> callback)
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    impl_->on_threshold = std::move(callback);
+}
 
 void Mapper::set_inverse(bool on)
 {
@@ -280,12 +368,8 @@ double Mapper::map(double x)
 
 Value Mapper::map(const Value& in)
 {
-    Value out;
-    out.reserve(in.size());
     std::lock_guard<std::mutex> lock(impl_->mutex);
-    for (const Atom& a : in)
-        out.push_back(a.is_number() ? Atom(impl_->map_locked(a.as_double())) : a);
-    return out;
+    return impl_->map_value_locked(in);
 }
 
 std::vector<double> Mapper::samples(std::size_t count) const
