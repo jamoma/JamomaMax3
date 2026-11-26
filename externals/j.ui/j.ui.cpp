@@ -372,7 +372,11 @@ private:
         if (panel_patcher() == nullptr) {
             return;
         }
+        const std::weak_ptr<int> alive = alive_.weak();
         c74::max::outlet_bang(out.max_outlet());
+        if (alive.expired()) {
+            return; // the bang led to this object being deleted
+        }
         c74::max::t_object* second = panel_patcher(); // the bang may have changed the patcher
         if (second == nullptr) {
             return;
@@ -491,8 +495,12 @@ private:
         add("Parameters", c.parameters);
         add("Messages", c.messages);
         add("Returns", c.returns);
+        const std::weak_ptr<int> alive = alive_.weak(); // the menu runs its own event loop: this object may be deleted meanwhile
         const int choice = items.empty() ? 0 : c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
         c74::max::jpopupmenu_destroy(menu);
+        if (alive.expired()) {
+            return;
+        }
         if (choice >= 1 && choice <= static_cast<int>(items.size())) {
             send_symbol("model:reference/open", model_ + "/" + items[static_cast<std::size_t>(choice - 1)]);
         }
@@ -525,8 +533,12 @@ private:
             const bool current = m->presets().current() && *m->presets().current() == i;
             c74::max::jpopupmenu_additem(menu, static_cast<int>(200 + i), names[i].c_str(), nullptr, current ? 1 : 0, 0, nullptr);
         }
+        const std::weak_ptr<int> alive = alive_.weak(); // the menu and the dialog run their own event loops: this object may be deleted meanwhile
         const int choice = c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
         c74::max::jpopupmenu_destroy(menu);
+        if (alive.expired()) {
+            return;
+        }
         m = model(); // the menu runs its own event loop: the model may have gone or been made again meanwhile
         if (choice >= 1 && choice <= static_cast<int>(utilities.size())) {
             const std::string item = utilities[static_cast<std::size_t>(choice - 1)];
@@ -543,6 +555,9 @@ private:
             const std::string wanted = name != nullptr ? name : "";
             if (name != nullptr) {
                 c74::max::sysmem_freeptr(const_cast<char*>(name));
+            }
+            if (alive.expired()) {
+                return;
             }
             if (answer == 1) {
                 create_preset(wanted); // looks the model up again: the dialog runs its own event loop

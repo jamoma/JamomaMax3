@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <future>
 #include <memory>
 #include <string>
 #include <thread>
@@ -462,4 +463,52 @@ TEST_CASE("cue_address_is_the_parent_the_cue_stores_from_and_recalls_relative_to
     CHECK(cues.recall("p", Address::parse("freq")).applied == 1); // a relative start is taken from the address
     CHECK(r.at(0) == Approx(100.0));
     CHECK(r.at(1) == Approx(0.0));
+}
+
+/** A recall that starts at an address may lead to nodes being made or removed by what it recalls (review finding: it hung). */
+TEST_CASE("cue_recall_from_an_address_may_change_the_namespace", "[cue]")
+{
+    struct State {
+        jamoma::Namespace ns;
+        jamoma::Data load{jamoma::Service::Parameter};
+        jamoma::Data made{jamoma::Service::Parameter};
+        jamoma::Subscription load_sub, made_sub;
+        std::promise<std::size_t> applied;
+    };
+    auto state = std::make_shared<State>(); // shared: a thread that hangs keeps it alive
+    state->load.set_type(jamoma::DataType::Decimal);
+    state->load_sub = state->ns.subscribe(Address::parse("/a/load"), state->load);
+    state->load.command({1.0});
+    auto done = state->applied.get_future();
+    std::thread([state] {
+        CueList cues(state->ns);
+        cues.store("c", {"/a/load"});
+        state->load.set_output([s = state.get()](const jamoma::Value&) {
+            s->made_sub = s->ns.subscribe(Address::parse("/a/made"), s->made);
+        });
+        const auto report = cues.recall("c", Address::parse("/a"));
+        state->load.set_output(nullptr);
+        state->applied.set_value(report.applied);
+    }).detach();
+    REQUIRE(done.wait_for(std::chrono::seconds(5)) == std::future_status::ready);
+    CHECK(done.get() == 1);
+}
+
+/** Names with a comment sign survive writing and reading, and a line CUE without a name does not join the cue before it (review findings). */
+TEST_CASE("cue_names_with_a_comment_sign_round_trip", "[cue]")
+{
+    Rig r;
+    CueList cues(r.ns);
+    cues.store("scene #2", {"/a/freq"});
+    cues.store("a \"quoted\" one", {"/a/q"});
+    cues.store("two\nlines", {"/a/q"});
+    CueList again(r.ns);
+    CHECK(again.read_text(cues.write_text()).empty());
+    CHECK(again.cues().names() == std::vector<std::string>{"scene #2", "a \"quoted\" one", "two lines"});
+
+    CueList hand(r.ns);
+    const auto problems = hand.read_text("CUE first # a comment\n\t/a/freq 1\nCUE   \n\t/a/q 2\n");
+    CHECK(problems.size() == 1);
+    REQUIRE(hand.cues().names() == std::vector<std::string>{"first"});
+    CHECK(hand.cues().presets().at(0).entries.size() == 1);
 }

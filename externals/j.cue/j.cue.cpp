@@ -377,7 +377,11 @@ public:
 
     /** `read [<file>]`: replaces the cues by those of a file (text, or XML if the name ends in `.xml`). */
     message<> m_read{this, "read", MIN_FUNCTION {
-        read_file(args.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(word_of(args[0])), args);
+        const std::weak_ptr<int> alive = alive_.weak(); // a file dialog runs its own event loop: this object may be deleted meanwhile
+        const auto file = args.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(word_of(args[0]));
+        if (!alive.expired()) {
+            read_file(file, args);
+        }
         return {};
     }};
 
@@ -389,7 +393,11 @@ public:
 
     /** `write [<file>]`: writes the cues to a file (text, or XML if the name ends in `.xml`). */
     message<> m_write{this, "write", MIN_FUNCTION {
-        write_file(args.empty() ? jamoma_max::ask_for_file(true, "cues.txt") : jamoma_max::target_file(patcher(), word_of(args[0])));
+        const std::weak_ptr<int> alive = alive_.weak(); // as in read
+        const auto file = args.empty() ? jamoma_max::ask_for_file(true, "cues.txt") : jamoma_max::target_file(patcher(), word_of(args[0]));
+        if (!alive.expired()) {
+            write_file(file);
+        }
         return {};
     }};
 

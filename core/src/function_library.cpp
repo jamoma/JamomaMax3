@@ -162,9 +162,9 @@ public:
     Value get(std::string_view parameter) const override { return parameter == "coefficient" ? Value{coefficient_} : Value{}; }
     bool set(std::string_view parameter, const Value& value) override {
         double c = 0;
-        if (parameter != "coefficient" || !number_of(value, c))
+        if (parameter != "coefficient" || !number_of(value, c) || !std::isfinite(c))
             return false;
-        coefficient_ = c;
+        coefficient_ = std::clamp(c, 0.0, 1.0); // above 1 the filter grows without end
         return true;
     }
     void reset() override { state_ = 0.0; }
@@ -172,8 +172,10 @@ public:
 private:
     /** @brief The filter. @param x The input. @return The output. */
     double calculate(double x) override {
+        if (!std::isfinite(x))
+            return state_; // one such input must not stay in the filter for good
         state_ = state_ * coefficient_ + x * (1.0 - coefficient_);
-        if (std::fabs(state_) < 1e-30)
+        if (!std::isfinite(state_) || std::fabs(state_) < 1e-30)
             state_ = 0.0;
         return state_;
     }

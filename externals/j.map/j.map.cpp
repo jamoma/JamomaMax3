@@ -71,8 +71,16 @@ public:
         });
     }
 
-    /** Unbinds before the outlets are destroyed. */
-    ~j_map() override { watch_.stop(); }
+    /** Unbinds before the outlets are destroyed (the mapper itself goes last, as the first member). */
+    ~j_map() override
+    {
+        watch_.stop();
+        mapper_.bind_input({});
+        mapper_.bind_output({});
+        mapper_.set_return(nullptr);
+        mapper_.set_threshold_callback(nullptr);
+        mapper_.set_send_dispatcher(nullptr);
+    }
 
     inlet<> input_inlet{this, "(number or list) values to map"};                     /**< The inlet. */
     jamoma_max::dump_outlet data_out{this, "(anything) mapped values"};              /**< Outlet 0. */

@@ -26,6 +26,7 @@ struct Mapper::Impl {
     /** One end of the mapper that is bound to a parameter: the address, whether its range is followed, and the observers. */
     struct End {
         Address address;                 /**< The bound parameter (empty if none). */
+        Address last;                    /**< The last parameter this end was bound to (kept while it is unbound). */
         bool follow = true;              /**< Whether the range of the parameter sets the limits. */
         std::shared_ptr<void> created;   /**< Observer of the namespace: the parameter may appear later. */
         std::shared_ptr<void> range;     /**< Observer of the range of the parameter. */
@@ -161,9 +162,8 @@ bool usable(double v) { return std::isfinite(v); }
  * @brief Reads the range of the parameter at an address and watches it.
  * @param impl The mapper's state.
  * @param is_input True for the input end, false for the output end.
- * @param on_creation True if the parameter has just appeared (an explicit limit is then kept unless it is still the default 0 or 1).
  */
-void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, bool on_creation)
+void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input)
 {
     Address address;
     {
@@ -173,7 +173,7 @@ void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, bool o
     if (address.empty())
         return;
     std::weak_ptr<Mapper::Impl> weak = impl;
-    auto apply = [weak, is_input, on_creation](const Value& range) {
+    auto apply = [weak, is_input](const Value& range) {
         auto self = weak.lock();
         if (!self || range.size() != 2 || !range[0].is_number() || !range[1].is_number() || !usable(range[0].as_double()) || !usable(range[1].as_double()))
             return;
@@ -181,14 +181,13 @@ void take_range(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, bool o
         Mapper::Impl::End& end = is_input ? self->in : self->out;
         double& lo = is_input ? self->settings.input_min : self->settings.output_min;
         double& hi = is_input ? self->settings.input_max : self->settings.output_max;
-        if (end.follow || !on_creation) { // a limit set by hand is not followed; at creation the old rule keeps non-default hand-set limits
-            if (end.follow || lo == 0.0)
-                lo = range[0].as_double();
-            if (end.follow || hi == 1.0)
-                hi = range[1].as_double();
-            (is_input ? self->settings.input_threshold_down : self->settings.output_threshold_down) = lo;
-            (is_input ? self->settings.input_threshold_up : self->settings.output_threshold_up) = hi;
-        }
+        // The old rule: a limit set by hand stays (unless it is still the default 0 or 1); a followed end takes the range.
+        if (end.follow || lo == 0.0)
+            lo = range[0].as_double();
+        if (end.follow || hi == 1.0)
+            hi = range[1].as_double();
+        (is_input ? self->settings.input_threshold_down : self->settings.output_threshold_down) = lo;
+        (is_input ? self->settings.input_threshold_up : self->settings.output_threshold_up) = hi;
     };
     std::shared_ptr<void> handle;
     impl->ns.read_object(address, [&](Object& object) {
@@ -224,7 +223,12 @@ void bind_end(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, const Ad
         std::lock_guard<std::mutex> lock(impl->mutex);
         Mapper::Impl::End& end = is_input ? impl->in : impl->out;
         end.address = address;
-        end.follow = true;
+        if (!address.empty()) {
+            // limits set by hand stay until the end is turned to another parameter
+            if (!end.last.empty() && !(end.last == address))
+                end.follow = true;
+            end.last = address;
+        }
         end.range.reset();
         end.created.reset();
     }
@@ -239,13 +243,13 @@ void bind_end(const std::shared_ptr<Mapper::Impl>& impl, bool is_input, const Ad
         if (!was_created)
             return;
         if (auto self = weak.lock())
-            take_range(self, is_input, true);
+            take_range(self, is_input);
     });
     {
         std::lock_guard<std::mutex> lock(impl->mutex);
         (is_input ? impl->in : impl->out).created = created;
     }
-    take_range(impl, is_input, false);
+    take_range(impl, is_input);
 }
 
 } // namespace

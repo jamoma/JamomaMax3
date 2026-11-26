@@ -192,17 +192,15 @@ RecallReport CueList::recall(std::string_view name_or_index, const Address& give
         const auto& path = entry.address.path();
         if (path.size() < from.size() || !std::equal(from.begin(), from.end(), path.begin()))
             continue;
-        bool done = false;
-        ns_.read_object(absolute_of(entry.address), [&](Object& object) {
-            if (auto* data = dynamic_cast<Data*>(&object)) {
-                data->command(entry.value);
-                done = true;
-            }
-        });
-        if (done)
+        // The command is sent without the namespace's lock: what it causes may add or remove nodes.
+        Node* node = ns_.lookup(absolute_of(entry.address));
+        auto* data = node != nullptr ? dynamic_cast<Data*>(node->object()) : nullptr;
+        if (data != nullptr) {
+            data->command(entry.value);
             ++report.applied;
-        else
+        } else {
             report.skipped.push_back(entry.address);
+        }
     }
     report.entries.clear();
     return report;
@@ -360,12 +358,47 @@ std::optional<std::string> CueList::description(std::string_view name) const
     return std::nullopt;
 }
 
+/**
+ * @param name A cue name. @return The name as written after `CUE`: line breaks become spaces, and a name with a comment sign (or one that starts
+ *        with a quote) is quoted, since the reader ends an unquoted name at `#`.
+ */
+static std::string written_name(std::string name)
+{
+    std::replace_if(name.begin(), name.end(), [](char c) { return c == '\n' || c == '\r'; }, ' ');
+    if (name.find('#') == std::string::npos && (name.empty() || name.front() != '"'))
+        return name;
+    std::string quoted = "\"";
+    for (char c : name) {
+        if (c == '"' || c == '\\')
+            quoted += '\\';
+        quoted += c;
+    }
+    return quoted + "\"";
+}
+
+/** @param text What follows `CUE` on its line, without surrounding spaces. @return The name: the quoted one, else what precedes a `#`. */
+static std::string read_name(std::string_view text)
+{
+    if (!text.empty() && text.front() == '"') {
+        std::string name;
+        for (std::size_t i = 1; i < text.size(); ++i) {
+            if (text[i] == '"')
+                return name;
+            if (text[i] == '\\' && i + 1 < text.size())
+                ++i;
+            name += text[i];
+        }
+        // no closing quote: an ordinary name that happens to start with one
+    }
+    return std::string(text.substr(0, text.find('#')));
+}
+
 std::string CueList::write_text() const
 {
     const std::string rule(75, '#');
     std::string out;
     for (const Preset& p : manager_.presets()) {
-        out += rule + "\nCUE " + p.name + "\n" + rule + "\n";
+        out += rule + "\nCUE " + written_name(p.name) + "\n" + rule + "\n";
         if (!p.description.empty())
             out += "\t# description: " + p.description + "\n";
         for (const PresetEntry& e : p.entries) {
@@ -405,12 +438,8 @@ std::vector<std::string> CueList::read_text(std::string_view text)
                 current->description = trim(trimmed.substr(key.size()));
             continue;
         }
-        if (trimmed.compare(0, 4, "CUE ") == 0 || trimmed.compare(0, 4, "CUE\t") == 0) {
-            std::string name = trimmed.substr(4);
-            const std::size_t hash = name.find('#');
-            if (hash != std::string::npos)
-                name = name.substr(0, hash);
-            name = trim(name);
+        if (trimmed == "CUE" || trimmed.compare(0, 4, "CUE ") == 0 || trimmed.compare(0, 4, "CUE\t") == 0) {
+            const std::string name = trim(read_name(trim(trimmed.substr(3))));
             if (name.empty()) {
                 problems.push_back(where + "a cue without a name is skipped");
                 current = nullptr;

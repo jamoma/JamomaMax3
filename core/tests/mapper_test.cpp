@@ -382,3 +382,44 @@ TEST_CASE("mapper_work_left_with_the_dispatcher_is_harmless_after_the_mapper_is_
     CHECK_NOTHROW(waiting[0]());
     CHECK(out.value() == Approx(0.0));
 }
+
+/** Limits set by hand before the parameter is bound stay, whether it is there already or appears later (review finding). */
+TEST_CASE("mapper_limits_set_by_hand_survive_binding", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Param there(ns, "/there", 0.0, 127.0);
+    Mapper now(ns);
+    now.set_input_min(20.0);
+    now.set_input_max(80.0);
+    now.bind_input(Address::parse("/there"));
+    CHECK(now.settings().input_min == Approx(20.0));
+    CHECK(now.settings().input_max == Approx(80.0));
+
+    Mapper later(ns);
+    later.bind_input(Address::parse("/later"));
+    later.set_input_min(20.0);
+    Param appears(ns, "/later", 0.0, 127.0);
+    CHECK(later.settings().input_min == Approx(20.0));
+    CHECK(later.settings().input_max == Approx(127.0)); // still the default: taken from the parameter
+}
+
+/** Binding the same address again keeps the limits set by hand; another address follows its own range again. */
+TEST_CASE("mapper_limits_follow_again_only_with_another_address", "[mapper]")
+{
+    jamoma::Namespace ns;
+    Param one(ns, "/one", 0.0, 127.0);
+    Param two(ns, "/two", -3.0, 3.0);
+    Mapper m(ns);
+    m.bind_output(Address::parse("/one"));
+    m.set_output_min(20.0);
+    m.set_output_max(80.0);
+    m.bind_output(Address::parse("/one"));
+    CHECK(m.settings().output_min == Approx(20.0));
+    CHECK(m.settings().output_max == Approx(80.0));
+    m.bind_output({});
+    m.bind_output(Address::parse("/one"));
+    CHECK(m.settings().output_min == Approx(20.0));
+    m.bind_output(Address::parse("/two"));
+    CHECK(m.settings().output_min == Approx(-3.0));
+    CHECK(m.settings().output_max == Approx(3.0));
+}

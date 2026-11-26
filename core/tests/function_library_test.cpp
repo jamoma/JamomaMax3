@@ -198,3 +198,24 @@ TEST_CASE("function_nan_and_infinity_stay_finite_and_in_range", "[function]") {
     CHECK(make("linear")->apply(2.0) == Approx(2.0)); // outside 0..1 is not clipped
     CHECK(make("linear")->apply(-1.0) == Approx(-1.0));
 }
+
+/** An input that is not finite, or a coefficient above 1, does not leave the lowpass stuck (review finding). */
+TEST_CASE("function_library_lowpass_recovers_from_extreme_input", "[functions]")
+{
+    auto f = make("lowpass");
+    const double inf = std::numeric_limits<double>::infinity();
+    f->apply(0.5);
+    for (double bad : {inf, -inf, std::numeric_limits<double>::quiet_NaN()}) {
+        f->apply(bad);
+    }
+    CHECK(f->apply(0.5) > 0.0);
+    CHECK(std::isfinite(f->apply(0.5)));
+    f->reset();
+    REQUIRE(f->set("coefficient", {5.0}));
+    for (int i = 0; i < 2000; ++i) {
+        f->apply(0.5);
+    }
+    CHECK(f->get("coefficient").at(0).as_double() <= 1.0);
+    REQUIRE(f->set("coefficient", {-2.0}));
+    CHECK(f->get("coefficient").at(0).as_double() >= 0.0);
+}

@@ -280,7 +280,11 @@ public:
     /** `preset:read [<file>]`: replaces the presets by those of a text file (a dialog if there is no file). */
     message<> preset_read{this, "preset:read", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        read_file(w.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(w[0]));
+        const std::weak_ptr<int> alive = alive_.weak(); // a file dialog runs its own event loop: this object may be deleted meanwhile
+        const auto file = w.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(w[0]);
+        if (!alive.expired()) {
+            read_file(file);
+        }
         return {};
     }};
 
@@ -293,7 +297,11 @@ public:
     /** `preset:write [<file>]`: writes the presets to a text file (a dialog if there is no file). */
     message<> preset_write{this, "preset:write", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        write_file(w.empty() ? jamoma_max::ask_for_file(true, name_ + ".presets.txt") : jamoma_max::target_file(patcher_, w[0]));
+        const std::weak_ptr<int> alive = alive_.weak(); // as in preset:read
+        const auto file = w.empty() ? jamoma_max::ask_for_file(true, name_ + ".presets.txt") : jamoma_max::target_file(patcher_, w[0]);
+        if (!alive.expired()) {
+            write_file(file);
+        }
         return {};
     }};
 
