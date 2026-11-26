@@ -8,7 +8,7 @@
 
 **Tech Stack:** As milestone 3 (C++20, CMake, Catch2, Min-API, max-test, Python tools, jgraphics, the Max editor and popup APIs).
 
-**Spec:** `docs/superpowers/specs/2026-11-26-milestone-4-old-surface-design.md` (approved 26 November 2026), parent `docs/superpowers/specs/2026-11-21-jamomamax3-modular-design.md`. Earlier plans in this folder; results `docs/conformance/m3-results.md`; differences `docs/changes.md`; new features `CHANGELOG.md`. Old behaviour: `~/Developer/Jamoma/JamomaMax/source/{j.map,j.namespace,j.cue,j.textslider,j.ui}`, the old Foundation function library and `TTMapper.cpp` (`~/Developer/Jamoma/Jamoma.0.5.7/Modules/Modular/library/PeerObject/`), `TTExplorer`, `TTCueManager`, and the patchers under `~/Developer/Jamoma/JamomaMax/Jamoma/` (`help`, `patchers/models/data/osc`).
+**Spec:** `docs/superpowers/specs/2026-11-26-milestone-4-old-surface-design.md` (approved 26 November 2026), parent `docs/superpowers/specs/2026-11-21-jamomamax3-modular-design.md`. Earlier plans in this folder; results `docs/conformance/m3-results.md`; differences `docs/changes.md`; new features `CHANGELOG.md`. Old behaviour: `~/Developer/Jamoma/JamomaMax/source/{j.map,j.namespace,j.cue,j.textslider,j.ui}`, `JamomaMax/JamomaCore` (`Modular/library/source/TTMapper.cpp`, `TTExplorer.cpp`, `TTCue.cpp`, `TTCueManager.cpp`, `DSP/extensions/FunctionLib`); only the JamomaMax tree is read, never Jamoma 0.5.7, and the patchers under `~/Developer/Jamoma/JamomaMax/Jamoma/` (`help`, `patchers/models/data/osc`).
 
 ## Global Constraints
 
