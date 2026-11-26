@@ -49,7 +49,7 @@ OBJECT_SOURCES = {
 }
 
 #: Min messages that are plumbing, not part of the object's interface.
-INFRASTRUCTURE = {"setup", "maxclass_setup"}
+INFRASTRUCTURE = {"setup", "maxclass_setup", "oksize"}  # oksize: Max asks a UI object whether a new size is fine
 
 
 #: Attributes every Max box has; a page may document them and the sources never name them.
