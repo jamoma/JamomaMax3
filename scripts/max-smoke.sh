@@ -30,17 +30,27 @@ LINK="$PACKAGES/Jamoma"
 
 if pgrep -f "Max 9/Max.app/Contents/MacOS/Max" >/dev/null; then echo "FAIL: Max 9 is already running; quit it first" >&2; exit 2; fi
 # A Jamoma link that is already there (permanent links, scripts/max-links.sh) is taken away for the run and put back afterwards. Anything
-# else under that name (a real folder, an installed package) is never touched.
+# else under that name (a real folder, an installed package) is never touched. If macOS does not let the link be removed and it already points
+# to this package, the run uses it as it is (not possible with --odd-path or --no-loader, which need their own copy).
 SAVED_TARGET=""
+IN_PLACE=0
 if [[ -L "$LINK" ]]; then
     SAVED_TARGET="$(readlink "$LINK")"
-    rm "$LINK"
+    if ! rm "$LINK" 2>/dev/null; then
+        if [[ "$SAVED_TARGET" == "$ROOT/package/Jamoma" && $ODD == 0 && $NOLOADER == 0 ]]; then
+            IN_PLACE=1
+        else
+            echo "FAIL: cannot remove the link $LINK" >&2; exit 2
+        fi
+    fi
 elif [[ -e "$LINK" ]]; then
     echo "FAIL: $LINK exists and is not a link; not touching it" >&2; exit 2
 fi
 restore_link() {
+    [[ $IN_PLACE == 1 ]] && return 0
     [[ -L "$LINK" ]] && rm "$LINK"
-    if [[ -n "$SAVED_TARGET" ]]; then ln -s "$SAVED_TARGET" "$LINK"; fi
+    # never link into a link that is still there: that would put a link inside the folder it points to
+    if [[ -n "$SAVED_TARGET" && ! -e "$LINK" && ! -L "$LINK" ]]; then ln -s "$SAVED_TARGET" "$LINK"; fi
 }
 trap restore_link EXIT
 
@@ -63,7 +73,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-ln -s "$STAGE/Jamoma" "$LINK" || { echo "FAIL: cannot link into $PACKAGES" >&2; exit 2; }
+if [[ $IN_PLACE == 0 ]]; then
+    ln -s "$STAGE/Jamoma" "$LINK" || { echo "FAIL: cannot link into $PACKAGES" >&2; exit 2; }
+fi
 # Launch through Launch Services: Max started as a direct child of a non-interactive shell does not run reliably.
 open -a "$MAX_APP" "$WORK/smoke.maxpat"
 for _ in $(seq 1 20); do MAXPID="$(pgrep -f "Max 9/Max.app/Contents/MacOS/Max" | head -1)"; [[ -n "$MAXPID" ]] && break; sleep 0.5; done
