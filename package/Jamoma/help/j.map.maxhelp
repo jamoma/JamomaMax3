@@ -69,18 +69,6 @@
 							1228.0,
 							784.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -131,13 +119,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "Draw a custom function using function (including curve option)",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Draw a custom function using function (including curve option)"
 								}
 							},
 							{
@@ -159,13 +141,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Draw a custom function using multislider",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Draw a custom function using multislider"
 								}
 							},
 							{
@@ -186,13 +162,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Turn on ramping",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Turn on ramping"
 								}
 							},
 							{
@@ -668,12 +638,6 @@
 							},
 							{
 								"box": {
-									"color": [
-										0.656533,
-										0.023209,
-										0.0,
-										1.0
-									],
 									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-22",
@@ -697,18 +661,6 @@
 											241.0,
 											269.0,
 											414.0
-										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -1822,27 +1774,9 @@
 										0,
 										-0.65
 									],
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										0.0
-									],
 									"domain": 1.0,
-									"gridcolor": [
-										0.5,
-										0.5,
-										0.5,
-										0.5
-									],
 									"id": "obj-64",
 									"legend": 0,
-									"linecolor": [
-										0.333333,
-										0.333333,
-										0.333333,
-										1.0
-									],
 									"maxclass": "function",
 									"mode": 1,
 									"numinlets": 1,
@@ -1908,12 +1842,6 @@
 							},
 							{
 								"box": {
-									"color": [
-										0.656533,
-										0.023209,
-										0.0,
-										1.0
-									],
 									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-67",
@@ -1938,18 +1866,6 @@
 											79.0,
 											640.0,
 											480.0
-										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -2747,12 +2663,6 @@
 							},
 							{
 								"box": {
-									"color": [
-										0.656533,
-										0.023209,
-										0.0,
-										1.0
-									],
 									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-79",
@@ -2777,18 +2687,6 @@
 											441.0,
 											760.0,
 											463.0
-										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -3643,27 +3541,9 @@
 										0,
 										0.0
 									],
-									"bgcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									],
 									"domain": 1.0,
-									"gridcolor": [
-										0.5,
-										0.5,
-										0.5,
-										0.5
-									],
 									"id": "obj-82",
 									"legend": 0,
-									"linecolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									],
 									"maxclass": "function",
 									"mode": 1,
 									"numinlets": 1,
@@ -4241,18 +4121,6 @@
 							26.0,
 							1228.0,
 							784.0
-						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -5123,18 +4991,6 @@
 							1228.0,
 							784.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -5187,23 +5043,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-50",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -5221,27 +5064,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
@@ -5263,13 +5086,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Set a function parameter value",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set a function parameter value"
 								}
 							},
 							{
@@ -5291,34 +5108,15 @@
 										49.0
 									],
 									"style": "",
-									"text": "Get current value of a function parameter",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Get current value of a function parameter"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-47",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -5336,27 +5134,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -5375,13 +5153,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Some functions can be teaked with some parameters so the function can fit your needs.\n\nHere's how to get a list of available function provided and the list of parameters for the chosen function. Each parameter value can be get and set.",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Some functions can be teaked with some parameters so the function can fit your needs.\n\nHere's how to get a list of available function provided and the list of parameters for the chosen function. Each parameter value can be get and set."
 								}
 							},
 							{
@@ -5446,13 +5218,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Get a list of all functions available",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Get a list of all functions available"
 								}
 							},
 							{
@@ -5474,13 +5240,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Get a list of mapped test values",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Get a list of mapped test values"
 								}
 							},
 							{
@@ -5523,34 +5283,15 @@
 										35.0
 									],
 									"style": "",
-									"text": "Choose a function",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Choose a function"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-34",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -5568,27 +5309,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -5610,13 +5331,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Get a list of all functions available",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Get a list of all functions available"
 								}
 							},
 							{
@@ -5979,40 +5694,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.290196,
-										0.309804,
-										0.301961,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"gradient": 1,
 									"id": "obj-10",
 									"maxclass": "message",
@@ -6028,13 +5709,7 @@
 										22.0
 									],
 									"style": "",
-									"text": "100.",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "100."
 								}
 							},
 							{
@@ -6153,19 +5828,7 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									],
 									"fontname": "Arial",
-									"gridcolor": [
-										0.3,
-										0.3,
-										0.3,
-										0.501961
-									],
 									"id": "obj-136",
 									"ignoreclick": 1,
 									"margins": [
@@ -6778,12 +6441,6 @@
 							1228.0,
 							784.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -6857,13 +6514,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Reverse function",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Reverse function"
 								}
 							},
 							{
@@ -6885,13 +6536,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Set input and output min and max values",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set input and output min and max values"
 								}
 							},
 							{
@@ -6911,13 +6556,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Works with lists too",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Works with lists too"
 								}
 							},
 							{
@@ -6939,51 +6578,11 @@
 										64.0
 									],
 									"style": "",
-									"text": "Choose a transfert function using j.function_editor widget",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Choose a transfert function using j.function_editor widget"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.290196,
-										0.309804,
-										0.301961,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"gradient": 1,
 									"id": "obj-10",
 									"maxclass": "message",
@@ -6999,13 +6598,7 @@
 										22.0
 									],
 									"style": "",
-									"text": "100.",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "100."
 								}
 							},
 							{
@@ -8001,12 +7594,6 @@
 			},
 			{
 				"box": {
-					"color": [
-						0.619608,
-						0.0,
-						0.360784,
-						0.701961
-					],
 					"fontname": "Arial",
 					"fontsize": 12.0,
 					"id": "obj-8",
@@ -8027,18 +7614,6 @@
 							26.0,
 							1228.0,
 							784.0
-						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -8073,12 +7648,6 @@
 						"boxes": [
 							{
 								"box": {
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"fontsize": 14.0,
@@ -8093,13 +7662,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "Mapping parameter arrays",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Mapping parameter arrays"
 								}
 							},
 							{
@@ -8118,13 +7681,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "j.map can be set some j.parameter addresses as input and output. In that case, mapping between both parameters using their defined range attribute",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "j.map can be set some j.parameter addresses as input and output. In that case, mapping between both parameters using their defined range attribute"
 								}
 							},
 							{
@@ -8206,13 +7763,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Using the @input/index attribute, j.map will pick an item from the input parameter array and map it to the destination parameter. By default (0), j.map will map all items from array.",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Using the @input/index attribute, j.map will pick an item from the input parameter array and map it to the destination parameter. By default (0), j.map will map all items from array."
 								}
 							},
 							{

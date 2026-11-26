@@ -1357,18 +1357,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.537255,
-										0.537255,
-										0.537255,
-										1.0
-									],
-									"bordercolor": [
-										0.501961,
-										0.501961,
-										0.501961,
-										0.0
-									],
 									"fontname": "Arial",
 									"fontsize": 12.0,
 									"id": "obj-71",
@@ -1392,13 +1380,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "none",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "none"
 								}
 							},
 							{
@@ -1514,12 +1496,6 @@
 								"box": {
 									"angle": 0.0,
 									"background": 1,
-									"bgcolor": [
-										0.898039,
-										0.898039,
-										0.898039,
-										0.33
-									],
 									"id": "obj-1",
 									"maxclass": "panel",
 									"mode": 0,
@@ -1766,12 +1742,6 @@
 							1596.0,
 							737.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -1823,12 +1793,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-15",
 									"maxclass": "panel",
 									"mode": 0,
@@ -1847,40 +1811,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Arial",
 									"fontsize": 16.0,
@@ -1899,13 +1829,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Reveal demo models and view",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Reveal demo models and view"
 								}
 							},
 							{
@@ -1948,13 +1872,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "Manage ordered list of states",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Manage ordered list of states"
 								}
 							},
 							{
@@ -1973,13 +1891,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "Manage states",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Manage states"
 								}
 							},
 							{
@@ -1998,13 +1910,7 @@
 										23.0
 									],
 									"style": "",
-									"text": "State options edits",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "State options edits"
 								}
 							},
 							{
@@ -2023,13 +1929,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Edits done in text editor are automatically stored in state",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Edits done in text editor are automatically stored in state"
 								}
 							},
 							{
@@ -2051,13 +1951,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Change sequence of states stored in j.cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Change sequence of states stored in j.cue"
 								}
 							},
 							{
@@ -2075,13 +1969,7 @@
 										21.0
 									],
 									"style": "",
-									"text": "Use 3d arg to set a position",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "Use 3d arg to set a position"
 								}
 							},
 							{
@@ -2102,13 +1990,7 @@
 										35.0
 									],
 									"style": "",
-									"text": "Duplicate state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Duplicate state"
 								}
 							},
 							{
@@ -2190,13 +2072,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "Rename a named or indexed stored state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Rename a named or indexed stored state"
 								}
 							},
 							{
@@ -2261,13 +2137,7 @@
 									],
 									"prototypename": "Jamoma.bubble",
 									"style": "",
-									"text": "Double click to display all stored state in a text editor\n\nAlternatively, use the 'edit' message to display all or a single state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Double click to display all stored state in a text editor\n\nAlternatively, use the 'edit' message to display all or a single state"
 								}
 							},
 							{
@@ -2310,13 +2180,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Optional description and ramp time can be attached to a stored cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Optional description and ramp time can be attached to a stored cue"
 								}
 							},
 							{
@@ -2465,13 +2329,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Move a named or indexed state to a new position",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Move a named or indexed state to a new position"
 								}
 							},
 							{
@@ -2598,13 +2456,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Delete all states stored in j.cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Delete all states stored in j.cue"
 								}
 							},
 							{
@@ -2626,13 +2478,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "Remove state specified by name or index",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Remove state specified by name or index"
 								}
 							},
 							{
@@ -2696,13 +2542,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Get an ordered list of states stored in j.cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Get an ordered list of states stored in j.cue"
 								}
 							},
 							{
@@ -2724,34 +2564,15 @@
 										78.0
 									],
 									"style": "",
-									"text": "Load some previously saved states",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Load some previously saved states"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-44",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -2770,27 +2591,7 @@
 									"prototypename": "Jamoma.step",
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -2845,12 +2646,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-59",
 									"maxclass": "panel",
 									"mode": 0,
@@ -2870,12 +2665,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-61",
 									"maxclass": "panel",
 									"mode": 0,
@@ -2895,12 +2684,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-60",
 									"maxclass": "panel",
 									"mode": 0,
@@ -3407,18 +3190,6 @@
 							1596.0,
 							737.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -3471,12 +3242,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-15",
 									"maxclass": "panel",
 									"mode": 0,
@@ -3495,40 +3260,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Arial",
 									"fontsize": 16.0,
@@ -3547,13 +3278,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Reveal demo models and view",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Reveal demo models and view"
 								}
 							},
 							{
@@ -3618,40 +3343,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.290196,
-										0.309804,
-										0.301961,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										0.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontname": "Arial",
 									"fontsize": 14.0,
 									"gradient": 1,
@@ -3669,13 +3360,7 @@
 										25.0
 									],
 									"style": "",
-									"text": "cue_manager.model",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "cue_manager.model"
 								}
 							},
 							{
@@ -3694,13 +3379,7 @@
 										57.0
 									],
 									"style": "",
-									"text": "You may also like cue_manager.model and its view providing a handy gui for namespace manual selection",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "You may also like cue_manager.model and its view providing a handy gui for namespace manual selection"
 								}
 							},
 							{
@@ -3722,13 +3401,7 @@
 										49.0
 									],
 									"style": "",
-									"text": "Start from a full selection",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Start from a full selection"
 								}
 							},
 							{
@@ -3747,34 +3420,15 @@
 										78.0
 									],
 									"style": "",
-									"text": "You can use j.namespace in combination with j.cue to fine-tune namespace selection using j.namespace advanced filters options.\n\nWhen linked to j.cue, you can then send a filter pattern to j.namespace that will apply to j.cue current namespace selection",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "You can use j.namespace in combination with j.cue to fine-tune namespace selection using j.namespace advanced filters options.\n\nWhen linked to j.cue, you can then send a filter pattern to j.namespace that will apply to j.cue current namespace selection"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-9",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -3792,48 +3446,15 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "4",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "4"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-8",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -3851,27 +3472,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
@@ -3904,23 +3505,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-90",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -3938,38 +3526,12 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"id": "obj-89",
 									"maxclass": "panel",
 									"mode": 0,
@@ -4003,13 +3565,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "See j.namespace maxhelp for full description of filtering options",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "See j.namespace maxhelp for full description of filtering options"
 								}
 							},
 							{
@@ -4050,34 +3606,15 @@
 										64.0
 									],
 									"style": "",
-									"text": "Make j.cue bind to a named j.namespace",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Make j.cue bind to a named j.namespace"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-84",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -4095,27 +3632,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -4137,13 +3654,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Filter in only addresses containing 'gain'",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Filter in only addresses containing 'gain'"
 								}
 							},
 							{
@@ -4162,24 +3673,12 @@
 										23.0
 									],
 									"style": "",
-									"text": "Binding to j.namespace filters",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Binding to j.namespace filters"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-81",
 									"maxclass": "panel",
 									"mode": 0,
@@ -4212,24 +3711,12 @@
 										23.0
 									],
 									"style": "",
-									"text": "Manual addresses selection",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Manual addresses selection"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-79",
 									"maxclass": "panel",
 									"mode": 0,
@@ -4295,13 +3782,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Grab a selection of addresses from a stored state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Grab a selection of addresses from a stored state"
 								}
 							},
 							{
@@ -4355,34 +3836,15 @@
 										64.0
 									],
 									"style": "",
-									"text": "Add multiple addresses in a row",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Add multiple addresses in a row"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-73",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -4400,48 +3862,15 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "5",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "5"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-72",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -4459,27 +3888,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "4",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "4"
 								}
 							},
 							{
@@ -4501,13 +3910,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Add a specific address to current selection",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Add a specific address to current selection"
 								}
 							},
 							{
@@ -4542,23 +3945,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-69",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -4576,27 +3966,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
@@ -4646,13 +4016,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Add node to the addresses selection",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Add node to the addresses selection"
 								}
 							},
 							{
@@ -4674,13 +4038,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Clear current nodes selection (default all nodes from the root: /)",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Clear current nodes selection (default all nodes from the root: /)"
 								}
 							},
 							{
@@ -4699,13 +4057,7 @@
 										50.0
 									],
 									"style": "",
-									"text": "See j.cue will only store addresses under the '/mouse' node",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "See j.cue will only store addresses under the '/mouse' node"
 								}
 							},
 							{
@@ -4724,13 +4076,7 @@
 										309.0
 									],
 									"style": "",
-									"text": "By default, j.cue will store value of all addresses placed under the root (/) of Jamoma namespace. This is convenent as it allows to store the state of all your instanciated models in one go.\n\nHowever, j.cue offers differents ways to narrow down the list of addresses that will be stored as a state. \n\nAddresses may be added or removed (namespace/select - namespace/unselect) from j.cue internal namespace selection. \n\nAddresses may also be added to j.cue selection from a remote j.namespace filter for advanced addresses selection.",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "By default, j.cue will store value of all addresses placed under the root (/) of Jamoma namespace. This is convenent as it allows to store the state of all your instanciated models in one go.\n\nHowever, j.cue offers differents ways to narrow down the list of addresses that will be stored as a state. \n\nAddresses may be added or removed (namespace/select - namespace/unselect) from j.cue internal namespace selection. \n\nAddresses may also be added to j.cue selection from a remote j.namespace filter for advanced addresses selection."
 								}
 							},
 							{
@@ -4819,35 +4165,11 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cols": 1,
 									"colwidth": 172,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-7",
 									"maxclass": "jit.cellblock",
@@ -4938,23 +4260,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-55",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -4972,27 +4281,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -5011,34 +4300,15 @@
 										47.0
 									],
 									"style": "",
-									"text": "delete j.cue/j.namespace binding",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "delete j.cue/j.namespace binding"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-50",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -5056,27 +4326,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -5548,18 +4798,6 @@
 							1596.0,
 							737.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -5611,12 +4849,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-15",
 									"maxclass": "panel",
 									"mode": 0,
@@ -5635,40 +4867,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Arial",
 									"fontsize": 16.0,
@@ -5687,13 +4885,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Reveal demo models and view",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Reveal demo models and view"
 								}
 							},
 							{
@@ -5715,13 +4907,7 @@
 										76.0
 									],
 									"style": "",
-									"text": "Set a ramp time (ms) to a stored state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Set a ramp time (ms) to a stored state"
 								}
 							},
 							{
@@ -5740,13 +4926,7 @@
 										107.0
 									],
 									"style": "",
-									"text": "When recalling the state, models addresses stored in the state will ramp from their current state (whether it is set from j.cue or from views gui) to the value defined in the stored state",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "When recalling the state, models addresses stored in the state will ramp from their current state (whether it is set from j.cue or from views gui) to the value defined in the stored state"
 								}
 							},
 							{
@@ -5822,24 +5002,12 @@
 										23.0
 									],
 									"style": "",
-									"text": "Time state interpolation",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Time state interpolation"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-32",
 									"maxclass": "panel",
 									"mode": 0,
@@ -5929,24 +5097,12 @@
 										23.0
 									],
 									"style": "",
-									"text": "Multiple states interpolation",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "Multiple states interpolation"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-19",
 									"maxclass": "panel",
 									"mode": 0,
@@ -5979,24 +5135,12 @@
 										23.0
 									],
 									"style": "",
-									"text": "State interpolation",
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"text": "State interpolation"
 								}
 							},
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.113725,
-										0.607843,
-										0.607843,
-										1.0
-									],
 									"id": "obj-59",
 									"maxclass": "panel",
 									"mode": 0,
@@ -6051,13 +5195,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "Interpolate between two named or indexed stored states",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Interpolate between two named or indexed stored states"
 								}
 							},
 							{
@@ -6103,13 +5241,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "Interpolate between many weighted states",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Interpolate between many weighted states"
 								}
 							},
 							{
@@ -6131,13 +5263,7 @@
 										104.0
 									],
 									"style": "",
-									"text": "Change some parameters value in the models then recall the init cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Change some parameters value in the models then recall the init cue"
 								}
 							},
 							{
@@ -6176,13 +5302,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "Outro",
-									"textcolor": [
-										0.0,
-										0.0,
-										0.0,
-										0.8
-									]
+									"text": "Outro"
 								}
 							},
 							{
@@ -6200,13 +5320,7 @@
 										20.0
 									],
 									"style": "",
-									"text": "scene_2",
-									"textcolor": [
-										0.0,
-										0.0,
-										0.0,
-										0.8
-									]
+									"text": "scene_2"
 								}
 							},
 							{
@@ -6224,23 +5338,11 @@
 										20.0
 									],
 									"style": "",
-									"text": "scene_1",
-									"textcolor": [
-										0.0,
-										0.0,
-										0.0,
-										0.8
-									]
+									"text": "scene_1"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
 									"contdata": 1,
 									"ghostbar": 27,
 									"id": "obj-14",
@@ -6264,24 +5366,12 @@
 										1.0
 									],
 									"size": 3,
-									"slidercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.701961
-									],
 									"spacing": 1,
 									"style": ""
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
 									"contdata": 1,
 									"ghostbar": 27,
 									"id": "obj-9",
@@ -6304,24 +5394,12 @@
 										0.0,
 										1.0
 									],
-									"slidercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.701961
-									],
 									"spacing": 1,
 									"style": ""
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
 									"contdata": 1,
 									"ghostbar": 27,
 									"id": "obj-8",
@@ -6343,12 +5421,6 @@
 									"setminmax": [
 										0.0,
 										1.0
-									],
-									"slidercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.701961
 									],
 									"spacing": 1,
 									"style": ""
@@ -6377,23 +5449,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-50",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -6411,27 +5470,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -6483,28 +5522,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
 									"displayknob": 1,
 									"id": "obj-5",
-									"knobcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.19
-									],
 									"maxclass": "nodes",
 									"mousemode": 2,
-									"nodecolor": [
-										0.2,
-										0.2,
-										0.2,
-										0.4
-									],
 									"nodenumber": 3,
 									"nsize": [
 										0.341026,
@@ -6525,19 +5546,7 @@
 										190.0,
 										182.0
 									],
-									"pointcolor": [
-										0.9,
-										0.9,
-										0.9,
-										0.8
-									],
 									"style": "",
-									"textcolor": [
-										0.1,
-										0.1,
-										0.1,
-										0.6
-									],
 									"xplace": [
 										0.41,
 										0.23,
@@ -6571,28 +5580,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
 									"displayknob": 1,
 									"id": "obj-48",
-									"knobcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.19
-									],
 									"maxclass": "nodes",
 									"mousemode": 2,
-									"nodecolor": [
-										0.2,
-										0.2,
-										0.2,
-										0.4
-									],
 									"nodenumber": 3,
 									"nsize": [
 										0.341026,
@@ -6613,19 +5604,7 @@
 										190.0,
 										182.0
 									],
-									"pointcolor": [
-										0.9,
-										0.9,
-										0.9,
-										0.8
-									],
 									"style": "",
-									"textcolor": [
-										0.1,
-										0.1,
-										0.1,
-										0.6
-									],
 									"xplace": [
 										0.41,
 										0.23,
@@ -7041,18 +6020,6 @@
 							1596.0,
 							737.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -7104,12 +6071,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-6",
 									"maxclass": "panel",
 									"mode": 0,
@@ -7128,40 +6089,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Arial",
 									"fontsize": 16.0,
@@ -7180,13 +6107,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Reveal demo models and view",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Reveal demo models and view"
 								}
 							},
 							{
@@ -7204,13 +6125,7 @@
 										19.0
 									],
 									"style": "",
-									"text": "'optimize State_1 State_2'",
-									"textcolor": [
-										0.239216,
-										0.254902,
-										0.278431,
-										1.0
-									]
+									"text": "'optimize State_1 State_2'"
 								}
 							},
 							{
@@ -7256,13 +6171,7 @@
 										107.0
 									],
 									"style": "",
-									"text": "Give optimize a sequence fo states and see results in j.cue text editor window.\n\nNote that you may optimize more than 2 states at once",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Give optimize a sequence fo states and see results in j.cue text editor window.\n\nNote that you may optimize more than 2 states at once"
 								}
 							},
 							{
@@ -7325,12 +6234,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-31",
 									"maxclass": "panel",
 									"mode": 0,
@@ -7785,41 +6688,11 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										0.0
-									],
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cols": 2,
 									"colwidth": 90,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-20",
 									"maxclass": "jit.cellblock",
@@ -7844,41 +6717,11 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										0.0
-									],
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cols": 2,
 									"colwidth": 90,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-9",
 									"maxclass": "jit.cellblock",
@@ -7903,41 +6746,11 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										1.0,
-										1.0,
-										1.0,
-										0.0
-									],
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cols": 2,
 									"colwidth": 90,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-24",
 									"maxclass": "jit.cellblock",
@@ -7979,13 +6792,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Open j.cue text editor and see what your states look like",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Open j.cue text editor and see what your states look like"
 								}
 							},
 							{
@@ -8009,23 +6816,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-27",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -8043,48 +6837,15 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-23",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -8102,27 +6863,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -8170,34 +6911,15 @@
 										92.0
 									],
 									"style": "",
-									"text": "Change some settings in the attached models then store states in j.cue",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Change some settings in the attached models then store states in j.cue"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-14",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -8215,27 +6937,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -8254,13 +6956,7 @@
 										64.0
 									],
 									"style": "",
-									"text": "The 'optimize' message slims down a state by removing redundant addresses and stored values from consecutive cues. This can be seen as a kind of built-in change function between states",
-									"textcolor": [
-										0.7,
-										0.7,
-										0.7,
-										1.0
-									]
+									"text": "The 'optimize' message slims down a state by removing redundant addresses and stored values from consecutive cues. This can be seen as a kind of built-in change function between states"
 								}
 							},
 							{
@@ -8669,18 +7365,6 @@
 							505.0,
 							182.0
 						],
-						"bgcolor": [
-							1.0,
-							1.0,
-							1.0,
-							1.0
-						],
-						"editing_bgcolor": [
-							1.0,
-							1.0,
-							1.0,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -9054,12 +7738,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										1.0,
-										1.0,
-										0.75,
-										0.0
-									],
 									"id": "obj-2",
 									"maxclass": "panel",
 									"mode": 0,
@@ -9270,12 +7948,6 @@
 							1596.0,
 							737.0
 						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -9327,12 +7999,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										1.0
-									],
 									"id": "obj-5",
 									"maxclass": "panel",
 									"mode": 0,
@@ -9351,40 +8017,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgcolor2": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_angle": 270.0,
-									"bgfillcolor_autogradient": 0.0,
-									"bgfillcolor_color": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.0
-									],
-									"bgfillcolor_color1": [
-										0.376471,
-										0.384314,
-										0.4,
-										1.0
-									],
-									"bgfillcolor_color2": [
-										0.290196,
-										0.309804,
-										0.301961,
-										1.0
-									],
-									"bgfillcolor_proportion": 0.39,
-									"bgfillcolor_type": "color",
 									"fontface": 2,
 									"fontname": "Arial",
 									"fontsize": 16.0,
@@ -9403,13 +8035,7 @@
 										28.0
 									],
 									"style": "",
-									"text": "Reveal demo models and view",
-									"textcolor": [
-										0.65098,
-										0.666667,
-										0.662745,
-										0.698039
-									]
+									"text": "Reveal demo models and view"
 								}
 							},
 							{
@@ -10005,13 +8631,7 @@
 										93.0
 									],
 									"style": "",
-									"text": "You may specify a node address to grab content of from a specific stored state. \n\nThis may be a model or a particular parameter address",
-									"textcolor": [
-										0.6,
-										0.6,
-										0.6,
-										1.0
-									]
+									"text": "You may specify a node address to grab content of from a specific stored state. \n\nThis may be a model or a particular parameter address"
 								}
 							},
 							{
@@ -10033,13 +8653,7 @@
 										92.0
 									],
 									"style": "",
-									"text": "A stored state may be output out of j.cue leftmost outlet for further processing",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "A stored state may be output out of j.cue leftmost outlet for further processing"
 								}
 							},
 							{
@@ -10061,13 +8675,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Update nodes address stored in a named state with their current value",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Update nodes address stored in a named state with their current value"
 								}
 							},
 							{
@@ -10089,13 +8697,7 @@
 										78.0
 									],
 									"style": "",
-									"text": "Bring models back to a previously stored states",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Bring models back to a previously stored states"
 								}
 							},
 							{
@@ -10117,13 +8719,7 @@
 										121.0
 									],
 									"style": "",
-									"text": "Change settings of the attached demo models and store their current parameters value as a new named state",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Change settings of the attached demo models and store their current parameters value as a new named state"
 								}
 							},
 							{
@@ -10183,13 +8779,7 @@
 									],
 									"prototypename": "Jamoma.light",
 									"style": "",
-									"text": "Note that j.cue's content is not saved within the patch. Be sure to save its content as a file.",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									]
+									"text": "Note that j.cue's content is not saved within the patch. Be sure to save its content as a file."
 								}
 							},
 							{
@@ -10210,34 +8800,15 @@
 										150.0
 									],
 									"style": "",
-									"text": "Once you're happy with the collection of states stored in j.cue, you can save them to disk as a text file.\n\nThe text file containing all states can then be loaded back using the 'read' message.",
-									"textcolor": [
-										0.3,
-										0.3,
-										0.3,
-										1.0
-									]
+									"text": "Once you're happy with the collection of states stored in j.cue, you can save them to disk as a text file.\n\nThe text file containing all states can then be loaded back using the 'read' message."
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-69",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -10255,27 +8826,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
@@ -10322,23 +8873,10 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-54",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -10356,48 +8894,15 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
-									"bgoncolor": [
-										0.93,
-										0.93,
-										0.93,
-										1.0
-									],
 									"fontface": 1,
 									"fontname": "Arial",
 									"id": "obj-44",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -10416,27 +8921,7 @@
 									"prototypename": "Jamoma.step",
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"textcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										0.698039
-									],
-									"textoncolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									],
-									"textovercolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{

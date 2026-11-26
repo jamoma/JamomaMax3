@@ -15,6 +15,9 @@ import json
 import pathlib
 import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "package"))
+import clean_patcher  # noqa: E402
+
 HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node", "j.namespace", "j.map", "j.cue", "j.textslider"]
 
 
@@ -89,18 +92,6 @@ def migrate_patcher(patcher, implemented, replaced):
                         if l["patchline"]["source"][0] not in gone and l["patchline"]["destination"][0] not in gone]
 
 
-def set_fonts(patcher):
-    """The fonts of the package: Arial, and size 12 where the old patcher had 13 (in place, subpatchers too)."""
-    for entry in patcher.get("boxes", []):
-        box = entry["box"]
-        if "fontname" in box:
-            box["fontname"] = "Arial"
-        if box.get("fontsize") == 13 or box.get("fontsize") == 13.0:
-            box["fontsize"] = 12.0
-        if "patcher" in box:
-            set_fonts(box["patcher"])
-
-
 def main():
     """Command line entry point."""
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -117,7 +108,7 @@ def main():
         data = json.loads(source.read_text(encoding="utf-8"))
         replaced = []
         migrate_patcher(data["patcher"], implemented, replaced)
-        set_fonts(data["patcher"])
+        clean_patcher.clean(data["patcher"])  # default colours, Arial, no size 13
         (out_dir / f"{name}.maxhelp").write_text(json.dumps(data, indent="\t") + "\n", encoding="utf-8")
         print(f"{name}.maxhelp: replaced {len(replaced)}: {', '.join(sorted(set(replaced)))}")
     return 0

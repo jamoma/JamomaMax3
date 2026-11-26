@@ -14,18 +14,6 @@
 			1680.0,
 			1001.0
 		],
-		"bgcolor": [
-			0.878431,
-			0.878431,
-			0.858824,
-			1.0
-		],
-		"editing_bgcolor": [
-			0.878431,
-			0.878431,
-			0.858824,
-			1.0
-		],
 		"bglocked": 0,
 		"openinpresentation": 0,
 		"default_fontsize": 12.0,
@@ -116,18 +104,6 @@
 							26.0,
 							1680.0,
 							975.0
-						],
-						"bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -475,18 +451,6 @@
 											1100.0,
 											732.0
 										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
-										"editing_bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -553,13 +517,7 @@
 														50.0
 													],
 													"style": "",
-													"text": "When using '@format jit.cellblock', j.namespace displays addresses selection state as a jit.cellblock cell color message. Colors are hardcoded.",
-													"textcolor": [
-														0.113725,
-														0.607843,
-														0.607843,
-														1.0
-													]
+													"text": "When using '@format jit.cellblock', j.namespace displays addresses selection state as a jit.cellblock cell color message. Colors are hardcoded."
 												}
 											},
 											{
@@ -578,13 +536,7 @@
 														50.0
 													],
 													"style": "",
-													"text": "When using '@format umenu' (and _prefix variant), j.namespace uses umenu's check mark option to display selection state",
-													"textcolor": [
-														0.113725,
-														0.607843,
-														0.607843,
-														1.0
-													]
+													"text": "When using '@format umenu' (and _prefix variant), j.namespace uses umenu's check mark option to display selection state"
 												}
 											},
 											{
@@ -603,29 +555,11 @@
 														64.0
 													],
 													"style": "",
-													"text": "When using '@format none', j.namespace outputs  the message \"selection\" followed by a list of boolean values asociated with every filtered address",
-													"textcolor": [
-														0.113725,
-														0.607843,
-														0.607843,
-														1.0
-													]
+													"text": "When using '@format none', j.namespace outputs  the message \"selection\" followed by a list of boolean values asociated with every filtered address"
 												}
 											},
 											{
 												"box": {
-													"bgcolor": [
-														0.3,
-														0.3,
-														0.3,
-														1.0
-													],
-													"bordercolor": [
-														0.0,
-														0.0,
-														0.0,
-														1.0
-													],
 													"celldef": [
 														[
 															0,
@@ -747,27 +681,9 @@
 													],
 													"cols": 1,
 													"colwidth": 196,
-													"fgcolor": [
-														0.819608,
-														0.819608,
-														0.819608,
-														1.0
-													],
 													"fontface": 0,
 													"fontname": "Arial",
 													"fontsize": 12.0,
-													"gridlinecolor": [
-														0.0,
-														0.0,
-														0.0,
-														1.0
-													],
-													"hcellcolor": [
-														0.7,
-														0.7,
-														0.7,
-														0.76
-													],
 													"hscroll": 0,
 													"id": "obj-21",
 													"maxclass": "jit.cellblock",
@@ -786,13 +702,7 @@
 														173.75
 													],
 													"rows": 5,
-													"savemode": 1,
-													"stcolor": [
-														0.8,
-														0.8,
-														0.8,
-														1.0
-													]
+													"savemode": 1
 												}
 											},
 											{
@@ -1820,7 +1730,6 @@
 								"box": {
 									"id": "obj-71",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -1838,9 +1747,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -2019,7 +1926,6 @@
 								"box": {
 									"id": "obj-58",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -2037,9 +1943,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -2566,12 +2470,6 @@
 											166.0,
 											965.0,
 											768.0
-										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -3163,13 +3061,7 @@
 														158.0
 													],
 													"style": "",
-													"text": "When using @format jit.cellblock, j.namespace fakes a multi lines selection in jit.cellblock by setting differents colors for selected cells and unselected cells.\n\nThis abstraction can be removed if you want to use hardcodded j.namespace colors",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "When using @format jit.cellblock, j.namespace fakes a multi lines selection in jit.cellblock by setting differents colors for selected cells and unselected cells.\n\nThis abstraction can be removed if you want to use hardcodded j.namespace colors"
 												}
 											},
 											{
@@ -3328,12 +3220,6 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"celldef": [
 										[
 											0,
@@ -7917,27 +7803,9 @@
 									],
 									"cols": 1,
 									"colwidth": 196,
-									"fgcolor": [
-										0.819608,
-										0.819608,
-										0.819608,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.896579,
-										0.896579,
-										0.896579,
-										1.0
-									],
 									"hscroll": 0,
 									"id": "obj-16",
 									"maxclass": "jit.cellblock",
@@ -7956,13 +7824,7 @@
 										350.75
 									],
 									"rows": 199,
-									"savemode": 1,
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -8546,18 +8408,6 @@
 							26.0,
 							1680.0,
 							975.0
-						],
-						"bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -9753,12 +9603,6 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cellmap": [
 										[
 											0,
@@ -10758,27 +10602,9 @@
 									],
 									"cols": 2,
 									"colwidth": 200,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-16",
 									"maxclass": "jit.cellblock",
@@ -10797,13 +10623,7 @@
 										257.75
 									],
 									"rows": 199,
-									"savemode": 1,
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -11194,18 +11014,6 @@
 							280.0,
 							325.0
 						],
-						"bgcolor": [
-							1.0,
-							1.0,
-							1.0,
-							1.0
-						],
-						"editing_bgcolor": [
-							1.0,
-							1.0,
-							1.0,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -11578,12 +11386,6 @@
 							{
 								"box": {
 									"angle": 270.0,
-									"bgcolor": [
-										1.0,
-										1.0,
-										0.75,
-										0.0
-									],
 									"id": "obj-2",
 									"maxclass": "panel",
 									"mode": 0,
@@ -11768,18 +11570,6 @@
 							1680.0,
 							975.0
 						],
-						"bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
-						],
 						"bglocked": 0,
 						"openinpresentation": 0,
 						"default_fontsize": 12.0,
@@ -11941,12 +11731,6 @@
 											277.0,
 											209.0
 										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 0,
 										"default_fontsize": 12.0,
@@ -11993,13 +11777,7 @@
 														194.0
 													],
 													"style": "",
-													"text": "- object (the low-level c++ class of the object)\n\n- attribute (any attribute of the inspected object)\n\n- value (value of the inspected attribute)\n\n- part (a string in the object full address)\n\n- parent (name of the parent node)\n\n- name (name of the object node)\n\n- instance (instance number of the object)",
-													"textcolor": [
-														0.3,
-														0.3,
-														0.3,
-														1.0
-													]
+													"text": "- object (the low-level c++ class of the object)\n\n- attribute (any attribute of the inspected object)\n\n- value (value of the inspected attribute)\n\n- part (a string in the object full address)\n\n- parent (name of the parent node)\n\n- name (name of the object node)\n\n- instance (instance number of the object)"
 												}
 											},
 											{
@@ -12024,12 +11802,6 @@
 											},
 											{
 												"box": {
-													"bgcolor": [
-														0.896579,
-														0.896579,
-														0.896579,
-														1.0
-													],
 													"cols": 1,
 													"colwidth": 275,
 													"fontface": 0,
@@ -12825,12 +12597,6 @@
 											236.0,
 											167.0
 										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
-										],
 										"bglocked": 0,
 										"openinpresentation": 1,
 										"default_fontsize": 12.0,
@@ -12864,19 +12630,7 @@
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-17",
@@ -12904,31 +12658,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-19",
@@ -12956,31 +12692,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-21",
@@ -13008,31 +12726,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-23",
@@ -13060,31 +12760,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-13",
@@ -13112,31 +12794,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-15",
@@ -13164,31 +12828,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-11",
@@ -13216,31 +12862,13 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-88",
@@ -13268,13 +12896,7 @@
 														22.0
 													],
 													"rounded": 0.0,
-													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													]
+													"style": ""
 												}
 											},
 											{
@@ -13300,19 +12922,7 @@
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-10",
@@ -13341,31 +12951,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-29",
@@ -13394,31 +12986,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-30",
@@ -13447,31 +13021,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-31",
@@ -13500,31 +13056,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-33",
@@ -13553,31 +13091,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-34",
@@ -13606,31 +13126,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-36",
@@ -13659,31 +13161,13 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
 											{
 												"box": {
 													"annotation": "0.5000",
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														0.0
-													],
 													"border": 1.0,
-													"bordercolor": [
-														0.65098,
-														0.666667,
-														0.662745,
-														1.0
-													],
 													"fontname": "Arial",
 													"hint": "0.5000",
 													"id": "obj-38",
@@ -13712,12 +13196,6 @@
 													],
 													"rounded": 0.0,
 													"style": "",
-													"textcolor": [
-														0.32549,
-														0.345098,
-														0.372549,
-														1.0
-													],
 													"textjustification": 2
 												}
 											},
@@ -13743,13 +13221,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Parent name :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Parent name :"
 												}
 											},
 											{
@@ -13960,13 +13432,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Instance number :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Instance number :"
 												}
 											},
 											{
@@ -13991,13 +13457,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Node name :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Node name :"
 												}
 											},
 											{
@@ -14022,13 +13482,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Address part :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Address part :"
 												}
 											},
 											{
@@ -14053,13 +13507,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Attribute value :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Attribute value :"
 												}
 											},
 											{
@@ -14105,13 +13553,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Inspected attribute :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Inspected attribute :"
 												}
 											},
 											{
@@ -14136,13 +13578,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Object type :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Object type :"
 												}
 											},
 											{
@@ -14167,13 +13603,7 @@
 														21.0
 													],
 													"style": "",
-													"text": "Filter name :",
-													"textcolor": [
-														0.239216,
-														0.254902,
-														0.278431,
-														1.0
-													]
+													"text": "Filter name :"
 												}
 											},
 											{
@@ -14264,12 +13694,6 @@
 											{
 												"box": {
 													"angle": 270.0,
-													"bgcolor": [
-														0.898039,
-														0.898039,
-														0.898039,
-														1.0
-													],
 													"id": "obj-1",
 													"maxclass": "panel",
 													"mode": 0,
@@ -14296,12 +13720,6 @@
 											{
 												"box": {
 													"angle": 270.0,
-													"bgcolor": [
-														0.8,
-														0.8,
-														0.8,
-														1.0
-													],
 													"id": "obj-28",
 													"maxclass": "panel",
 													"mode": 0,
@@ -15128,12 +14546,6 @@
 							},
 							{
 								"box": {
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cellmap": [
 										[
 											0,
@@ -15218,27 +14630,9 @@
 									],
 									"cols": 1,
 									"colwidth": 200,
-									"fgcolor": [
-										0.619608,
-										0.0,
-										0.360784,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
-									"hcellcolor": [
-										0.819608,
-										0.819608,
-										0.898039,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-12",
 									"maxclass": "jit.cellblock",
@@ -15257,13 +14651,7 @@
 										167.0
 									],
 									"rows": 16,
-									"savemode": 1,
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -15399,12 +14787,6 @@
 											0.0,
 											640.0,
 											480.0
-										],
-										"bgcolor": [
-											0.862745,
-											0.870588,
-											0.878431,
-											1.0
 										],
 										"bglocked": 0,
 										"openinpresentation": 0,
@@ -16442,12 +15824,6 @@
 								"parentstyle": "",
 								"multi": 0
 							}
-						],
-						"patchlinecolor": [
-							0.65098,
-							0.65098,
-							0.65098,
-							0.898039
 						]
 					},
 					"patching_rect": [
@@ -16493,18 +15869,6 @@
 							26.0,
 							1680.0,
 							975.0
-						],
-						"bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.862745,
-							0.870588,
-							0.878431,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -16583,18 +15947,6 @@
 							71.0,
 							1680.0,
 							975.0
-						],
-						"bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
-						],
-						"editing_bgcolor": [
-							0.878431,
-							0.878431,
-							0.858824,
-							1.0
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -16782,7 +16134,6 @@
 								"box": {
 									"id": "obj-14",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -16800,16 +16151,13 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
 								"box": {
 									"id": "obj-15",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -16827,9 +16175,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -17117,7 +16463,6 @@
 								"box": {
 									"id": "obj-55",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -17135,9 +16480,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "3",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "3"
 								}
 							},
 							{
@@ -17164,7 +16507,6 @@
 								"box": {
 									"id": "obj-53",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -17182,9 +16524,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "2",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "2"
 								}
 							},
 							{
@@ -17211,7 +16551,6 @@
 								"box": {
 									"id": "obj-52",
 									"ignoreclick": 1,
-									"legacytextcolor": 1,
 									"maxclass": "textbutton",
 									"numinlets": 1,
 									"numoutlets": 3,
@@ -17229,9 +16568,7 @@
 									],
 									"rounded": 180.0,
 									"style": "",
-									"text": "1",
-									"usebgoncolor": 1,
-									"usetextovercolor": 1
+									"text": "1"
 								}
 							},
 							{
@@ -17538,18 +16875,6 @@
 							},
 							{
 								"box": {
-									"bgcolor": [
-										0.311041,
-										0.314599,
-										0.318357,
-										1.0
-									],
-									"bordercolor": [
-										0.0,
-										0.0,
-										0.0,
-										1.0
-									],
 									"cellmap": [
 										[
 											0,
@@ -17619,27 +16944,9 @@
 									],
 									"cols": 1,
 									"colwidth": 200,
-									"fgcolor": [
-										0.921569,
-										0.917647,
-										0.933333,
-										1.0
-									],
 									"fontface": 0,
 									"fontname": "Arial",
 									"fontsize": 12.0,
-									"gridlinecolor": [
-										0.560317,
-										0.570942,
-										0.601066,
-										1.0
-									],
-									"hcellcolor": [
-										0.165741,
-										0.364658,
-										0.14032,
-										0.0
-									],
 									"hscroll": 0,
 									"id": "obj-16",
 									"maxclass": "jit.cellblock",
@@ -17658,31 +16965,7 @@
 										252.75
 									],
 									"rows": 13,
-									"savemode": 1,
-									"sccolor": [
-										0.2495,
-										0.242348,
-										0.248704,
-										1.0
-									],
-									"sgcolor": [
-										0.560317,
-										0.570942,
-										0.601066,
-										1.0
-									],
-									"stcolor": [
-										0.8,
-										0.8,
-										0.8,
-										1.0
-									],
-									"textcolor": [
-										1.0,
-										1.0,
-										1.0,
-										1.0
-									]
+									"savemode": 1
 								}
 							},
 							{
@@ -18101,12 +17384,6 @@
 								"parentstyle": "",
 								"multi": 0
 							}
-						],
-						"patchlinecolor": [
-							0.65098,
-							0.65098,
-							0.65098,
-							0.898039
 						]
 					},
 					"patching_rect": [
@@ -18422,33 +17699,6 @@
 				"parentstyle": "",
 				"multi": 0
 			}
-		],
-		"patchlinecolor": [
-			0.65098,
-			0.65098,
-			0.65098,
-			0.898039
-		],
-		"bgfillcolor_type": "color",
-		"bgfillcolor_color1": [
-			0.376471,
-			0.384314,
-			0.4,
-			1.0
-		],
-		"bgfillcolor_color2": [
-			0.290196,
-			0.309804,
-			0.301961,
-			1.0
-		],
-		"bgfillcolor_color": [
-			0.290196,
-			0.309804,
-			0.301961,
-			1.0
-		],
-		"bgfillcolor_angle": 270.0,
-		"bgfillcolor_proportion": 0.39
+		]
 	}
 }
