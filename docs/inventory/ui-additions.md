@@ -13,7 +13,7 @@ Old "Create New Preset" (j.ui.cpp, `ui_menu_qfn`): `jdialog_showtext("Provide a 
 The old menu item "Edit Current State" and a double-click on the box open the Max text editor on the model's state (`ui_edit_state`); the new menu sends `preset:edit` (known not built until Task 6) and this item stays as it is.
 
 ## `view/freeze` and the freeze button
-- `view/freeze` exists in the old package only as a symbol (`JamomaSymbols.h`: `jps_ui_slash_freeze`); nothing in the 0.6 source creates or reads such an address. Cue scripts and helper patchers of the 0.5 days still send it (`cue_script.demoscript.txt`, `alias_renaming.cues.txt`, `j.presetParameters.helper.maxpat`); such lines address nothing and are skipped.
+- `view/freeze` exists in the old package only as a symbol (`JamomaMax/library/includes/JamomaSymbols.h` and `source/JamomaSymbols.cpp`: `jps_ui_slash_freeze`; nothing else outside the `quarantine` models uses the address); nothing in the 0.6 source creates or reads such an address. Cue scripts and helper patchers of the 0.5 days still send it (`cue_script.demoscript.txt`, `alias_renaming.cues.txt`, `j.presetParameters.helper.maxpat`); such lines address nothing and are skipped.
 - The freeze button of the old `j.ui` is never shown: `ui_return_model_content` declares `freeze = NO` and never sets it (`j.ui.internals.cpp:514`, `612-618`), confirmed in the old `qmetro.model.maxhelp` (no freeze button).
 
 ## Rulings

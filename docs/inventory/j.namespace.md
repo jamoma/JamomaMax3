@@ -1,6 +1,6 @@
 # j.namespace (old behaviour, read for milestone 4)
 
-Sources: `JamomaMax/source/j.namespace/j.namespace.cpp` (609 lines), `Jamoma.0.5.7/Modules/Modular/library/PeerObject/TTExplorer.cpp` (1031 lines), the old help `j.namespace.maxhelp`, `j.model.maxhelp` and `j.parameter.maxhelp`.
+Sources: `JamomaMax/source/j.namespace/j.namespace.cpp` (609 lines), `JamomaMax/JamomaCore/Modular/library/source/TTExplorer.cpp` (1141 lines; checked against the explorer of the older Jamoma 0.5.7, which has the same exploration but lacks `SelectionClear`; only the JamomaMax tree is the source from now on), the old help `j.namespace.maxhelp`, `j.model.maxhelp` and `j.parameter.maxhelp`.
 
 ## Object
 - Inlet: `bang` and `explore` (explore again), a symbol = a new address (an absolute address, or a relative one only with `@relative 1`, else the error "set relative attribute on before to send relative address"), `select`, `select/all`, `select/none`, `selection/refresh`, `filter/set`, `filter/remove`, `filter/info` and the attributes of the explorer, passed through by the class wrapper.
@@ -19,5 +19,5 @@ Sources: `JamomaMax/source/j.namespace/j.namespace.cpp` (609 lines), `Jamoma.0.5
 1. **Built:** address, output, format (all five), relative, sort, depth, update, the three result forms, the size outlet. These cover the help patchers of the in-scope objects.
 2. **Selection is built** (a core `Selection` shared by name: `select`, `selectall`, `selectnone`, selection output in the three formats), because `j.cue` stores the selected addresses (see `j.cue.md`).
 3. **Filters (`filter/set`, `filter/remove`, `filter/info`, `@filter/list`) are not built** in this milestone (not read, not needed by the pass-bar set); listed in `docs/changes.md`.
-4. Defaults are those of the `TTExplorer` constructor (TTExplorer.cpp:14-22): output `descendants`, update on, sort `alphabetic`, depth 0, namespace `none`.
+4. Defaults are those of the `TTExplorer` constructor (`TTExplorer.cpp`, constructor): output `descendants`, update on, sort `alphabetic`, depth 0, namespace `none`.
 5. Names are written in Max form (a leading `/`, `:` before an attribute); a name with a space (not possible in an address) is not a case.
