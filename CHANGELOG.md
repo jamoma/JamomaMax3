@@ -6,5 +6,6 @@ New features and notable changes for each release of JamomaMax3. Everything that
 
 ### New features
 
+- **`j.textslider` follows the colour theme of Max.** A colour that is left at its default takes the theme's colour for that part (track and border, bar, text, line), and these are adjusted where needed so that the text stays readable on every theme. A colour you set yourself is used as it is.
 - **`j.ui`: the attribute `snap`** (default 1) decides whether the size of the object snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down, at least one unit in each direction. This is how the old `j.ui` behaved, always; with `@snap 0` the object can now have any size.
 - **`j.ui`: the message `active [0|1]`** switches the model on or off through its parameter `data/active`, as a click on the active button of the header does (no argument: the other way round).

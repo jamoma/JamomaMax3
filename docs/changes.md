@@ -80,3 +80,8 @@ Differences from the old behaviour, on top of the lists above. The old suite has
 - Windows: nothing of milestone 3 has been built or run there (see `docs/conformance/m3-results.md`).
 - The look of `j.ui` and its menus have not been checked by eye.
 - `tools/maxtest/open_help.py` and `run_maxtests.py` still end Max with `pkill` if it has not quit by itself after 30 seconds (milestone 1 leftover).
+
+## j.textslider (milestone 4)
+
+- **Colours:** the old object had fixed light colours (a grey track, a near-white bar, black text). The new defaults follow the colour theme of Max (see `CHANGELOG.md`); where a theme gives no colour, the defaults are a dark set. A patcher that saved the old colours keeps them as chosen colours. A colour set to exactly the new default value counts as the default and follows the theme.
+- The pointer stays visible while dragging and is not put back at the knob on release.

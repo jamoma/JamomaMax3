@@ -24,7 +24,8 @@ add_library(jamoma_core SHARED
     src/mapper.cpp
     src/explore.cpp
     src/cue.cpp
-    src/slider.cpp)
+    src/slider.cpp
+    src/readable_colours.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
@@ -65,7 +66,8 @@ add_executable(jamoma_core_tests
     tests/mapper_test.cpp
     tests/explore_nodes_test.cpp
     tests/cue_test.cpp
-    tests/slider_test.cpp)
+    tests/slider_test.cpp
+    tests/readable_colours_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 target_compile_definitions(jamoma_core_tests PRIVATE JAMOMA_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/tests/data")
 # The registry must outlive static destruction (its own executable, checked through its exit code).

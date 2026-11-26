@@ -9,6 +9,10 @@
  * `int` and `float` give a value that is output as it is and drawn limited to the range, `set` the same without output, `bang` outputs it.
  * A click jumps to the position (`clickjump`), a drag moves it (Command: whole numbers; Shift: fine), Control and a double click give
  * `defaultvalue`. Values are accepted on any thread and output on it; drawing happens on the main thread.
+ *
+ * Colours follow the Max theme: a colour attribute that has its default takes the theme's colour for that part (track and border
+ * `live_control_bg`, bar `live_selection`, text `live_control_fg`, knob `live_value_bar`), and those theme colours are adjusted where needed so that
+ * the text can be read (jamoma/readable_colours.hpp). A colour the user sets is used as it is.
  */
 
 #include <atomic>
@@ -17,6 +21,7 @@
 
 #include "c74_min.h"
 
+#include "jamoma/readable_colours.hpp"
 #include "jamoma/slider.hpp"
 #include "max_attributes.hpp"
 #include "max_context.hpp"
@@ -44,21 +49,22 @@ public:
     inlet<> input{this, "(int, float) the value; set, bang"};       /**< The inlet. */
     outlet<> out{this, "(float) the value"};                        /**< Outlet 0. */
 
+    // The default of every colour means "follow the Max theme" (see theme_colour); any other value is the user's and is used as it is.
     /** The background colour. */
-    attribute<numbers> bgcolor{this, "bgcolor", {0.8, 0.8, 0.8, 0.7}, title{"Background Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.8, 0.8, 0.8, 0.7}); }}};
+    attribute<numbers> bgcolor{this, "bgcolor", {0.172, 0.172, 0.172, 1.0}, title{"Background Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.172, 0.172, 0.172, 1.0}); }}};
     /** The colour of the bar. */
-    attribute<numbers> fgcolor{this, "fgcolor", {0.95, 0.95, 0.95, 1.0}, title{"Foreground Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.95, 0.95, 0.95, 1.0}); }}};
+    attribute<numbers> fgcolor{this, "fgcolor", {0.199, 0.347, 0.529, 1.0}, title{"Foreground Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.199, 0.347, 0.529, 1.0}); }}};
     /** The border colour. */
-    attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 1.0}, title{"Border Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 1.0}); }}};
+    attribute<numbers> bordercolor{this, "bordercolor", {0.35, 0.35, 0.35, 1.0}, title{"Border Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.35, 0.35, 0.35, 1.0}); }}};
     /** The colour of the text. */
-    attribute<numbers> textcolor{this, "textcolor", {0.0, 0.0, 0.0, 1.0}, title{"Text Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.0, 0.0, 0.0, 1.0}); }}};
+    attribute<numbers> textcolor{this, "textcolor", {0.85, 0.85, 0.85, 1.0}, title{"Text Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0}); }}};
     /** The colour of the line at the end of the bar. */
-    attribute<numbers> knobcolor{this, "knobcolor", {0.7, 0.7, 0.7, 1.0}, title{"Knob Color"}, style::color,
-        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.7, 0.7, 0.7, 1.0}); }}};
+    attribute<numbers> knobcolor{this, "knobcolor", {0.594, 0.721, 0.928, 1.0}, title{"Knob Color"}, style::color,
+        setter{MIN_FUNCTION { return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0}); }}};
 
     /** The range, `low high`; the ends are swapped if the second is smaller. */
     attribute<numbers> range_attribute{this, "range", {0.0, 1.0}, title{"Range"}, setter{MIN_FUNCTION {
@@ -203,10 +209,45 @@ private:
         settle_.request(maxobj(), alive_.weak(), [this] { redraw(); });
     }
 
-    /** @param t The graphics context. @param c A colour as red, green, blue, alpha. */
-    static void colour(c74::max::t_jgraphics* t, const numbers& c)
+    /** @param g The graphics context. @param c A colour. */
+    static void colour(c74::max::t_jgraphics* g, const jamoma::Rgba& c) { c74::max::jgraphics_set_source_rgba(g, c.r, c.g, c.b, c.a); }
+
+    /**
+     * The colour of one part: the attribute if the user set it, else the colour of that part in the current Max theme (the default of the
+     * attribute if the theme has none).
+     * @param value The attribute. @param fallback Its default. @param theme The name of the theme colour.
+     * @param[out] follows Set to true if the theme colour is used. @return The colour.
+     */
+    static jamoma::Rgba theme_colour(const numbers& value, const jamoma::Rgba& fallback, const char* theme, bool& follows)
     {
-        c74::max::jgraphics_set_source_rgba(t, c.size() > 0 ? c[0] : 0.0, c.size() > 1 ? c[1] : 0.0, c.size() > 2 ? c[2] : 0.0, c.size() > 3 ? c[3] : 1.0);
+        const jamoma::Rgba given{value.size() > 0 ? value[0] : fallback.r, value.size() > 1 ? value[1] : fallback.g,
+                                 value.size() > 2 ? value[2] : fallback.b, value.size() > 3 ? value[3] : fallback.a};
+        const bool is_default = std::fabs(given.r - fallback.r) < 1e-4 && std::fabs(given.g - fallback.g) < 1e-4
+                                && std::fabs(given.b - fallback.b) < 1e-4 && std::fabs(given.a - fallback.a) < 1e-4;
+        follows = false;
+        if (!is_default) {
+            return given;
+        }
+        c74::max::t_jrgba on{}, off{};
+        if (c74::max::jcolor_getcolor(c74::max::gensym(theme), &on, &off) != 0) {
+            return given;
+        }
+        follows = true;
+        return {on.red, on.green, on.blue, on.alpha};
+    }
+
+    /** @return The colours to draw with now: the theme's or the user's, with the theme colours adjusted so that the text can be read. */
+    jamoma::SliderColours drawing_colours()
+    {
+        jamoma::SliderColours c;
+        jamoma::Adjustable follows;
+        bool track = false, border = false;
+        c.track = theme_colour(bgcolor.get(), {0.172, 0.172, 0.172, 1.0}, "live_control_bg", track);
+        c.bar = theme_colour(fgcolor.get(), {0.199, 0.347, 0.529, 1.0}, "live_selection", follows.bar);
+        c.text = theme_colour(textcolor.get(), {0.85, 0.85, 0.85, 1.0}, "live_control_fg", follows.text);
+        c.knob = theme_colour(knobcolor.get(), {0.594, 0.721, 0.928, 1.0}, "live_value_bar", follows.knob);
+        c.border = theme_colour(bordercolor.get(), {0.35, 0.35, 0.35, 1.0}, "live_control_bg", border);
+        return jamoma::readable_colours(c, follows);
     }
 
     /** Draws the slider into a target. @param t The target. */
@@ -214,20 +255,21 @@ private:
     {
         c74::max::t_jgraphics* g = t;
         const double w = t.width(), h = t.height();
-        colour(g, bgcolor.get());
+        const jamoma::SliderColours colours = drawing_colours();
+        colour(g, colours.track);
         c74::max::jgraphics_rectangle(g, 0, 0, w, h);
         c74::max::jgraphics_fill(g);
-        colour(g, bordercolor.get());
+        colour(g, colours.border);
         c74::max::jgraphics_set_line_width(g, 2.0);
         c74::max::jgraphics_rectangle(g, 0, 0, w, h);
         c74::max::jgraphics_stroke(g);
         const double place = jamoma::slider_normalised(value_.load(), low(), high());
         if (place > 0.0 && w > 3.0 && h > 2.0) {
             const double position = (w - 3.0) * place + 1.0;
-            colour(g, fgcolor.get());
+            colour(g, colours.bar);
             c74::max::jgraphics_rectangle(g, 1.0, 1.0, position, h - 2.0);
             c74::max::jgraphics_fill(g);
-            colour(g, knobcolor.get());
+            colour(g, colours.knob);
             c74::max::jgraphics_set_line_width(g, 2.0);
             c74::max::jgraphics_move_to(g, position, 1.0);
             c74::max::jgraphics_line_to(g, position, h - 1.0);
@@ -237,7 +279,7 @@ private:
             ? jamoma::slider_value_text(value_.load(), static_cast<symbol>(unit.get()).c_str())
             : std::string(static_cast<symbol>(text_attribute.get()).c_str());
         const numbers at = textpos.get();
-        colour(g, textcolor.get());
+        colour(g, colours.text);
         c74::max::jgraphics_save(g);
         c74::max::jgraphics_clip(g, 0, 0, w, h);
         c74::max::jgraphics_select_font_face(g, "Arial", c74::max::JGRAPHICS_FONT_SLANT_NORMAL, c74::max::JGRAPHICS_FONT_WEIGHT_NORMAL);
