@@ -258,10 +258,10 @@ private:
 };
 
 /**
- * @brief Calls a function whenever a model is registered for a patcher or removed again (anywhere), so that an object can find its model
- *        again when it appears later, is replaced or goes.
+ * @brief Calls a function whenever a model is registered for a patcher or removed again, or a view is given another model address (anywhere),
+ *        so that an object can find its model again when it appears later, is replaced or goes, or the view turns to another one.
  *
- * The function runs on the thread that registers the model (the main thread, for Max objects), after the registry's lock is released.
+ * The function runs on the thread that registers the model or sets the address (the main thread, for Max objects), after the registry's lock is released.
  * It is not called for the object's own start-up: the object binds once itself and then watches.
  */
 class ContextWatch {
@@ -272,15 +272,21 @@ public:
      */
     void start(std::function<void()> changed)
     {
+        views_ = jamoma::Registry::instance().views().observe([changed](const void*) { changed(); });
         handle_ = jamoma::Registry::instance().contexts().observe(
             [changed = std::move(changed)](const void*, jamoma::Model*, bool) { changed(); });
     }
 
     /** Stops watching (also done by the destructor). */
-    void stop() { handle_.reset(); }
+    void stop()
+    {
+        handle_.reset();
+        views_.reset();
+    }
 
 private:
-    std::shared_ptr<void> handle_; /**< The observer registration. */
+    std::shared_ptr<void> handle_; /**< The observer registration for models. */
+    std::shared_ptr<void> views_;  /**< The observer registration for views. */
 };
 
 } // namespace jamoma_max

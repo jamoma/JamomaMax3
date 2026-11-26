@@ -118,16 +118,34 @@ private:
  */
 class JAMOMA_API ViewMap {
 public:
+    ViewMap();
+
     /** @brief Registers a view. @param patcher The patcher of the view. @param argument The model address as given to the view (may be empty). */
     void add(const void* patcher, std::string argument);
     /** @brief Removes a view. @param patcher The patcher of the view. */
     void remove(const void* patcher);
+    /**
+     * @brief Gives a view another model argument and tells the observers.
+     * @param patcher The patcher of the view. @param argument The new model address (may be empty).
+     * @return True if there is a view there and its argument changed.
+     */
+    bool set_argument(const void* patcher, std::string argument);
+    /**
+     * @brief Watches the argument of views being changed (adding and removing a view is not told).
+     *
+     * The callback runs on the thread that calls set_argument(), after the map's lock is released, so it may drop its own handle or call the map.
+     * @param callback The function to call with the patcher of the view.
+     * @return A handle that unregisters the observer when dropped; it may outlive the map.
+     */
+    std::shared_ptr<void> observe(std::function<void(const void* patcher)> callback);
     /** @brief Finds a view. @param patcher The patcher. @return The model argument it was given, or nothing if there is no view there. */
     std::optional<std::string> find(const void* patcher) const;
 
 private:
+    struct Observers;                                           /**< The observers, shared with their handles so that a handle may outlive the map. */
     mutable std::mutex mutex_;                                  /**< Guards the entries. */
     std::vector<std::pair<const void*, std::string>> entries_;  /**< The views. */
+    std::shared_ptr<Observers> observers_;                      /**< The observers of changed arguments. */
 };
 
 } // namespace jamoma

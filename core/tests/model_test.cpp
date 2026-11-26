@@ -327,3 +327,42 @@ TEST_CASE("view map keeps the argument of a view")
     map.remove(&p);
     REQUIRE_FALSE(map.find(&p).has_value());
 }
+
+/** A view can be given another model address; observers are told which view changed, once per change. */
+TEST_CASE("view map changes the address of a view and tells its observers")
+{
+    jamoma::ViewMap map;
+    int p = 0;
+    int q = 0;
+    std::vector<const void*> told;
+    auto handle = map.observe([&](const void* patcher) { told.push_back(patcher); });
+    map.add(&p, "/one");
+    REQUIRE(map.set_argument(&p, "/two"));
+    REQUIRE(*map.find(&p) == "/two");
+    REQUIRE(told == std::vector<const void*>{&p});
+
+    REQUIRE_FALSE(map.set_argument(&p, "/two")); // unchanged
+    REQUIRE_FALSE(map.set_argument(&q, "/two")); // no view there
+    REQUIRE_FALSE(map.find(&q).has_value());
+    REQUIRE(told.size() == 1);
+
+    handle.reset();
+    REQUIRE(map.set_argument(&p, "/three"));
+    REQUIRE(told.size() == 1);
+}
+
+/** The observer may call the map and outlive it. */
+TEST_CASE("view map observers may call the map and their handles may outlive it")
+{
+    std::shared_ptr<void> handle;
+    {
+        jamoma::ViewMap map;
+        int p = 0;
+        std::string seen;
+        handle = map.observe([&](const void* patcher) { seen = map.find(patcher).value_or(""); });
+        map.add(&p, "/one");
+        map.set_argument(&p, "/two");
+        REQUIRE(seen == "/two");
+    }
+    handle.reset();
+}

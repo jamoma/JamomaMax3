@@ -7,7 +7,7 @@
  *
  * The model is named by the first argument (an absolute address, or one relative to the model of the patcher that contains the view);
  * without an argument the view binds to the model of the same class in the containing patcher (`qmetro.view` and `qmetro.model`).
- * The binding follows models coming and going: the view says `model:address <address>` on its dump outlet while it is bound and
+ * The message `model:address <address>` names another model later on. The binding follows models coming and going: the view says `model:address <address>` on its dump outlet while it is bound and
  * `model:waiting` while it is not. A message `<parameter> <value...>` is sent to that parameter of the model and echoed out of the left outlet.
  */
 
@@ -84,9 +84,21 @@ public:
         return {};
     }};
 
-    /** Answers like dump. */
+    /**
+     * `model:address <address>` binds the view to another model (absolute, or relative to the model of the containing patcher); everything in
+     * the view that follows its model binds again. Without an argument it answers like dump.
+     */
     message<> model_address{this, "model:address", MIN_FUNCTION {
-        report_binding();
+        if (args.empty()) {
+            report_binding();
+            return {};
+        }
+        if (args[0].type() != message_type::symbol_argument || patcher_ == nullptr) {
+            c74::max::object_warn(maxobj(), "j.view: model:address takes the address of a model");
+            return {};
+        }
+        argument_ = static_cast<symbol>(args[0]).c_str();
+        jamoma::Registry::instance().views().set_argument(patcher_, argument_);
         return {};
     }};
 
