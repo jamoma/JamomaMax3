@@ -93,8 +93,9 @@ def main():
     p.add_argument("--old", required=True, type=pathlib.Path)
     p.add_argument("--package", required=True, type=pathlib.Path)
     p.add_argument("--externals", required=True, type=pathlib.Path)
+    p.add_argument("--only", nargs="*", default=[], help="migrate only these objects (the other pages, which may have been edited by hand, are left alone)")
     args = p.parse_args()
-    for name in check.OBJECT_SOURCES:
+    for name in args.only or check.OBJECT_SOURCES:
         found = sorted((args.old / "Jamoma/docs/refpages").glob(f"*/{name}.maxref.xml"))
         if not found:
             print(f"{name}: no old page")

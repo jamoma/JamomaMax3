@@ -33,18 +33,20 @@ class TestPatcher:
         self.rect = [34.0, 96.0, width, height]
         self._ids = set()
 
-    def _add(self, box_id, text, maxclass, inlets, outlets, outlettype):
+    def _add(self, box_id, text, maxclass, inlets, outlets, outlettype, extra=None):
         assert box_id not in self._ids, f"duplicate box id {box_id}"
         self._ids.add(box_id)
         box = {"id": box_id, "maxclass": maxclass, "numinlets": inlets, "numoutlets": outlets, "outlettype": outlettype,
                "patching_rect": [0.0, 0.0, 100.0, 22.0]}
         if text is not None:
             box["text"] = text
+        if extra:
+            box.update(extra)
         self.boxes.append({"box": box})
 
-    def obj(self, box_id, text, inlets=1, outlets=1):
-        """An object box."""
-        self._add(box_id, text, "newobj", inlets, outlets, [""] * outlets)
+    def obj(self, box_id, text, inlets=1, outlets=1, **extra):
+        """An object box; keyword arguments are more keys of the box (for example varname="x" for an object a script can delete)."""
+        self._add(box_id, text, "newobj", inlets, outlets, [""] * outlets, extra)
 
     def msg(self, box_id, text):
         """A message box."""
@@ -55,6 +57,26 @@ class TestPatcher:
         s = source if isinstance(source, tuple) else (source, 0)
         d = destination if isinstance(destination, tuple) else (destination, 0)
         self.lines.append({"patchline": {"source": [s[0], s[1]], "destination": [d[0], d[1]]}})
+
+    def counter(self, name, source, selector):
+        """Counts the messages with this selector that come out of `source`.
+
+        Returns (i, n): the id of the counter's `int` (reset by a `0` into its right inlet) and of the `int` that holds the count (reset the same way
+        and read with a bang into its left inlet). Both right inlets have to be reset together, so a step "0" has the targets (i, 1) and (n, 1).
+        """
+        rt, t, i, p, n = (f"{name}_{k}" for k in ("rt", "t", "i", "p", "n"))
+        self.obj(rt, f"route {selector}", 1, 2)
+        self.obj(t, "t b", 1, 1)
+        self.obj(i, "int", 2, 1)
+        self.obj(p, "+ 1", 2, 1)
+        self.obj(n, "int", 2, 1)
+        self.line(source, rt)
+        self.line(rt, t)
+        self.line(t, i)
+        self.line(i, p)
+        self.line(p, (i, 1))
+        self.line(p, (n, 1))
+        return i, n
 
     def check(self, box_id, name, feed):
         """A test.assert with this assertion name, fed from an outlet (box id or (box id, outlet))."""

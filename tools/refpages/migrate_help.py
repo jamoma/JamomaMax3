@@ -15,7 +15,7 @@ import json
 import pathlib
 import sys
 
-HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node"]
+HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node", "j.namespace", "j.map", "j.cue", "j.textslider"]
 
 
 #: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.
@@ -54,7 +54,7 @@ def object_name(box):
         name = box["text"].split()[0]
     else:
         return ""
-    other_module = (name.endswith(".model") and name != "j.model") or name.endswith(".view")
+    other_module = (name.endswith(".model") and name != "j.model") or name.endswith(".view") or ".view." in name or ".model." in name
     return name if name.startswith("j.") or other_module else ""
 
 
@@ -85,21 +85,35 @@ def migrate_patcher(patcher, implemented, replaced):
                         if l["patchline"]["source"][0] not in gone and l["patchline"]["destination"][0] not in gone]
 
 
+def set_fonts(patcher):
+    """The fonts of the package: Arial, and size 12 where the old patcher had 13 (in place, subpatchers too)."""
+    for entry in patcher.get("boxes", []):
+        box = entry["box"]
+        if "fontname" in box:
+            box["fontname"] = "Arial"
+        if box.get("fontsize") == 13 or box.get("fontsize") == 13.0:
+            box["fontsize"] = 12.0
+        if "patcher" in box:
+            set_fonts(box["patcher"])
+
+
 def main():
     """Command line entry point."""
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--old", required=True, type=pathlib.Path)
     p.add_argument("--package", required=True, type=pathlib.Path)
     p.add_argument("--implemented", required=True, type=pathlib.Path)
+    p.add_argument("--only", nargs="*", default=[], help="migrate only these objects (the other help patchers, which may have been edited by hand, are left alone)")
     args = p.parse_args()
     implemented = {l.strip() for l in args.implemented.read_text().splitlines() if l.strip() and not l.startswith("#")}
     out_dir = args.package / "help"
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name in HELP_OBJECTS:
+    for name in args.only or HELP_OBJECTS:
         source = args.old / "Jamoma/help" / f"{name}.maxhelp"
         data = json.loads(source.read_text(encoding="utf-8"))
         replaced = []
         migrate_patcher(data["patcher"], implemented, replaced)
+        set_fonts(data["patcher"])
         (out_dir / f"{name}.maxhelp").write_text(json.dumps(data, indent="\t") + "\n", encoding="utf-8")
         print(f"{name}.maxhelp: replaced {len(replaced)}: {', '.join(sorted(set(replaced)))}")
     return 0
