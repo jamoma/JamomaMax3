@@ -17,7 +17,10 @@ namespace jamoma {
 
 /** A colour as red, green, blue and alpha, each 0 to 1. */
 struct Rgba {
-    double r = 0, g = 0, b = 0, a = 1; /**< The components. */
+    double r = 0; /**< Red. */
+    double g = 0; /**< Green. */
+    double b = 0; /**< Blue. */
+    double a = 1; /**< Alpha. */
     /** @param o Another colour. @return True if all four components are equal. */
     bool operator==(const Rgba& o) const { return r == o.r && g == o.g && b == o.b && a == o.a; }
 };

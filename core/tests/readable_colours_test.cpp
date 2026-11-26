@@ -30,6 +30,7 @@ SliderColours default_theme()
 
 } // namespace
 
+/** Contrast ratio follows the guidelines. */
 TEST_CASE("colours_contrast_ratio_follows_the_guidelines", "[colours]")
 {
     CHECK(jamoma::contrast_ratio(grey(0), grey(1)) == Approx(21.0));
@@ -37,6 +38,7 @@ TEST_CASE("colours_contrast_ratio_follows_the_guidelines", "[colours]")
     CHECK(jamoma::contrast_ratio(grey(0.5), grey(0.5)) == Approx(1.0));
 }
 
+/** That are readable already stay as they are. */
 TEST_CASE("colours_that_are_readable_already_stay_as_they_are", "[colours]")
 {
     const SliderColours good{grey(0.172), {0.199, 0.347, 0.529, 1}, grey(0.85), {0.594, 0.721, 0.928, 1}, grey(0.35)};
@@ -48,6 +50,7 @@ TEST_CASE("colours_that_are_readable_already_stay_as_they_are", "[colours]")
     CHECK(out.border == good.border);
 }
 
+/** Of the default theme get a slightly adjusted bar. */
 TEST_CASE("colours_of_the_default_theme_get_a_slightly_adjusted_bar", "[colours]")
 {
     const auto wanted = default_theme();
@@ -60,6 +63,7 @@ TEST_CASE("colours_of_the_default_theme_get_a_slightly_adjusted_bar", "[colours]
     CHECK(jamoma::contrast_ratio(out.bar, out.track) > 1.15); // still to be told from the track
 }
 
+/** Bar stays distinct when the track is barely readable. */
 TEST_CASE("colours_bar_stays_distinct_when_the_track_is_barely_readable", "[colours]")
 {
     // light text on a mid grey track at just 4.5: moving the bar to the track would make it vanish, moving it away from the text does not
@@ -71,6 +75,7 @@ TEST_CASE("colours_bar_stays_distinct_when_the_track_is_barely_readable", "[colo
     CHECK(jamoma::contrast_ratio(out.bar, out.track) > 1.3);
 }
 
+/** Unreadable text becomes black or white. */
 TEST_CASE("colours_unreadable_text_becomes_black_or_white", "[colours]")
 {
     SliderColours wanted{grey(0.2), grey(0.3), grey(0.25), grey(0.9), grey(0.2)};
@@ -79,6 +84,7 @@ TEST_CASE("colours_unreadable_text_becomes_black_or_white", "[colours]")
     CHECK(jamoma::contrast_ratio(out.text, out.bar) >= jamoma::kTextContrast - 1e-9);
 }
 
+/** A line that cannot be seen takes the text colour. */
 TEST_CASE("colours_a_line_that_cannot_be_seen_takes_the_text_colour", "[colours]")
 {
     SliderColours wanted{grey(0.8), grey(0.7), grey(0.0), grey(0.85), grey(0.5)};
@@ -86,6 +92,7 @@ TEST_CASE("colours_a_line_that_cannot_be_seen_takes_the_text_colour", "[colours]
     CHECK(out.knob == out.text);
 }
 
+/** Chosen by the user are not changed. */
 TEST_CASE("colours_chosen_by_the_user_are_not_changed", "[colours]")
 {
     const SliderColours bad{grey(0.5), grey(0.55), grey(0.52), grey(0.5), grey(0.5)};
@@ -97,6 +104,7 @@ TEST_CASE("colours_chosen_by_the_user_are_not_changed", "[colours]")
     CHECK(out.knob == bad.knob);
 }
 
+/** Any theme gives readable text and a visible line. */
 TEST_CASE("colours_any_theme_gives_readable_text_and_a_visible_line", "[colours]")
 {
     std::mt19937 random(1);
@@ -126,6 +134,7 @@ const jamoma::PanelSurroundings kLight{grey(0.9), grey(0.2), {0.1, 0.3, 0.7, 1}}
 
 } // namespace
 
+/** The panel: automatic background and border are translucent grey. */
 TEST_CASE("panel_automatic_background_and_border_are_translucent_grey", "[colours]")
 {
     const auto out = jamoma::panel_colours({}, {}, kDark);
@@ -133,6 +142,7 @@ TEST_CASE("panel_automatic_background_and_border_are_translucent_grey", "[colour
     CHECK(out.border == Rgba{0.5, 0.5, 0.5, 0.6});
 }
 
+/** The panel: automatic header is darker than the panel and stands out. */
 TEST_CASE("panel_automatic_header_is_darker_than_the_panel_and_stands_out", "[colours]")
 {
     for (const auto& around : {kDark, kLight}) {
@@ -145,6 +155,7 @@ TEST_CASE("panel_automatic_header_is_darker_than_the_panel_and_stands_out", "[co
     }
 }
 
+/** The panel: header on a black patcher becomes lighter. */
 TEST_CASE("panel_header_on_a_black_patcher_becomes_lighter", "[colours]")
 {
     const auto out = jamoma::panel_colours({}, {}, {grey(0.0), grey(0.85), kDark.highlight});
@@ -153,6 +164,7 @@ TEST_CASE("panel_header_on_a_black_patcher_becomes_lighter", "[colours]")
     CHECK(jamoma::contrast_ratio(out.header, panel) >= jamoma::kHeaderSeparation);
 }
 
+/** The panel: title is the theme text if readable else black or white. */
 TEST_CASE("panel_title_is_the_theme_text_if_readable_else_black_or_white", "[colours]")
 {
     CHECK(jamoma::panel_colours({}, {}, kDark).text == kDark.text);
@@ -161,6 +173,7 @@ TEST_CASE("panel_title_is_the_theme_text_if_readable_else_black_or_white", "[col
     CHECK(jamoma::contrast_ratio(out.text, out.header) >= jamoma::kTextContrast);
 }
 
+/** The panel: highlight is the theme colour if visible else the title colour. */
 TEST_CASE("panel_highlight_is_the_theme_colour_if_visible_else_the_title_colour", "[colours]")
 {
     CHECK(jamoma::panel_colours({}, {}, kDark).highlight == kDark.highlight);
@@ -168,6 +181,7 @@ TEST_CASE("panel_highlight_is_the_theme_colour_if_visible_else_the_title_colour"
     CHECK(out.highlight == out.text);
 }
 
+/** The panel: colours of the user are used as they are. */
 TEST_CASE("panel_colours_of_the_user_are_used_as_they_are", "[colours]")
 {
     const jamoma::PanelColours given{{1, 0, 0, 1}, {0, 1, 0, 1}, {0, 0.9, 0, 1}, {0, 0.8, 0, 1}, {0, 0, 1, 1}};
@@ -179,6 +193,7 @@ TEST_CASE("panel_colours_of_the_user_are_used_as_they_are", "[colours]")
     CHECK(out.border == given.border);
 }
 
+/** The panel: automatic colours adapt to the colours of the user. */
 TEST_CASE("panel_automatic_colours_adapt_to_the_colours_of_the_user", "[colours]")
 {
     jamoma::PanelColours given;
@@ -198,6 +213,7 @@ TEST_CASE("panel_automatic_colours_adapt_to_the_colours_of_the_user", "[colours]
     CHECK(jamoma::contrast_ratio(light_panel.text, light_panel.header) >= jamoma::kTextContrast);
 }
 
+/** The panel: a translucent header of the user is judged as seen. */
 TEST_CASE("panel_a_translucent_header_of_the_user_is_judged_as_seen", "[colours]")
 {
     jamoma::PanelColours given;
