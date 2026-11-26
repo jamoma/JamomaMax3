@@ -306,7 +306,15 @@ TEST_CASE("cue_many_cues_stay_fast", "[cue]")
     CHECK(again.read_text(text).empty());
     CHECK(again.cues().names().size() == 10000);
     const auto elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+#if defined(__has_feature)
+#if __has_feature(thread_sanitizer)
+    CHECK(elapsed < 120.0); // ThreadSanitizer slows this down about tenfold; the limit is for the plain build
+#else
     CHECK(elapsed < 10.0);
+#endif
+#else
+    CHECK(elapsed < 10.0);
+#endif
 }
 
 /** Edit text round trip and an empty edit changes nothing. */
