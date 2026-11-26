@@ -53,6 +53,10 @@ which needs `j.in~`/`j.out~`), so the old-test suite for milestone 1 is the 82 `
 `j.savebang` and `j.pass` are covered by own tests under `docs/conformance/own/`.
 
 
+## The osc_receive patchers
+
+The second real model of the package (`patchers/models/data/osc/`: model, view and help patcher), ported in milestone 4. It is checked by the test `osc_receive_basic` (it listens on its default port and on a port that is set, passes messages out and on to their addresses, and forwards nothing while it is not active) and by `scripts/check-help.sh`, which opens every model of the package.
+
 ## The qmetro patchers
 
 The qmetro model, view, module and help patcher are the first test patch of the pass-bar set (`conformance/set.txt`). They are checked in three ways: the test `qmetro_module` (`tests/integration/.../Modular/qmetro/`, run by `--all` and `--dir qmetro`: the module loads, the default preset sets the time and stops the metro, and switching the metro on makes the `trigger` return fire); `scripts/check-help.sh` with no arguments, which opens every help patcher and the four qmetro patchers and reports missing objects and load errors (a missing bpatcher too); and the unit test `package_references`, which checks that every bpatcher, `js` file and picture that a package patcher loads is in the package.

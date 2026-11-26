@@ -5,7 +5,7 @@
  * @file j.model.cpp
  * @brief j.model: declares the patcher as a model. The data objects of the patcher register below its address.
  *
- * The model is named by its first argument, else by the first argument of the bpatcher it is loaded in, else by the file name of its patcher (dots become underscores, since a dot starts an
+ * The model is named by its first argument, else by the first argument its patcher was loaded with (bpatcher or abstraction), else by the file name of its patcher (dots become underscores, since a dot starts an
  * instance in an address). It initialises itself once the patcher has loaded (two deferred hops, so every data object of the
  * patcher has found its model first) and again whenever it gets the `init` message. The presets of the model are the `preset:...`
  * messages; after the first initialisation the file `<patcher name>.presets.txt` (for `qmetro.model.maxpat`: `qmetro.model.presets.txt`)
@@ -640,7 +640,7 @@ private:
     /** @return The name the patcher gives the model: its `.model` class if it has one, else its name (`model` while it has none). */
     std::string name_from_patcher() const
     {
-        if (std::optional<std::string> argument = jamoma_max::bpatcher_argument(patcher_)) {
+        if (std::optional<std::string> argument = jamoma_max::patcher_argument(patcher_)) {
             argument->erase(0, argument->find_first_not_of('/'));
             if (!argument->empty()) {
                 return *argument;

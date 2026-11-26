@@ -51,7 +51,7 @@
       167.2,
       22.0
      ],
-     "text": "j.receive /qmetro/time"
+     "text": "j.receive /q1/time"
     }
    },
    {
@@ -71,7 +71,7 @@
       213.4,
       22.0
      ],
-     "text": "j.receive /qmetro/data/active"
+     "text": "j.receive /q1/data/active"
     }
    },
    {
@@ -342,7 +342,7 @@
       187.0,
       22.0
      ],
-     "text": "j.receive /qmetro/trigger"
+     "text": "j.receive /q1/trigger"
     }
    },
    {
@@ -448,7 +448,7 @@
       193.6,
       22.0
      ],
-     "text": "j.send /qmetro/data/active"
+     "text": "j.send /q1/data/active"
     }
    },
    {
