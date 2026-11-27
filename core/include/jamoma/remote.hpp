@@ -21,6 +21,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <thread>
 
 #include "jamoma/address.hpp"
 #include "jamoma/atom.hpp"
@@ -54,8 +55,11 @@ public:
     void set_freeze(bool on);
     /** @brief The user moved the UI object: sends the value to the node as a command in the UI's unit. @param value The value. */
     void from_ui(const Value& value);
-    /** @brief Shows a value in the UI without sending it to the node (the `set` message). @param value The value. */
-    void set_without_echo(const Value& value);
+    /**
+     * @brief Sends a value to the node like from_ui, but shows nothing of the node's answer here (the `set` message). Other remotes show it.
+     * @param value The value.
+     */
+    void set_without_output(const Value& value);
     /** @return The value last shown to the UI or sent from it, if any. */
     std::optional<Value> current() const;
 
@@ -69,6 +73,7 @@ private:
     std::function<void(const Value&)> to_ui_;        /**< What shows a value in the UI. */
     std::atomic<bool> active_{true};                 /**< Whether anything is passed on. */
     std::atomic<bool> freeze_{false};                /**< Whether the UI direction is stopped. */
+    std::atomic<std::thread::id> setting_{};         /**< The thread that is inside set_without_output (none otherwise): what it brings is not shown. */
     mutable std::mutex mutex_;                       /**< Guards the unit, the node address and the current value. */
     std::string unit_;                               /**< The unit of the UI object. */
     Address node_;                                   /**< The address of the last node reported. */

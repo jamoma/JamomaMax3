@@ -8,6 +8,8 @@
 
 #include "jamoma/ramp.hpp"
 
+#include "jamoma/function_library.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <mutex>
@@ -29,6 +31,7 @@ struct Ramp::State {
     double start_time = 0.0;                                   /**< The clock time at the start. */
     bool running = false;                                      /**< Whether a ramp is running. */
     bool function_ok = true;                                   /**< Whether the last function name was known. */
+    Ramp::Shape shape;                                         /**< The shape of the running ramp; empty for linear. */
     unsigned long generation = 0;                              /**< Incremented by start and stop; stale callbacks compare against it. */
     mutable std::mutex mutex;                                  /**< Guards the fields above; never held while on_value or the clock is called. */
 };
@@ -56,9 +59,11 @@ void tick(const std::shared_ptr<Ramp::State>& state, unsigned long gen)
             last = true;
         } else {
             value.resize(state->to.size());
+            const double part = state->shape ? state->shape(elapsed / state->duration) : 0.0;
             for (std::size_t i = 0; i < value.size(); ++i) {
                 // Multiply before dividing: (to - from) * elapsed is exact for whole numbers, so integer ramps do not truncate to a neighbour.
-                value[i] = state->from[i] + ((state->to[i] - state->from[i]) * elapsed) / state->duration;
+                value[i] = state->shape ? state->from[i] + (state->to[i] - state->from[i]) * part
+                                        : state->from[i] + ((state->to[i] - state->from[i]) * elapsed) / state->duration;
             }
         }
     }
@@ -106,6 +111,21 @@ Ramp::~Ramp()
 
 void Ramp::start(const std::vector<double>& from, const std::vector<double>& to, double duration_ms, std::string_view function)
 {
+    Shape shape;
+    bool ok = function == "linear" || function == "none" || function.empty();
+    if (!ok) {
+        if (std::shared_ptr<Function> made = Function::create(function)) {
+            ok = true;
+            shape = [made](double x) { return made->apply(x); };
+        }
+    }
+    start(from, to, duration_ms, std::move(shape));
+    std::lock_guard<std::mutex> lock(state_->mutex);
+    state_->function_ok = ok;
+}
+
+void Ramp::start(const std::vector<double>& from, const std::vector<double>& to, double duration_ms, Shape shape)
+{
     stop();
     State& s = *state_;
     std::vector<double> first;
@@ -113,7 +133,8 @@ void Ramp::start(const std::vector<double>& from, const std::vector<double>& to,
     bool immediate = false;
     {
         std::lock_guard<std::mutex> lock(s.mutex);
-        s.function_ok = (function == "linear" || function == "none" || function.empty());
+        s.function_ok = true;
+        s.shape = std::move(shape);
         s.to = to;
         s.from = from;
         s.from.resize(to.size());

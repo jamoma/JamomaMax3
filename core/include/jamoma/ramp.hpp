@@ -34,7 +34,7 @@ public:
 };
 
 /**
- * @brief A linear ramp over a vector of numbers.
+ * @brief A ramp over a vector of numbers, linear or shaped by a function.
  *
  * start() emits the start vector at once, then one vector every kTickMs (at the next 20 ms boundary of the elapsed time, or at
  * the end of the ramp, whichever comes first); the last vector is exactly the target. A duration of zero or less emits the
@@ -44,6 +44,9 @@ public:
 class JAMOMA_API Ramp {
 public:
     static constexpr double kTickMs = 20.0; /**< The time between ticks, in milliseconds (from the old tests). */
+
+    /** The shape of a ramp: from the elapsed part of the duration (0..1) to the part of the way travelled. Empty means linear. */
+    using Shape = std::function<double(double)>;
 
     /** @param clock The clock to use; it must outlive the ramp. @param on_value Called with every emitted vector. */
     Ramp(Clock& clock, std::function<void(const std::vector<double>&)> on_value);
@@ -56,9 +59,15 @@ public:
      * @param from The start vector; a vector shorter than `to` is padded with the target's elements (those jump at once).
      * @param to The target vector (its length is the length of every emitted vector).
      * @param duration_ms The duration in milliseconds.
-     * @param function The function name; only `linear` exists. `none` (the old default) and the empty name behave as linear; any other name falls back to linear too and is reported by function_ok().
+     * @param function The name of a function of the library (function_library.hpp, with its default parameters). `linear`, `none` (the old default) and the empty name are linear; an unknown name is linear too and is reported by function_ok().
      */
     void start(const std::vector<double>& from, const std::vector<double>& to, double duration_ms, std::string_view function);
+    /**
+     * @brief Starts a ramp with a given shape (the last value is exactly the target, whatever the shape gives at 1).
+     * @param from The start vector. @param to The target vector. @param duration_ms The duration in milliseconds.
+     * @param shape The shape, called on the thread of the clock; empty for linear.
+     */
+    void start(const std::vector<double>& from, const std::vector<double>& to, double duration_ms, Shape shape);
     /** @brief Stops the ramp and cancels pending ticks. */
     void stop();
     /** @return True while a ramp is running. */
