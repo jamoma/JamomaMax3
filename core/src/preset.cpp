@@ -425,11 +425,59 @@ std::string PresetManager::free_name(std::string_view stem) const
     }
 }
 
+std::string PresetManager::unused_name(std::string_view wanted) const
+{
+    const std::size_t first = wanted.find_first_not_of(" \t");
+    if (first == std::string_view::npos) {
+        return free_name("preset");
+    }
+    const std::string name(wanted.substr(first, wanted.find_last_not_of(" \t") - first + 1));
+    const bool taken = std::any_of(presets_.begin(), presets_.end(), [&name](const Preset& p) { return p.name == name; });
+    return taken ? free_name(name) : name;
+}
+
 void PresetManager::clear()
 {
     presets_.clear();
     current_.reset();
     changed();
+}
+
+bool PresetManager::set_entries(std::string_view name, std::vector<PresetEntry> entries, bool make_current)
+{
+    if (name.empty()) {
+        return false;
+    }
+    std::size_t at = presets_.size();
+    for (std::size_t i = 0; i < presets_.size(); ++i) {
+        if (presets_[i].name == name) {
+            at = i;
+            break;
+        }
+    }
+    if (at == presets_.size()) {
+        Preset preset;
+        preset.name = std::string(name);
+        presets_.push_back(std::move(preset));
+    }
+    presets_[at].entries = std::move(entries);
+    if (make_current) {
+        current_ = at;
+    }
+    changed();
+    return true;
+}
+
+bool PresetManager::set_description(std::string_view name, std::string text)
+{
+    for (Preset& p : presets_) {
+        if (p.name == name) {
+            p.description = std::move(text);
+            changed();
+            return true;
+        }
+    }
+    return false;
 }
 
 void PresetManager::replace_all(std::vector<Preset> presets)

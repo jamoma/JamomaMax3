@@ -5,7 +5,7 @@
  * @file j.model.cpp
  * @brief j.model: declares the patcher as a model. The data objects of the patcher register below its address.
  *
- * The model is named by its first argument, else by the file name of its patcher (dots become underscores, since a dot starts an
+ * The model is named by its first argument, else by the first argument its patcher was loaded with (bpatcher or abstraction), else by the file name of its patcher (dots become underscores, since a dot starts an
  * instance in an address). It initialises itself once the patcher has loaded (two deferred hops, so every data object of the
  * patcher has found its model first) and again whenever it gets the `init` message. The presets of the model are the `preset:...`
  * messages; after the first initialisation the file `<patcher name>.presets.txt` (for `qmetro.model.maxpat`: `qmetro.model.presets.txt`)
@@ -33,6 +33,8 @@
 #include "jamoma/registry.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_editor.hpp"
+#include "max_files.hpp"
 
 using namespace c74::min;
 
@@ -50,6 +52,7 @@ class j_model : public c74::min::object<j_model> {
     std::shared_ptr<void> init_watch_;         /**< Recalls the default preset whenever the model has been initialised (a parent model may do it). */
     bool in_default_ = false;                  /**< True while the default preset is recalled (it must not start itself again). */
     std::string last_file_;                    /**< The presets file used last. */
+    jamoma_max::TextEditor editor_;            /**< The editor window of `preset:edit`. */
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
@@ -123,6 +126,9 @@ public:
     inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
     jamoma_max::dump_outlet results_out{this, "(anything) parameter changes: the name of the parameter and its value"}; /**< Outlet 0: every change of a parameter below the model, with the name (relative to the model) in front. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};              /**< Outlet 1: the dump outlet. */
+
+    /** @return The text editor window of the model (the Max method edclose reaches it). */
+    jamoma_max::TextEditor& editor() { return editor_; }
 
     /** Initialises the model: sends the default value through every parameter below it. */
     message<> init{this, "init", MIN_FUNCTION {
@@ -274,7 +280,11 @@ public:
     /** `preset:read [<file>]`: replaces the presets by those of a text file (a dialog if there is no file). */
     message<> preset_read{this, "preset:read", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        read_file(w.empty() ? ask_for_file(false) : find_file(w[0]));
+        const std::weak_ptr<int> alive = alive_.weak(); // a file dialog runs its own event loop: this object may be deleted meanwhile
+        const auto file = w.empty() ? jamoma_max::ask_for_file(false, "") : jamoma_max::find_file(w[0]);
+        if (!alive.expired()) {
+            read_file(file);
+        }
         return {};
     }};
 
@@ -287,13 +297,43 @@ public:
     /** `preset:write [<file>]`: writes the presets to a text file (a dialog if there is no file). */
     message<> preset_write{this, "preset:write", MIN_FUNCTION {
         const std::vector<std::string> w = words(args);
-        write_file(w.empty() ? ask_for_file(true) : target_file(w[0]));
+        const std::weak_ptr<int> alive = alive_.weak(); // as in preset:read
+        const auto file = w.empty() ? jamoma_max::ask_for_file(true, name_ + ".presets.txt") : jamoma_max::target_file(patcher_, w[0]);
+        if (!alive.expired()) {
+            write_file(file);
+        }
         return {};
     }};
 
     /** `preset:write/again`: writes to the file used last. */
     message<> preset_write_again{this, "preset:write/again", MIN_FUNCTION {
         write_file(last_file_);
+        return {};
+    }};
+
+    /** `preset:edit`: opens a text editor window with the presets in the text form of the presets file; closing it replaces the presets by the edited text. */
+    message<> preset_edit{this, "preset:edit", MIN_FUNCTION {
+        if (!model_) {
+            return {};
+        }
+        editor_.open(maxobj(), name_ + " presets", jamoma::write_presets_text(model_->presets().presets()),
+                     [this](const std::string& text) { apply_presets_text(text, "preset:edit"); });
+        return {};
+    }};
+
+    /**
+     * `preset:edit/apply <text>`: what closing the editor window does, for a patch or a test: the words are joined with spaces and the two
+     * characters `\n` stand for a line break.
+     */
+    message<> preset_edit_apply{this, "preset:edit/apply", MIN_FUNCTION {
+        std::string text;
+        for (const std::string& w : words(args)) {
+            text += (text.empty() ? "" : " ") + w;
+        }
+        for (std::size_t at = text.find("\\n"); at != std::string::npos; at = text.find("\\n", at + 1)) {
+            text.replace(at, 2, "\n");
+        }
+        apply_presets_text(text, "preset:edit/apply");
         return {};
     }};
 
@@ -397,70 +437,6 @@ private:
         return {};
     }
 
-    /** @return A path as Max writes it (`Macintosh HD:/Users/me/x.txt`, as opendialog gives it) in the native form of the system; a native path stays as it is. @param name The path. */
-    static std::string native_path(const std::string& name)
-    {
-        char out[c74::max::MAX_PATH_CHARS];
-        if (c74::max::path_nameconform(name.c_str(), out, c74::max::PATH_STYLE_NATIVE, c74::max::PATH_TYPE_BOOT) == 0 && out[0] != '\0') {
-            return out;
-        }
-        return name;
-    }
-
-    /** @return The native path of a file the user named for reading: as given if absolute, else found in the Max search path (empty if not found). @param name The name. */
-    std::string find_file(const std::string& name) const
-    {
-        if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return native_path(name);
-        }
-        char file[c74::max::MAX_FILENAME_CHARS];
-        std::snprintf(file, sizeof file, "%s", name.c_str());
-        short vol = 0;
-        c74::max::t_fourcc type = 0;
-        if (c74::max::locatefile_extended(file, &vol, &type, nullptr, 0) != 0) {
-            return {};
-        }
-        char full[c74::max::MAX_PATH_CHARS];
-        c74::max::path_toabsolutesystempath(vol, file, full);
-        return full;
-    }
-
-    /** @return The native path of a file the user named for writing: as given if absolute, else in the folder of the patcher (empty if that is unknown). @param name The name. */
-    std::string target_file(const std::string& name) const
-    {
-        if (!name.empty() && (name[0] == '/' || name.find(':') != std::string::npos)) {
-            return native_path(name);
-        }
-        c74::max::t_symbol* path = patcher_ == nullptr ? nullptr
-            : c74::max::object_attr_getsym(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher_)), c74::max::gensym("filepath"));
-        std::string folder = path != nullptr && path->s_name != nullptr ? path->s_name : "";
-        const std::size_t slash = folder.find_last_of("/\\");
-        if (slash == std::string::npos) {
-            return {};
-        }
-        return folder.substr(0, slash + 1) + name;
-    }
-
-    /** Asks for a file with the system dialog. @param saving True for a save dialog. @return The native path, or empty if cancelled. */
-    std::string ask_for_file(bool saving)
-    {
-        char file[c74::max::MAX_FILENAME_CHARS] = "";
-        short vol = 0;
-        c74::max::t_fourcc type = 0;
-        if (saving) {
-            std::snprintf(file, sizeof file, "%s.presets.txt", name_.c_str());
-            short binary = 0;
-            if (c74::max::saveas_dialog(file, &vol, &binary) != 0) {
-                return {};
-            }
-        } else if (c74::max::open_dialog(file, &vol, &type, nullptr, 0) != 0) {
-            return {};
-        }
-        char full[c74::max::MAX_PATH_CHARS];
-        c74::max::path_toabsolutesystempath(vol, file, full);
-        return full;
-    }
-
     /** Reads presets from a text file; on any problem nothing changes and the console says why. @param path The native path (empty: report that there is no file). */
     void read_file(const std::string& path)
     {
@@ -475,17 +451,28 @@ private:
         }
         std::stringstream text;
         text << in.rdbuf();
-        jamoma::ReadResult result = jamoma::read_presets_text(text.str());
+        if (apply_presets_text(text.str(), "preset:read " + path)) {
+            last_file_ = path;
+            presets = symbol(path);
+        }
+    }
+
+    /**
+     * Replaces the presets by those of a text; on any problem nothing changes and the console says why.
+     * @param text The text of a presets file. @param label What to call the source in console messages. @return True if presets were read.
+     */
+    bool apply_presets_text(const std::string& text, const std::string& label)
+    {
+        jamoma::ReadResult result = jamoma::read_presets_text(text);
         for (const std::string& problem : result.problems) {
-            c74::max::object_warn(maxobj(), "preset:read %s: %s", path.c_str(), problem.c_str());
+            c74::max::object_warn(maxobj(), "%s: %s", label.c_str(), problem.c_str());
         }
         if (result.presets.empty() || !model_) {
-            c74::max::object_error(maxobj(), "preset:read: %s holds no presets; nothing changed", path.c_str());
-            return;
+            c74::max::object_error(maxobj(), "%s: no presets in the text; nothing changed", label.c_str());
+            return false;
         }
         model_->presets().replace_all(std::move(result.presets));
-        last_file_ = path;
-        presets = symbol(path);
+        return true;
     }
 
     /** Writes the presets to a text file. @param path The native path (empty: report that there is no file). */
@@ -521,7 +508,7 @@ private:
             return;
         }
         const std::string named = std::string(static_cast<symbol>(presets.get()).c_str());
-        const std::string path = find_file(named.empty() ? stem + ".presets.txt" : named);
+        const std::string path = jamoma_max::find_file(named.empty() ? stem + ".presets.txt" : named);
         if (path.empty()) {
             return;
         }
@@ -661,6 +648,12 @@ private:
     /** @return The name the patcher gives the model: its `.model` class if it has one, else its name (`model` while it has none). */
     std::string name_from_patcher() const
     {
+        if (std::optional<std::string> argument = jamoma_max::patcher_argument(patcher_)) {
+            argument->erase(0, argument->find_first_not_of('/'));
+            if (!argument->empty()) {
+                return *argument;
+            }
+        }
         const std::optional<std::string> cls = jamoma_max::patcher_class(patcher_);
         return cls ? *cls : patcher_name();
     }
@@ -689,4 +682,9 @@ private:
 
 };
 
-MIN_EXTERNAL(j_model);
+/** Class setup, called by Max: the Min wrapper, then the method Min does not offer (the editor window of preset:edit sends it when it closes). @param r Max's class registry. */
+void ext_main(void* r)
+{
+    c74::min::wrap_as_max_external<j_model>("j_model", __FILE__, r);
+    jamoma_max::add_edclose_method<j_model>("j.model");
+}

@@ -15,3 +15,7 @@ j.view
 j.remote
 j.ui
 j.node
+j.namespace
+j.map
+j.cue
+j.textslider

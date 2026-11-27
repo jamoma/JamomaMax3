@@ -42,10 +42,14 @@ OBJECT_SOURCES = {
     "j.remote": ["j.remote/j.remote.cpp"],
     "j.ui": ["j.ui/j.ui.cpp"],
     "j.node": ["j.node/j.node.cpp"],
+    "j.namespace": ["j.namespace/j.namespace.cpp"],
+    "j.map": ["j.map/j.map.cpp"],
+    "j.cue": ["j.cue/j.cue.cpp"],
+    "j.textslider": ["j.textslider/j.textslider.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.
-INFRASTRUCTURE = {"setup", "maxclass_setup"}
+INFRASTRUCTURE = {"setup", "maxclass_setup", "oksize"}  # oksize: Max asks a UI object whether a new size is fine
 
 
 #: Attributes every Max box has; a page may document them and the sources never name them.

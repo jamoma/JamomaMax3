@@ -325,12 +325,24 @@
                             },
                             {
                                 "box": {
+                                    "fontname": "Arial",
+                                    "fontsize": 12.0,
                                     "id": "obj-5",
-                                    "maxclass": "comment",
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 987.0, 555.0, 220.0, 19.0 ],
-                                    "text": "[j.cue: not in this version yet]"
+                                    "numoutlets": 2,
+                                    "outlettype": [
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        987.0,
+                                        555.0,
+                                        37.0,
+                                        22.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.cue"
                                 }
                             },
                             {
@@ -729,6 +741,76 @@
                                 "patchline": {
                                     "destination": [ "obj-3", 0 ],
                                     "source": [ "obj-4", 0 ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-20",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-21",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-22",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-7",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-5",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-9",
+                                        0
+                                    ]
                                 }
                             }
                         ]
@@ -1470,11 +1552,22 @@
                             {
                                 "box": {
                                     "id": "obj-21",
-                                    "maxclass": "comment",
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 1075.0, 325.0, 307.0, 20.0 ],
-                                    "text": "[j.namespace: not in this version yet]"
+                                    "numoutlets": 3,
+                                    "outlettype": [
+                                        "",
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        1075.0,
+                                        325.0,
+                                        307.0,
+                                        22.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.namespace @address /Amenities @format jit.cellblock"
                                 }
                             },
                             {
@@ -1628,7 +1721,180 @@
                                 }
                             }
                         ],
-                        "lines": [],
+                        "lines": [
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-22",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-21",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "source": [
+                                        "obj-41",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "midpoints": [
+                                        875.5,
+                                        329.0,
+                                        1060.0,
+                                        329.0,
+                                        1060.0,
+                                        320.0,
+                                        1084.5,
+                                        320.0
+                                    ],
+                                    "source": [
+                                        "obj-42",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "midpoints": [
+                                        875.5,
+                                        371.0,
+                                        1060.0,
+                                        371.0,
+                                        1060.0,
+                                        320.0,
+                                        1084.5,
+                                        320.0
+                                    ],
+                                    "source": [
+                                        "obj-43",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "midpoints": [
+                                        875.5,
+                                        413.0,
+                                        1060.0,
+                                        413.0,
+                                        1060.0,
+                                        320.0,
+                                        1084.5,
+                                        320.0
+                                    ],
+                                    "source": [
+                                        "obj-44",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "midpoints": [
+                                        875.5,
+                                        455.0,
+                                        1060.0,
+                                        455.0,
+                                        1060.0,
+                                        320.0,
+                                        1084.5,
+                                        320.0
+                                    ],
+                                    "source": [
+                                        "obj-45",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 1,
+                                    "midpoints": [
+                                        875.5,
+                                        506.0,
+                                        1060.0,
+                                        506.0,
+                                        1060.0,
+                                        320.0,
+                                        1084.5,
+                                        320.0
+                                    ],
+                                    "source": [
+                                        "obj-46",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-21",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "midpoints": [
+                                        875.5,
+                                        549.0,
+                                        1048.0,
+                                        549.0,
+                                        1048.0,
+                                        303.0,
+                                        1084.5,
+                                        303.0
+                                    ],
+                                    "source": [
+                                        "obj-47",
+                                        0
+                                    ]
+                                }
+                            }
+                        ],
                         "styles": [
                             {
                                 "name": "jpatcher001",
@@ -1994,12 +2260,23 @@
                             },
                             {
                                 "box": {
+                                    "fontface": 0,
+                                    "fontname": "Arial",
+                                    "fontsize": 12.0,
                                     "id": "obj-32",
-                                    "maxclass": "comment",
+                                    "maxclass": "j.textslider",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 1175.5, 72.283813, 220.0, 20.0 ],
-                                    "text": "[j.textslider: not in this version yet]"
+                                    "numoutlets": 1,
+                                    "outlettype": [
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        1175.5,
+                                        72.283813,
+                                        187.0,
+                                        21.182373
+                                    ],
+                                    "text": "Between 2 presets"
                                 }
                             },
                             {
@@ -2735,6 +3012,20 @@
                                 "patchline": {
                                     "destination": [ "obj-91", 0 ],
                                     "source": [ "obj-80", 0 ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-31",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-32",
+                                        0
+                                    ]
                                 }
                             }
                         ],

@@ -1,0 +1,30 @@
+# j.map (old behaviour, read for milestone 4)
+
+Sources read: `JamomaMax/source/j.map/j.map.cpp`, **`JamomaMax/JamomaCore/Modular/library/source/TTMapper.cpp`** (the Modular library that the contract names as the first source of truth; an earlier reading of `Jamoma.0.5.7/.../TTMapper.cpp` was an older version and has been replaced), the function classes in `JamomaMax/JamomaCore/DSP/extensions/FunctionLib/source/`, and the old reference page `Jamoma/docs/refpages/modular/j.map.maxref.xml`.
+
+## Object
+- One inlet; outlets: data (0), dump (1). Messages `int`, `float`, `list` map every element; `reset` re-applies the creation arguments; `dump`. The Max names of attributes are the TT names with a slash before each capital (`inputMin` is `input/min`).
+- Attributes (name, default): `input` and `output` (addresses of a j.parameter or j.return / of a j.parameter or j.message; empty), `input/min` 0, `input/max` 1, `output/min` 0, `output/max` 1, `input/index` 0, `input/threshold/down` 0, `input/threshold/up` 1, `output/threshold/down` 0, `output/threshold/up` 1, `active` 1, `clipmode` (`none` default, `low`, `high`, `both`), `inverse` 0, `ramp` 0, `function` (empty at start: no function = identity), and read-only `function/library` (the names), `function/parameters` (the parameters of the current function; `none` if it has none), `function/samples` (100 samples over `[input/min, input/max)`). The parameters of the current function (for example `base`, `power/value`) are also attributes of the mapper (TT `extendAttribute`).
+- `input` binds a receiver to `<input>:value`; every value that arrives is mapped and sent to the sender on `<output>:value` (with `ramp > 0` as a command with `ramp <ms>`), to the data outlet, and the thresholds are checked. If the input (output) address is a data node, `input/min/max` (`output/min/max`) and the thresholds are taken from its `rangeBounds` and followed while no explicit value was set; a node that appears later does the same at creation (an explicit value is kept unless it is still the default 0 / 1) (`setInput`, `TTMapperInputCreationCallback`, `TTMapperInputRangeCallback`).
+- Thresholds (TTMapper.cpp `Map` and `TTMapperReceiveValueCallback`): after each mapping, the input is "going down" when `<= input threshold down` and "going up" when `>= input threshold up`; the same for the output; each time one of the four states changes `j.map` sends `input/going/down <0|1>`, `input/going/up`, `output/going/down`, `output/going/up` out of the dump outlet (`j.map.cpp` `map_return_*`).
+
+## The law (`processMapping`, `scaleInput`, `scaleOutput`)
+1. Clip the input by `clipmode`: `low` raises values below the low end, `high` lowers values above the high end, `both` does both (the ends are sorted when `input/min > input/max`); `none` does nothing.
+2. `a = 1/(max - min)` (1 if the limits are equal), `t = a*x - a*min`.
+3. With `input/index` from 1 to the length of a list: only that item is kept.
+4. The function is applied to `t` (no function: identity).
+5. `y = (outputMax - outputMin) * f + outputMin`; with `inverse`: `y = (outputMax - outputMin) * (1 - f) + outputMin`.
+6. **No clipping of the output** (the old code has it commented out: easing functions such as the back and elastic ones may leave the range on purpose).
+
+## The function library (JamomaCore `FunctionLib`: 38 functions, class names are the values of `function`)
+`linear` y = x. `exponential` (`base`, default e, range epsilon..100000 clipped low; base 1 = identity) y = (exp(k x) - 1)/(base - 1), k = ln base. `logarithm` (`base`, same; base 1 = identity) y = ln(x (base-1) + 1)/ln base. `power` (`powerValue` 1, `symmetry` none|point|axis, none; K = 2^powerValue) none: x^K; axis: |2x-1|^K; point: 0.5 (sign(2x-1)|2x-1|^K + 1). `smoothPolynomial` x^3 (x (6x-15) + 10). `tanh` (`offset` 0, `width` 0.5; a = ln 7/width (ln 7 if width <= 0), b = (offset+1)/2, f0 = tanh(-a b), f1 = tanh(a (1-b)), alpha = 1/(f1-f0), beta = f0) y = alpha (tanh(a (x-b)) - beta). `lowpass` (`coefficient` 0.75): y = y_prev c + x (1-c). `freehand` (`curveList`): a point `x y`, then per further point a function name, at most one `attribute value` pair, and the point; evaluates in segments (before the first point its y; between two points `(y1-y0) f((x-x0)/(x1-x0)) + y0`; after the last its y); the example of the old header is `0.3 0.6 exponential base 0.5 1. 1. logarithm base 0.8`.
+The thirty easing functions: `easeIn`, `easeOut`, `easeInOut` of `Back`, `Bounce`, `Circular`, `Cubic`, `Elastic`, `Exponential`, `Quadratic`, `Quartic`, `Quintic`, `Sine` (Robert Penner's equations as AHEasing wrote them: for example `easeInBack` x^3 - x sin(pi x), `easeInElastic` sin(6.5 pi x) 2^(10(x-1)), `easeInExponential` x==0 ? x : 2^(10(x-1)); the formulas are in `core/src/function_library.cpp` with the old file for each). **`cosine`, `crossFadeIn`, `crossFadeOut` are not in this library** (only in the 0.5.7 one).
+
+## Rulings
+1. **All 38 functions are built**, `lowpass` (stateful) and `freehand` included; the order of `function/library` is alphabetical (the old order was the order of a hash table).
+2. The function input is **not** clipped to 0..1 (the old mapper passes values outside the range through the function when `clipmode` is `none`); NaN counts as 0 and a result that is not finite becomes 0, so a mapper never outputs NaN or infinity (the old one would).
+3. NaN into the mapper gives `output/min`; non-finite limits are ignored.
+4. Function parameters are **named** (core `Function::get/set`); in Max they are the messages `<parameter> <value>` and `function/parameters` lists them (the Max form with slashes); attributes of the function at creation (`@function exponential @base 2`) are not accepted by Min, so `base` and the others are set by message only (listed in `docs/changes.md`).
+5. Equal input limits keep the old arithmetic (`a = 1`).
+6. Thresholds compare the first number of a list (the old compared the whole list with `TTValue` operators).
+7. `functionsamples` keeps the 100 samples over `[input/min, input/max)`; the filter state of `lowpass` is not touched by it.

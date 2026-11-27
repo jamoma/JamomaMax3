@@ -128,5 +128,100 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(once, [e["box"]["patching_rect"] for e in p["boxes"]])
 
 
+
+def test_patcher():
+    """A test patcher as the author arranges them: a starter, one trigger, a block for each assertion, send/receive to the object under test.
+
+    The cords are given in an unhelpful order and every box starts at 0,0. Block `one` has an extra message in front of its send; `two` is shorter.
+    """
+    boxes = [box("lb", "loadbang"), box("top", "t b b b", outlets=3), box("term", "test.terminate")]
+    lines = [line("lb", 0, "top"), line("top", 0, "term")]
+    for name, outlet, long_one in (("one", 1, True), ("two", 2, False)):
+        boxes += [box(f"t{name}", "t b 0.5 b", outlets=3), box(f"s{name}", "s to_map"), box(f"h{name}", "float 0."),
+                  box(f"c{name}", f"expr abs($f1 - 0.25) < 0.00001"), box(f"g{name}", "", maxclass="toggle"),
+                  box(f"a{name}", f"test.assert Jamoma/Modular/j.map/functions/a_rather_long_name_of_{name}")]
+        lines += [line("top", outlet, f"t{name}"), line(f"t{name}", 0, f"h{name}"), line(f"t{name}", 1, f"s{name}"),
+                  line("m", 0, f"h{name}", 1), line(f"h{name}", 0, f"c{name}"), line(f"c{name}", 0, f"g{name}"), line(f"g{name}", 0, f"a{name}")]
+        if long_one:
+            boxes.append(box(f"msg{name}", "function easeOutBounce", maxclass="message"))
+            lines += [line(f"t{name}", 2, f"msg{name}"), line(f"msg{name}", 0, f"s{name}")]
+        else:
+            lines.append(line(f"t{name}", 2, f"s{name}"))
+    boxes += [box("rcv", "r to_map"), box("m", "j.map")]
+    lines.append(line("rcv", 0, "m"))
+    return patcher(boxes, lines)
+
+
+def span(p, ids):
+    """The left and right edge of a group of boxes."""
+    return min(rect(p, i)[0] for i in ids), max(rect(p, i)[0] + rect(p, i)[2] for i in ids)
+
+
+BLOCK_ONE = ("tone", "msgone", "sone", "hone", "cone", "gone", "aone")
+BLOCK_TWO = ("ttwo", "stwo", "htwo", "ctwo", "gtwo", "atwo")
+
+
+class TestPatcherLayoutTests(unittest.TestCase):
+    def setUp(self):
+        self.p = test_patcher()
+        lp.layout(self.p)
+
+    def y(self, box_id):
+        return rect(self.p, box_id)[1]
+
+    def test_starter_and_top_trigger_are_at_the_top_left(self):
+        self.assertLess(self.y("lb"), self.y("top"))
+        for other in BLOCK_ONE + BLOCK_TWO:
+            self.assertLess(self.y("top"), self.y(other), other)
+            self.assertLessEqual(rect(self.p, "top")[0], rect(self.p, other)[0], other)
+
+    def test_all_assertions_are_on_one_line(self):
+        self.assertEqual(self.y("aone"), self.y("atwo"))
+
+    def test_terminate_is_at_the_bottom_left_below_the_assertions(self):
+        self.assertGreater(self.y("term"), self.y("aone"))
+        self.assertEqual(rect(self.p, "term")[0], rect(self.p, "top")[0])
+
+    def test_blocks_stand_side_by_side_in_the_order_of_the_outlets(self):
+        one, two = span(self.p, BLOCK_ONE), span(self.p, BLOCK_TWO)
+        self.assertLess(one[1], two[0], "the block of outlet 1 is left of the block of outlet 2 and they do not overlap")
+
+    def test_each_block_reads_from_top_to_bottom(self):
+        for chain in (("tone", "msgone", "sone", "hone", "cone", "gone", "aone"), ("ttwo", "stwo", "htwo", "ctwo", "gtwo", "atwo")):
+            for upper, lower in zip(chain, chain[1:]):
+                self.assertLess(self.y(upper), self.y(lower), f"{upper} above {lower}")
+
+    def test_the_same_stage_is_on_the_same_line_in_every_block(self):
+        for a, b in (("tone", "ttwo"), ("hone", "htwo"), ("cone", "ctwo"), ("gone", "gtwo")):
+            self.assertEqual(self.y(a), self.y(b), f"{a} and {b}")
+
+    def test_a_toggle_sits_directly_above_its_assertion(self):
+        for name in ("one", "two"):
+            self.assertEqual(rect(self.p, f"g{name}")[0], rect(self.p, f"a{name}")[0])
+
+    def test_the_object_under_test_and_its_receive_stand_beside_the_blocks(self):
+        right = max(span(self.p, BLOCK_ONE)[1], span(self.p, BLOCK_TWO)[1])
+        for i in ("rcv", "m"):
+            self.assertGreater(rect(self.p, i)[0], right, i)
+        self.assertLess(self.y("rcv"), self.y("m"))
+
+    def test_nothing_overlaps(self):
+        rects = [e["box"]["patching_rect"] for e in self.p["boxes"]]
+        for i, a in enumerate(rects):
+            for b in rects[i + 1:]:
+                apart = a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0] or a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1]
+                self.assertTrue(apart, f"{a} overlaps {b}")
+
+    def test_laying_out_twice_gives_the_same_result(self):
+        once = [e["box"]["patching_rect"][:] for e in self.p["boxes"]]
+        lp.layout(self.p)
+        self.assertEqual(once, [e["box"]["patching_rect"] for e in self.p["boxes"]])
+
+    def test_the_window_is_big_enough(self):
+        self.assertGreaterEqual(self.p["rect"][2], max(r["box"]["patching_rect"][0] + r["box"]["patching_rect"][2] for r in self.p["boxes"]))
+        self.assertGreaterEqual(self.p["rect"][3], self.y("term") + 22.0)
+
+
+
 if __name__ == "__main__":
     unittest.main()

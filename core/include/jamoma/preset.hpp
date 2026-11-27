@@ -107,6 +107,12 @@ public:
     bool move(std::string_view name_or_index, std::size_t position);
     /** @brief The first name of the form `<stem> <n>` (n from 1) that no preset has. @param stem The text before the number. @return The name. */
     std::string free_name(std::string_view stem) const;
+    /**
+     * @brief The name a new preset gets when somebody asks for a name: that name without the spaces around it if no preset has it, else numbered
+     *        (`<name> <n>`); `preset <n>` if nothing is left of it.
+     * @param wanted The name asked for. @return A name no preset has.
+     */
+    std::string unused_name(std::string_view wanted) const;
     /** @brief Removes every preset. */
     void clear();
     /**
@@ -115,6 +121,16 @@ public:
      * @return A handle; dropping it unregisters the observer (it may outlive the manager).
      */
     std::shared_ptr<void> observe(std::function<void()> callback);
+    /**
+     * @brief Sets the entries of a preset to those given (the preset is made if it does not exist, at the end); nothing is read from the namespace.
+     * @param name The preset name (not empty).
+     * @param entries The entries, in recall order.
+     * @param make_current Whether the preset becomes the current one.
+     * @return False for an empty name.
+     */
+    bool set_entries(std::string_view name, std::vector<PresetEntry> entries, bool make_current = true);
+    /** @brief Sets the description of a preset. @param name The preset name. @param text The description. @return False if there is no such preset. */
+    bool set_description(std::string_view name, std::string text);
     /** @brief Replaces the whole list (what a file reader does); there is no current preset afterwards. @param presets The new list. */
     void replace_all(std::vector<Preset> presets);
 

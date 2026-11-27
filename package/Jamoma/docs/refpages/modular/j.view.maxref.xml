@@ -50,12 +50,14 @@
 			</description>
 		</method>
 		<method name="model:address">
-			<arglist />
+			<arglist>
+				<arg name="address" optional="1" type="symbol" />
+			</arglist>
 			<digest>
-				Report the model
+				Set or report the model
 			</digest>
 			<description>
-				The <m>model:address</m> message answers like <m>dump</m>.
+				<m>model:address</m> followed by an address binds the view to that model (an absolute address, or one relative to the model of the containing patcher); the objects of the view that follow its model, such as <o>j.ui</o> and <o>j.remote</o>, bind again. While there is no model at the address the view waits for it. Without an address the message answers like <m>dump</m>.
 			</description>
 		</method>
 	</methodlist>

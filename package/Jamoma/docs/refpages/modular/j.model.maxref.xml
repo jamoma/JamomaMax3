@@ -196,6 +196,18 @@
 				The <m>preset:write/again</m> message writes to the file used last.
 			</description>
 		</method>
+		<method name="anything">
+			<digest>Send a value to a parameter or message</digest>
+			<description>&lt;name&gt; &lt;value...&gt; sends the value to the parameter or message of that name below the model; the name is relative to the model, as in the output. A name that is neither, and a return, is ignored.</description>
+		</method>
+		<method name="preset:edit">
+			<digest>Edit the presets in a text window</digest>
+			<description>Opens a text editor window with the presets in the text form of the presets file; closing the window replaces the presets by the edited text.</description>
+		</method>
+		<method name="preset:edit/apply">
+			<digest>Replace the presets by a text</digest>
+			<description>What closing the editor window does: the words are joined with spaces and the two characters backslash n stand for a line break. A text without presets changes nothing.</description>
+		</method>
 	</methodlist>
 	<attributelist>
 		<attribute name="amenities" get="1" set="1" type="symbol" size="1">

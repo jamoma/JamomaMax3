@@ -129,19 +129,76 @@ inline std::optional<std::string> patcher_class(const void* patcher)
 }
 
 /**
+ * @brief The first argument a patcher was loaded with, if it is a name: that of its bpatcher, or the word after the name of the abstraction in the
+ *        box that loads it (the old objects took the address of a model or view from it). Subpatchers (`p`, `patcher`) have none.
+ *
+ * Max offers no accessor for the arguments of an abstraction; as the old objects did, the text of its box is read.
+ * @param patcher The patcher (as patcher_of gives it).
+ * @return The argument, or nothing if there is none, or the first one is not a symbol, is an attribute or is a `#` placeholder.
+ */
+inline std::optional<std::string> patcher_argument(const void* patcher)
+{
+    if (patcher == nullptr) {
+        return std::nullopt;
+    }
+    auto* box = static_cast<c74::max::t_object*>(c74::max::object_attr_getobj(
+        const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(patcher)), c74::max::gensym("box")));
+    if (box == nullptr) {
+        return std::nullopt;
+    }
+    long count = 0;
+    c74::max::t_atom* values = nullptr;
+    long position = 0; // which of the values is the first argument
+    if (c74::max::object_classname(box) == c74::max::gensym("bpatcher")) {
+        if (c74::max::object_attr_getvalueof(box, c74::max::gensym("args"), &count, &values) != 0) {
+            return std::nullopt;
+        }
+    } else if (c74::max::object_classname(box) == c74::max::gensym("newobj")) {
+        auto* field = static_cast<c74::max::t_object*>(c74::max::object_attr_getobj(box, c74::max::gensym("textfield")));
+        char* text = nullptr;
+        long length = 0;
+        if (field == nullptr) {
+            return std::nullopt;
+        }
+        c74::max::object_method(field, c74::max::gensym("gettextptr"), &text, &length);
+        if (text == nullptr || c74::max::atom_setparse(&count, &values, text) != 0) {
+            return std::nullopt;
+        }
+        position = 1; // the first word is the name of the abstraction
+    }
+    if (values == nullptr) {
+        return std::nullopt;
+    }
+    std::optional<std::string> result;
+    const bool subpatcher = position == 1 && count > 0 && c74::max::atom_gettype(values) == c74::max::A_SYM
+                            && (c74::max::atom_getsym(values) == c74::max::gensym("p") || c74::max::atom_getsym(values) == c74::max::gensym("patcher"));
+    if (!subpatcher && count > position && c74::max::atom_gettype(values + position) == c74::max::A_SYM) {
+        const std::string first = c74::max::atom_getsym(values + position)->s_name;
+        if (!first.empty() && first[0] != '@' && first[0] != '#') {
+            result = first;
+        }
+    }
+    c74::max::sysmem_freeptr(values);
+    return result;
+}
+
+/**
  * @brief The address of the model a view patcher is bound to, if there is one now.
  *
- * With a model argument: an absolute address is used as it is, a relative one is taken below the model of the patcher that contains the view
- * (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
+ * With a model argument (that of j.view, else the first argument the view's patcher was loaded with): an absolute address is used as it is, a relative one is
+ * taken below the model of the patcher that contains the view (the root if there is none). Without one, the patcher that contains the view is searched for a model patcher of the same class (`qmetro.view`
  * finds `qmetro.model`). The answer is worked out from what exists now, so it follows models coming and going.
  * @param view_patcher The patcher of the view.
  * @return The address of the model, or nothing while there is none (the view is waiting).
  */
 inline std::optional<std::string> view_model_address(const void* view_patcher)
 {
-    const std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
+    std::optional<std::string> argument = jamoma::Registry::instance().views().find(view_patcher);
     if (!argument) {
         return std::nullopt;
+    }
+    if (argument->empty()) {
+        argument = patcher_argument(view_patcher).value_or(std::string());
     }
     const void* container = parent_patcher(view_patcher);
     std::string address;
@@ -224,10 +281,10 @@ private:
 };
 
 /**
- * @brief Calls a function whenever a model is registered for a patcher or removed again (anywhere), so that an object can find its model
- *        again when it appears later, is replaced or goes.
+ * @brief Calls a function whenever a model is registered for a patcher or removed again, or a view is given another model address (anywhere),
+ *        so that an object can find its model again when it appears later, is replaced or goes, or the view turns to another one.
  *
- * The function runs on the thread that registers the model (the main thread, for Max objects), after the registry's lock is released.
+ * The function runs on the thread that registers the model or sets the address (the main thread, for Max objects), after the registry's lock is released.
  * It is not called for the object's own start-up: the object binds once itself and then watches.
  */
 class ContextWatch {
@@ -238,15 +295,21 @@ public:
      */
     void start(std::function<void()> changed)
     {
+        views_ = jamoma::Registry::instance().views().observe([changed](const void*) { changed(); });
         handle_ = jamoma::Registry::instance().contexts().observe(
             [changed = std::move(changed)](const void*, jamoma::Model*, bool) { changed(); });
     }
 
     /** Stops watching (also done by the destructor). */
-    void stop() { handle_.reset(); }
+    void stop()
+    {
+        handle_.reset();
+        views_.reset();
+    }
 
 private:
-    std::shared_ptr<void> handle_; /**< The observer registration. */
+    std::shared_ptr<void> handle_; /**< The observer registration for models. */
+    std::shared_ptr<void> views_;  /**< The observer registration for views. */
 };
 
 } // namespace jamoma_max

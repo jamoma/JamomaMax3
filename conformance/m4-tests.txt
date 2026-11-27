@@ -1,0 +1,2 @@
+# Old integration tests that use j.map, j.cue, j.namespace or j.textslider: none.
+# The only old test that mentions them is Modular/modular.externalsLoading (it loads every external of the old package, audio ones included), which is not copied.

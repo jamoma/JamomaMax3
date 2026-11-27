@@ -226,6 +226,62 @@ std::vector<std::pair<const void*, Model*>> ContextMap::all() const
     return entries_;
 }
 
+/** The observers of a view map. */
+struct ViewMap::Observers {
+    /** One observer. */
+    struct Entry {
+        unsigned id;                                 /**< Identifies the observer for removal. */
+        std::function<void(const void*)> callback;   /**< What to call. */
+    };
+    std::mutex mutex;                 /**< Guards the entries (never held while a callback runs). */
+    std::vector<Entry> entries;       /**< The observers. */
+    unsigned next_id = 1;             /**< The id of the next observer. */
+};
+
+ViewMap::ViewMap() : observers_(std::make_shared<Observers>()) {}
+
+bool ViewMap::set_argument(const void* patcher, std::string argument)
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        const auto it = std::find_if(entries_.begin(), entries_.end(), [patcher](const auto& e) { return e.first == patcher; });
+        if (it == entries_.end() || it->second == argument) {
+            return false;
+        }
+        it->second = std::move(argument);
+    }
+    std::vector<std::function<void(const void*)>> calls;
+    {
+        std::lock_guard<std::mutex> lock(observers_->mutex);
+        for (const Observers::Entry& e : observers_->entries) {
+            calls.push_back(e.callback);
+        }
+    }
+    for (const auto& call : calls) {
+        call(patcher);
+    }
+    return true;
+}
+
+std::shared_ptr<void> ViewMap::observe(std::function<void(const void*)> callback)
+{
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(observers_->mutex);
+        id = observers_->next_id++;
+        observers_->entries.push_back({id, std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<Observers> weak = observers_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto observers = weak.lock()) {
+            std::lock_guard<std::mutex> lock(observers->mutex);
+            auto& list = observers->entries;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const Observers::Entry& e) { return e.id == id; }), list.end());
+        }
+    });
+}
+
 void ViewMap::add(const void* patcher, std::string argument)
 {
     std::lock_guard<std::mutex> lock(mutex_);

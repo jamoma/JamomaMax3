@@ -32,16 +32,25 @@ scripts/run-maxtests.sh --dir j.model --dir j.ui --out build/maxtests
 
 A new test is run by these commands as soon as it is in its folder; there are no lists to keep up to date.
 
-## Laying out a patcher
+## Building and laying out a test patcher
 
-Patchers are laid out to read from top to bottom: every object sits below the objects that feed it, with its left edge lined up with theirs where the row allows (a chain is a straight vertical line), and the targets of a left outlet are left of
-the targets of a right outlet. After writing or changing a patcher, lay it out with
+A test patcher is built so that it reads at a glance (`j.map/j_map_functions` is the model):
+
+1. `loadbang` (or `j.init`, if the test has to wait for a model) feeds one `t b b b ...` at the top left. Its outlets run one **block** for each assertion, from right to left; the leftmost outlet, which fires last, goes to `test.terminate`.
+2. Inside a block a trigger fixes the order, with constants where useful (`t b 0.5 b`: first the setting message, then the value, last the read of the result).
+3. `s name` and `r name` replace long cords: every block sends to one receive that sits beside the object under test.
+4. A block reads from top to bottom: trigger, message, send, holder, check, toggle, `test.assert`.
+5. The blocks stand side by side in the order of the trigger's outlets, every stage on the same line, with all `test.assert` boxes on one line and no overlaps.
+
+Use no timed `delay` to order steps. A delay (or `deferlow`) is only for work that Max or an object has put off: binding at load (start from `j.init`), or the reaction to a deleted or new object.
+
+`tools/maxtest/make_test.py` builds patchers in this shape (`blocks` and `receive`). To lay out a patcher, run
 
 ```
 python3 tools/maxtest/layout_patcher.py <path>/<name>.maxtest.maxpat
 ```
 
-(running it twice changes nothing).
+(running it twice changes nothing). A patcher of the shape above is arranged by blocks; any other patcher is laid out so that every object sits below the objects that feed it, with its left edge lined up with theirs where the row allows (a chain is a straight vertical line), and the targets of a left outlet left of the targets of a right outlet. **Do not run it over a patcher that has been arranged by hand.**
 
 Every `test.assert` has a toggle directly above it, fed by whatever checks the result and feeding the assert. It does not change the test; when the
 check passes the toggle turns on, so a patcher that you open in Max shows at a glance whether its checks pass (the patcher runs itself on opening
@@ -51,7 +60,7 @@ when the three package links are in place, see `scripts/max-links.sh`). New patc
 python3 tools/maxtest/add_toggles.py <path>/<name>.maxtest.maxpat
 ```
 
-and are then laid out as above (adding toggles twice changes nothing). A test that waits for a model starts from the end outlet of `j.init`, never from a fixed delay.
+and are then laid out as above (adding toggles twice changes nothing).
 
 ## Tests that change themselves
 

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="./_c74_ref.xsl" type="text/xsl"?>
+<c74object name="j.textslider" module="" category="Jamoma">
+	<digest>
+		Slider with a text and a value display
+	</digest>
+	<description>
+		A horizontal slider that shows a text and, while the mouse is over it, its value. A click or a drag changes the value; with the Command key the values are whole numbers, with the Shift key the drag is fine, and a double click with the Control key gives <m>defaultvalue</m>. Its colors follow the Max theme unless you set them.
+	</description>
+	<metadatalist>
+		<metadata name="author">
+			Jamoma
+		</metadata>
+		<metadata name="tag">
+			user interface
+		</metadata>
+		<metadata name="tag">
+			Jamoma
+		</metadata>
+	</metadatalist>
+	<inletlist>
+		<inlet id="0" type="int/float">
+			<digest>
+				Values and messages
+			</digest>
+			<description>
+				Numbers, set and bang.
+			</description>
+		</inlet>
+	</inletlist>
+	<outletlist>
+		<outlet id="0" type="float">
+			<digest>
+				The value
+			</digest>
+			<description>
+				The value of the slider, a decimal number.
+			</description>
+		</outlet>
+	</outletlist>
+	<objarglist>
+	</objarglist>
+	<methodlist>
+		<method name="bang">
+			<arglist />
+			<digest>
+				Output the value
+			</digest>
+			<description>
+				Sends the value out of the outlet.
+			</description>
+		</method>
+		<method name="int">
+			<arglist>
+				<arg name="value" optional="0" type="int" />
+			</arglist>
+			<digest>
+				Set and output the value
+			</digest>
+			<description>
+				Keeps the number, sends it out of the outlet (as a decimal number) and draws it. A value outside the range is output as it is and drawn at the end of the slider.
+			</description>
+		</method>
+		<method name="float">
+			<arglist>
+				<arg name="value" optional="0" type="float" />
+			</arglist>
+			<digest>
+				Set and output the value
+			</digest>
+			<description>
+				As <m>int</m>.
+			</description>
+		</method>
+		<method name="set">
+			<arglist>
+				<arg name="value" optional="0" type="float" />
+			</arglist>
+			<digest>
+				Set the value without output
+			</digest>
+			<description>
+				Keeps the number and draws it, without sending it out.
+			</description>
+		</method>
+		<method name="paint">
+			<arglist />
+			<digest>
+				Draw the slider
+			</digest>
+			<description>
+				Sent by Max when the slider is drawn.
+			</description>
+		</method>
+		<method name="mousedown">
+			<arglist />
+			<digest>
+				Start a change
+			</digest>
+			<description>
+				A click; with <m>clickjump</m> on, the value moves to the position of the mouse.
+			</description>
+		</method>
+		<method name="mousedrag">
+			<arglist />
+			<digest>
+				Change the value
+			</digest>
+			<description>
+				A drag moves the value.
+			</description>
+		</method>
+		<method name="mousedoubleclick">
+			<arglist />
+			<digest>
+				Give the default value
+			</digest>
+			<description>
+				A double click with the Control key gives <m>defaultvalue</m>.
+			</description>
+		</method>
+		<method name="mouseenter">
+			<arglist />
+			<digest>
+				Show the value
+			</digest>
+			<description>
+				The mouse arrives: the value is shown if <m>showvalue</m> is on.
+			</description>
+		</method>
+		<method name="mouseleave">
+			<arglist />
+			<digest>
+				Show the text
+			</digest>
+			<description>
+				The mouse leaves: the text is shown.
+			</description>
+		</method>
+	</methodlist>
+	<attributelist>
+		<attribute name="bgcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Background color
+			</digest>
+			<description>
+				The color of the background. At its default it follows the Max theme (<m>live_control_bg</m>); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="fgcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Foreground color
+			</digest>
+			<description>
+				The color of the bar. At its default it follows the Max theme (<m>live_selection</m>, adjusted so that the text can be read on it); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="bordercolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Border color
+			</digest>
+			<description>
+				The color of the border. At its default it follows the Max theme (<m>live_control_bg</m>); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="textcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Text color
+			</digest>
+			<description>
+				The color of the text. At its default it follows the Max theme (<m>live_control_fg</m>, or black or white where that is hard to read); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="knobcolor" get="1" set="1" type="float" size="4">
+			<digest>
+				Knob color
+			</digest>
+			<description>
+				The color of the line at the end of the bar. At its default it follows the Max theme (<m>live_value_bar</m>, or the text color where that is hard to see); a color you set is used as it is, and the attribute name without values gives the default back.
+			</description>
+		</attribute>
+		<attribute name="range" get="1" set="1" type="float" size="2">
+			<digest>
+				Range
+			</digest>
+			<description>
+				The lowest and highest value of the slider (default 0 1); the two are swapped if the second is smaller.
+			</description>
+		</attribute>
+		<attribute name="text" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Displayed text
+			</digest>
+			<description>
+				The text shown on the slider.
+			</description>
+		</attribute>
+		<attribute name="textpos" get="1" set="1" type="float" size="2">
+			<digest>
+				Text position
+			</digest>
+			<description>
+				Where the text starts: pixels from the left and from the top (default 10 4).
+			</description>
+		</attribute>
+		<attribute name="unit" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Displayed unit
+			</digest>
+			<description>
+				The unit shown after the value.
+			</description>
+		</attribute>
+		<attribute name="showvalue" get="1" set="1" type="int" size="1">
+			<digest>
+				Show the value
+			</digest>
+			<description>
+				When on (the default), the value is shown instead of the text while the mouse is over the slider.
+			</description>
+		</attribute>
+		<attribute name="tracking" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Mouse tracking
+			</digest>
+			<description>
+				Which movement of the mouse moves the value: <m>horizontal</m> (the default), <m>vertical</m> or <m>both</m> (the larger one).
+			</description>
+		</attribute>
+		<attribute name="clickjump" get="1" set="1" type="int" size="1">
+			<digest>
+				Jump to the value on a click
+			</digest>
+			<description>
+				When on (the default), a click moves the value to the position of the mouse.
+			</description>
+		</attribute>
+		<attribute name="defaultvalue" get="1" set="1" type="float" size="1">
+			<digest>
+				Default value
+			</digest>
+			<description>
+				The value that a double click with the Control key gives (default 0).
+			</description>
+		</attribute>
+	</attributelist>
+</c74object>

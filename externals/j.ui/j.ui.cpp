@@ -7,18 +7,27 @@
  *
  * The panel shows the address of the model it is bound to (the model of its patcher, or the one a j.view in it is bound to), or
  * `waiting for a model:address`. A click on the address opens a menu of the parameters, messages and returns below the model; a choice is sent out of
- * the outlet as `model:reference/open <address>`. The menu arrow opens the utilities and presets menu: Create New Preset (stores `preset <n>`, the next
- * free number), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
+ * the outlet as `model:reference/open <address>`. The menu arrow opens the utilities and presets menu: Create New Preset (asks for the name; a taken name is numbered,
+ * an empty one becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
  * (Load / Save Presets File, Edit, Open Reference / Help / Internal) are sent out of the outlet as the old messages (`preset:read`, `preset:write/again`,
  * `preset:write`, `preset:edit`, `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. The text is drawn,
  * not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then `preset:count <n>`, `presets <name>...` and
  * `preset:current <name>`, on the outlet; this is what the own test reads.
+ *
+ * If the outlet feeds an inlet of a subpatcher (a second panel of the view), a round button with a plus sign is shown in the header; a click on it,
+ * or the message `panel`, sends `bang` out of the outlet, gives the subpatcher the address of the model as its title and opens it. `dump` then
+ * adds `panel 1`. A cord made later shows the button at the next redraw (for instance when the patcher is locked).
+ *
+ * Colours: a colour attribute that has its default is automatic, so that the panel fits every Max theme (jamoma/readable_colours.hpp, `panel_colours`):
+ * a faint grey tint of the patcher with a grey border, a header darker than the panel, the patcher's text colour for the title and the theme's
+ * `live_value_bar` for the lit active button, both replaced where they would be hard to see. A colour the user sets is used as it is.
  *
  * If the model has the parameter `data/active` (the `data` amenity), a round button sits left of the menu arrow: filled while the model is active, a ring while it is
  * not; a click on it switches the parameter. The button follows the parameter (also when something else changes it). `active 0|1` does the same from a patch (no
  * argument: toggle), and `dump` adds `active <0|1>` when the model has the parameter.
  */
 
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -28,10 +37,12 @@
 
 #include "jamoma/data.hpp"
 #include "jamoma/explorer.hpp"
+#include "jamoma/readable_colours.hpp"
 #include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
 #include "jamoma/ui_grid.hpp"
 #include "max_address.hpp"
+#include "max_attributes.hpp"
 #include "max_context.hpp"
 
 using namespace c74::min;
@@ -42,6 +53,7 @@ class j_ui : public c74::min::object<j_ui>, public c74::min::ui_operator<300, 70
     std::unique_ptr<jamoma::ModelExplorer> explorer_;  /**< What is below the model. */
     jamoma_max::Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;                   /**< Follows the model coming and going. */
+    jamoma_max::Settle settle_;                        /**< Redraws once for a burst of attribute changes. */
     std::string model_;                                /**< The address of the model the panel is bound to (empty: waiting). */
     std::unique_ptr<jamoma::Receiver> active_watch_;   /**< Follows `data/active` of the model so that the button shows its value. */
 
@@ -77,18 +89,39 @@ public:
 
     jamoma_max::dump_outlet out{this, "(anything) menu choices and dump"}; /**< The outlet. */
 
+    // The default of every colour means "automatic" (see drawing_colours); any other value is the user's and is used as it is.
     /** The background colour. */
-    attribute<numbers> bgcolor{this, "bgcolor", {0.17, 0.18, 0.20, 1.0}, title{"Background Color"}, style::color};
+    attribute<numbers> bgcolor{this, "bgcolor", {0.5, 0.5, 0.5, 0.14}, title{"Background Color"}, style::color,
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.14});
+        }}};
     /** The border colour. */
-    attribute<numbers> bordercolor{this, "bordercolor", {0.45, 0.47, 0.50, 1.0}, title{"Border Color"}, style::color};
+    attribute<numbers> bordercolor{this, "bordercolor", {0.5, 0.5, 0.5, 0.6}, title{"Border Color"}, style::color,
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.5, 0.5, 0.5, 0.6});
+        }}};
     /** The colour of the header. */
-    attribute<numbers> headercolor{this, "headercolor", {0.26, 0.28, 0.32, 1.0}, title{"Header Color"}, style::color};
+    attribute<numbers> headercolor{this, "headercolor", {0.3, 0.3, 0.3, 1.0}, title{"Header Color"}, style::color,
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.3, 0.3, 0.3, 1.0});
+        }}};
     /** The colour of the text. */
-    attribute<numbers> textcolor{this, "textcolor", {0.92, 0.93, 0.95, 1.0}, title{"Text Color"}, style::color};
+    attribute<numbers> textcolor{this, "textcolor", {0.85, 0.85, 0.85, 1.0}, title{"Text Color"}, style::color,
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.85, 0.85, 0.85, 1.0});
+        }}};
     /** The tags of the object (accepted so that old patchers load; no effect). */
     attribute<symbol> tags_attribute{this, "tags", ""}; // not named `tags`: Min's ui_operator calls the object's tags() function
     /** The colour of the highlights. */
-    attribute<numbers> highlightcolor{this, "highlightcolor", {0.35, 0.60, 0.85, 1.0}, title{"Highlight Color"}, style::color};
+    attribute<numbers> highlightcolor{this, "highlightcolor", {0.594, 0.721, 0.928, 1.0}, title{"Highlight Color"}, style::color,
+        setter{MIN_FUNCTION {
+            refresh();
+            return jamoma_max::values_or_default(args, {0.594, 0.721, 0.928, 1.0});
+        }}};
 
     /** Whether the size snaps to the grid of the interface: whole units of 150 pixels across and 35 pixels down (on by default, as in the old object). */
     attribute<int> snap{this, "snap", 1, title{"Snap Size to Grid"}, description{"The size of the object is a whole number of units, 150 pixels wide and 35 pixels high"}, range{0, 1}, style::onoff};
@@ -119,6 +152,8 @@ public:
         if (e.y() < kHeader) {
             if (e.x() > e.target().width() - kHeader) {
                 open_utilities_menu(e);
+            } else if (on_panel_button(e.x(), e.target().width())) {
+                open_panel();
             } else if (on_active_button(e.x(), e.target().width())) {
                 switch_active(-1);
             } else {
@@ -131,6 +166,28 @@ public:
     /** `active [0|1]`: switches the model on or off through its parameter `data/active` (no argument: the other way round). Does nothing without the parameter. */
     message<> active{this, "active", MIN_FUNCTION {
         switch_active(args.empty() ? -1 : (static_cast<double>(args[0]) != 0.0 ? 1 : 0));
+        return {};
+    }};
+
+    /** `panel`: what a click on the panel button does; nothing if the outlet feeds no subpatcher. */
+    message<> panel{this, "panel", MIN_FUNCTION {
+        open_panel();
+        return {};
+    }};
+
+    /** `preset:name <name>`: creates a preset of that name (see the file description); nothing without a name. */
+    message<> preset_name{this, "preset:name", MIN_FUNCTION {
+        if (args.empty()) {
+            return {};
+        }
+        std::string wanted;
+        for (const atom& a : args) {
+            const std::string word = a.type() == message_type::int_argument     ? std::to_string(static_cast<long long>(a))
+                                     : a.type() == message_type::float_argument ? std::to_string(static_cast<double>(a))
+                                                                                : std::string(static_cast<symbol>(a).c_str());
+            wanted += (wanted.empty() ? "" : " ") + word;
+        }
+        create_preset(wanted);
         return {};
     }};
 
@@ -147,14 +204,82 @@ private:
     static constexpr double kHeader = 22.0; /**< The height of the header. */
     static constexpr double kActiveRadius = 6.5; /**< The radius of the active button. */
 
-    /** @return The colour of an attribute. @param values Its four numbers. */
-    static c74::max::t_jrgba rgba(const numbers& values)
+    /** Asks for a redraw once the new value of an attribute is stored (Max itself redraws only for some colour attributes). */
+    void refresh()
     {
-        c74::max::t_jrgba c{0.5, 0.5, 0.5, 1.0};
-        if (values.size() >= 4) {
-            c = {values[0], values[1], values[2], values[3]};
+        if (c74::min::dummy() || maxobj() == nullptr) {
+            return;
         }
-        return c;
+        settle_.request(maxobj(), alive_.weak(), [this] { redraw(); });
+    }
+
+    /** @param g The graphics context. @param c A colour. */
+    static void colour(c74::max::t_jgraphics* g, const jamoma::Rgba& c) { c74::max::jgraphics_set_source_rgba(g, c.r, c.g, c.b, c.a); }
+
+    /**
+     * @param value A colour attribute. @param fallback Its default.
+     * @param[out] chosen Set to true if the value is not the default, i.e. the user's. @return The colour of the attribute.
+     */
+    static jamoma::Rgba attribute_colour(const numbers& value, const jamoma::Rgba& fallback, bool& chosen)
+    {
+        const jamoma::Rgba given{value.size() > 0 ? value[0] : fallback.r, value.size() > 1 ? value[1] : fallback.g,
+                                 value.size() > 2 ? value[2] : fallback.b, value.size() > 3 ? value[3] : fallback.a};
+        chosen = std::fabs(given.r - fallback.r) >= 1e-4 || std::fabs(given.g - fallback.g) >= 1e-4
+                 || std::fabs(given.b - fallback.b) >= 1e-4 || std::fabs(given.a - fallback.a) >= 1e-4;
+        return given;
+    }
+
+    /** @return A colour of the current Max theme. @param name Its name. @param fallback Used if the theme has none. */
+    static jamoma::Rgba theme_colour(const char* name, const jamoma::Rgba& fallback)
+    {
+        c74::max::t_jrgba on{}, off{};
+        if (c74::max::jcolor_getcolor(c74::max::gensym(name), &on, &off) != 0) {
+            return fallback;
+        }
+        return {on.red, on.green, on.blue, on.alpha};
+    }
+
+    /** @return The patcher the panel is in, or null. */
+    c74::max::t_object* own_patcher() const
+    {
+        c74::max::t_object* patcher = nullptr;
+        c74::max::object_obex_lookup(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(maxobj())), c74::max::gensym("#P"), &patcher);
+        return patcher;
+    }
+
+    /**
+     * A colour of the patcher, as Max has it from the theme or the patcher's own settings.
+     * @param patcher The patcher (may be null). @param name The attribute of the patcher. @param fallback Used if it cannot be read. @return The colour.
+     */
+    static jamoma::Rgba patcher_colour(c74::max::t_object* patcher, const char* name, const jamoma::Rgba& fallback)
+    {
+        c74::max::t_jrgba c{};
+        if (patcher == nullptr || c74::max::object_attr_getjrgba(patcher, c74::max::gensym(name), &c) != 0) {
+            return fallback;
+        }
+        return {c.red, c.green, c.blue, c.alpha};
+    }
+
+    /**
+     * @param view The patcher view that is drawn.
+     * @return The colours to draw with now: the user's, and for the others those derived from the patcher and the Max theme.
+     */
+    jamoma::PanelColours drawing_colours(c74::max::t_object* view)
+    {
+        jamoma::PanelColours given;
+        jamoma::PanelChosen chosen;
+        given.panel = attribute_colour(bgcolor.get(), {0.5, 0.5, 0.5, 0.14}, chosen.panel);
+        given.border = attribute_colour(bordercolor.get(), {0.5, 0.5, 0.5, 0.6}, chosen.border);
+        given.header = attribute_colour(headercolor.get(), {0.3, 0.3, 0.3, 1.0}, chosen.header);
+        given.text = attribute_colour(textcolor.get(), {0.85, 0.85, 0.85, 1.0}, chosen.text);
+        given.highlight = attribute_colour(highlightcolor.get(), {0.594, 0.721, 0.928, 1.0}, chosen.highlight);
+        c74::max::t_object* patcher = own_patcher();
+        const bool locked = view != nullptr && c74::max::object_attr_getlong(view, c74::max::gensym("locked")) != 0;
+        const jamoma::PanelSurroundings around{
+            patcher_colour(patcher, locked ? "locked_bgcolor" : "editing_bgcolor", {0.235, 0.235, 0.235, 1.0}),
+            patcher_colour(patcher, "textcolor", {0.85, 0.85, 0.85, 1.0}),
+            theme_colour("live_value_bar", {0.594, 0.721, 0.928, 1.0})};
+        return jamoma::panel_colours(given, chosen, around);
     }
 
     /** Looks for the model again and points the explorer at it. */
@@ -218,6 +343,68 @@ private:
         return width > kHeader * 2 && active_data() != nullptr && x >= active_centre(width) - 10.0 && x <= active_centre(width) + 10.0;
     }
 
+    /** @return The subpatcher an inlet of which the outlet feeds (the second panel), or null. */
+    c74::max::t_object* panel_patcher() const
+    {
+        c74::max::t_object* patcher = own_patcher();
+        if (patcher == nullptr) {
+            return nullptr;
+        }
+        const void* self = maxobj();
+        for (c74::max::t_object* line = c74::max::jpatcher_get_firstline(patcher); line != nullptr; line = c74::max::jpatchline_get_nextline(line)) {
+            c74::max::t_object* from = c74::max::jpatchline_get_box1(line);
+            c74::max::t_object* to = c74::max::jpatchline_get_box2(line);
+            if (from == nullptr || to == nullptr || c74::max::jbox_get_object(from) != self) {
+                continue;
+            }
+            c74::max::t_object* target = c74::max::jbox_get_object(to);
+            if (target != nullptr
+                && (c74::max::object_classname(target) == c74::max::gensym("jpatcher") || c74::max::object_classname(target) == c74::max::gensym("patcher"))) {
+                return target;
+            }
+        }
+        return nullptr;
+    }
+
+    /** Sends `bang` (so that the patch can prepare), titles the second panel with the address of the model and opens it. */
+    void open_panel()
+    {
+        if (panel_patcher() == nullptr) {
+            return;
+        }
+        const std::weak_ptr<int> alive = alive_.weak();
+        c74::max::outlet_bang(out.max_outlet());
+        if (alive.expired()) {
+            return; // the bang led to this object being deleted
+        }
+        c74::max::t_object* second = panel_patcher(); // the bang may have changed the patcher
+        if (second == nullptr) {
+            return;
+        }
+        if (!model_.empty()) {
+            c74::max::object_attr_setsym(second, c74::max::gensym("title"), c74::max::gensym(model_.c_str()));
+        }
+        c74::max::object_method(second, c74::max::gensym("vis"));
+    }
+
+    /** Creates a preset of the model with the wanted name, or one that is free. @param wanted The name asked for. */
+    void create_preset(const std::string& wanted)
+    {
+        if (jamoma::Model* m = model()) {
+            m->presets().new_preset(m->presets().unused_name(wanted));
+            redraw();
+        }
+    }
+
+    /** @return The x position of the middle of the panel button: left of the active button, if there is one. @param width The width of the panel. */
+    double panel_centre(double width) const { return active_centre(width) - (active_data() != nullptr ? 20.0 : 0.0); }
+
+    /** @return True if a click at x is on the panel button. @param x The position. @param width The width of the panel. */
+    bool on_panel_button(double x, double width) const
+    {
+        return width > kHeader * 2 && x >= panel_centre(width) - 10.0 && x < panel_centre(width) + 10.0 && panel_patcher() != nullptr;
+    }
+
     /** @return The model the panel is bound to, or null. */
     jamoma::Model* model() const
     {
@@ -234,18 +421,15 @@ private:
         c74::max::t_jgraphics* g = t;
         const double w = t.width();
         const double h = t.height();
-        c74::max::t_jrgba bg = rgba(bgcolor.get());
-        c74::max::t_jrgba border = rgba(bordercolor.get());
-        c74::max::t_jrgba header = rgba(headercolor.get());
-        c74::max::t_jrgba text = rgba(textcolor.get());
-        c74::max::jgraphics_set_source_jrgba(g, &bg);
+        const jamoma::PanelColours colours = drawing_colours(t.view());
+        colour(g, colours.panel);
         c74::max::jgraphics_rectangle(g, 0, 0, w, h);
         c74::max::jgraphics_fill(g);
         if (w >= 40 && h >= 2 * kHeader / 2) {
-            c74::max::jgraphics_set_source_jrgba(g, &header);
+            colour(g, colours.header);
             c74::max::jgraphics_rectangle(g, 0, 0, w, h < kHeader ? h : kHeader);
             c74::max::jgraphics_fill(g);
-            c74::max::jgraphics_set_source_jrgba(g, &text);
+            colour(g, colours.text);
             c74::max::jgraphics_select_font_face(g, "Arial", c74::max::JGRAPHICS_FONT_SLANT_NORMAL, c74::max::JGRAPHICS_FONT_WEIGHT_NORMAL);
             c74::max::jgraphics_set_font_size(g, 12.0);
             const std::string title = model_.empty() ? "waiting for a model:address" : model_;
@@ -257,21 +441,32 @@ private:
                 c74::max::jgraphics_line_to(g, w - 12.0, 15.0);
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
+                if (panel_patcher() != nullptr) { // the button of the second panel: a ring with a plus sign
+                    const double x = panel_centre(w), y = kHeader / 2.0;
+                    colour(g, colours.text);
+                    c74::max::jgraphics_set_line_width(g, 1.5);
+                    c74::max::jgraphics_arc(g, x, y, kActiveRadius, 0.0, JGRAPHICS_2PI);
+                    c74::max::jgraphics_stroke(g);
+                    c74::max::jgraphics_move_to(g, x - 3.5, y);
+                    c74::max::jgraphics_line_to(g, x + 3.5, y);
+                    c74::max::jgraphics_move_to(g, x, y - 3.5);
+                    c74::max::jgraphics_line_to(g, x, y + 3.5);
+                    c74::max::jgraphics_stroke(g);
+                }
                 if (active_data() != nullptr) { // the active button: filled while the model is on, a ring while it is off
-                    c74::max::t_jrgba lit = rgba(highlightcolor.get());
                     c74::max::jgraphics_set_line_width(g, 1.5);
                     c74::max::jgraphics_arc(g, active_centre(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
                     if (is_active()) {
-                        c74::max::jgraphics_set_source_jrgba(g, &lit);
+                        colour(g, colours.highlight);
                         c74::max::jgraphics_fill(g);
                     } else {
-                        c74::max::jgraphics_set_source_jrgba(g, &text);
+                        colour(g, colours.text);
                         c74::max::jgraphics_stroke(g);
                     }
                 }
             }
         }
-        c74::max::jgraphics_set_source_jrgba(g, &border);
+        colour(g, colours.border);
         c74::max::jgraphics_set_line_width(g, 1.0);
         c74::max::jgraphics_rectangle(g, 0.5, 0.5, w - 1.0, h - 1.0);
         c74::max::jgraphics_stroke(g);
@@ -300,8 +495,12 @@ private:
         add("Parameters", c.parameters);
         add("Messages", c.messages);
         add("Returns", c.returns);
+        const std::weak_ptr<int> alive = alive_.weak(); // the menu runs its own event loop: this object may be deleted meanwhile
         const int choice = items.empty() ? 0 : c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
         c74::max::jpopupmenu_destroy(menu);
+        if (alive.expired()) {
+            return;
+        }
         if (choice >= 1 && choice <= static_cast<int>(items.size())) {
             send_symbol("model:reference/open", model_ + "/" + items[static_cast<std::size_t>(choice - 1)]);
         }
@@ -334,8 +533,12 @@ private:
             const bool current = m->presets().current() && *m->presets().current() == i;
             c74::max::jpopupmenu_additem(menu, static_cast<int>(200 + i), names[i].c_str(), nullptr, current ? 1 : 0, 0, nullptr);
         }
+        const std::weak_ptr<int> alive = alive_.weak(); // the menu and the dialog run their own event loops: this object may be deleted meanwhile
         const int choice = c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
         c74::max::jpopupmenu_destroy(menu);
+        if (alive.expired()) {
+            return;
+        }
         m = model(); // the menu runs its own event loop: the model may have gone or been made again meanwhile
         if (choice >= 1 && choice <= static_cast<int>(utilities.size())) {
             const std::string item = utilities[static_cast<std::size_t>(choice - 1)];
@@ -347,7 +550,18 @@ private:
         } else if (m == nullptr) {
             return;
         } else if (choice == 100) {
-            m->presets().new_preset(m->presets().free_name("preset"));
+            const char* name = nullptr;
+            const long answer = c74::max::jdialog_showtext("Provide a name for this Preset", "Ch\xc3\xa2teau de Preset", 0, &name);
+            const std::string wanted = name != nullptr ? name : "";
+            if (name != nullptr) {
+                c74::max::sysmem_freeptr(const_cast<char*>(name));
+            }
+            if (alive.expired()) {
+                return;
+            }
+            if (answer == 1) {
+                create_preset(wanted); // looks the model up again: the dialog runs its own event loop
+            }
         } else if (choice == 101 && m->presets().current()) {
             m->presets().update(std::to_string(*m->presets().current() + 1));
         } else if (choice == 102 && m->presets().current()) {
@@ -374,6 +588,11 @@ private:
             return;
         }
         send_symbol("model:address", model_);
+        if (panel_patcher() != nullptr) {
+            c74::max::t_atom one;
+            c74::max::atom_setlong(&one, 1);
+            c74::max::outlet_anything(out.max_outlet(), c74::max::gensym("panel"), 1, &one);
+        }
         if (active_data() != nullptr) {
             c74::max::t_atom on;
             c74::max::atom_setlong(&on, is_active() ? 1 : 0);

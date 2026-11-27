@@ -330,12 +330,25 @@
                             },
                             {
                                 "box": {
+                                    "fontface": 0,
+                                    "fontname": "Arial",
+                                    "fontsize": 12.0,
                                     "id": "obj-30",
-                                    "maxclass": "comment",
+                                    "maxclass": "newobj",
                                     "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 319.0, 367.0, 220.0, 20.0 ],
-                                    "text": "[j.cue: not in this version yet]"
+                                    "numoutlets": 2,
+                                    "outlettype": [
+                                        "",
+                                        ""
+                                    ],
+                                    "patching_rect": [
+                                        319.0,
+                                        367.0,
+                                        36.0,
+                                        22.0
+                                    ],
+                                    "style": "",
+                                    "text": "j.cue"
                                 }
                             },
                             {
@@ -354,7 +367,36 @@
                                 }
                             }
                         ],
-                        "lines": []
+                        "lines": [
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-30",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-11",
+                                        0
+                                    ]
+                                }
+                            },
+                            {
+                                "patchline": {
+                                    "destination": [
+                                        "obj-30",
+                                        0
+                                    ],
+                                    "disabled": 0,
+                                    "hidden": 0,
+                                    "source": [
+                                        "obj-22",
+                                        0
+                                    ]
+                                }
+                            }
+                        ]
                     },
                     "patching_rect": [ 169.75, 112.0, 105.0, 20.0 ],
                     "text": "p \"Nodes & priorities\""

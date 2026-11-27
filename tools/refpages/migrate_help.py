@@ -15,11 +15,18 @@ import json
 import pathlib
 import sys
 
-HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node"]
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "package"))
+import clean_patcher  # noqa: E402
+
+HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node", "j.namespace", "j.map", "j.cue", "j.textslider"]
 
 
 #: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.
 KNOWN_DATASPACES = {"gain", "time", "position", "temperature"}
+#: Patchers of the package that old help patchers load as a bpatcher: they work, so they are kept.
+PACKAGE_PATCHERS = {"j.maxhelpui"}
+
+
 #: Objects from other packages that the help patchers use and that are not part of this package.
 OTHER_PACKAGE_OBJECTS = {"ambimonitor"}
 
@@ -54,7 +61,7 @@ def object_name(box):
         name = box["text"].split()[0]
     else:
         return ""
-    other_module = (name.endswith(".model") and name != "j.model") or name.endswith(".view")
+    other_module = (name.endswith(".model") and name != "j.model") or name.endswith(".view") or ".view." in name or ".model." in name
     return name if name.startswith("j.") or other_module else ""
 
 
@@ -72,7 +79,7 @@ def migrate_patcher(patcher, implemented, replaced):
     for entry in patcher.get("boxes", []):
         box = entry["box"]
         name = unavailable_name(box) or object_name(box)
-        if name and (name not in implemented or unavailable_name(box)):
+        if name and name not in PACKAGE_PATCHERS and (name not in implemented or unavailable_name(box)):
             gone.add(box["id"])
             replaced.append(name)
             boxes.append(comment_for(box, name))
@@ -91,15 +98,17 @@ def main():
     p.add_argument("--old", required=True, type=pathlib.Path)
     p.add_argument("--package", required=True, type=pathlib.Path)
     p.add_argument("--implemented", required=True, type=pathlib.Path)
+    p.add_argument("--only", nargs="*", default=[], help="migrate only these objects (the other help patchers, which may have been edited by hand, are left alone)")
     args = p.parse_args()
     implemented = {l.strip() for l in args.implemented.read_text().splitlines() if l.strip() and not l.startswith("#")}
     out_dir = args.package / "help"
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name in HELP_OBJECTS:
+    for name in args.only or HELP_OBJECTS:
         source = args.old / "Jamoma/help" / f"{name}.maxhelp"
         data = json.loads(source.read_text(encoding="utf-8"))
         replaced = []
         migrate_patcher(data["patcher"], implemented, replaced)
+        clean_patcher.clean(data["patcher"])  # default colours, Arial, no size 13
         (out_dir / f"{name}.maxhelp").write_text(json.dumps(data, indent="\t") + "\n", encoding="utf-8")
         print(f"{name}.maxhelp: replaced {len(replaced)}: {', '.join(sorted(set(replaced)))}")
     return 0
