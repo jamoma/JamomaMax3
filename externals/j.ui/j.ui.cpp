@@ -9,10 +9,10 @@
  * `waiting for a model:address`. The header is laid out as in the old object (ui_header.hpp): at the far left a circle with a downward triangle opens
  * the menu of the model and its presets; a click on the address next to it opens the menu of the model's class (the models of the same class, which a
  * view can be turned to) and of what is below the model (user-defined and generic parameters, messages and returns); a choice there is sent out of the
- * outlet as `model:reference/open <address>`. Initialize Model State, Create New Preset (asks for the name; a taken name is numbered, an empty one
+ * outlet as `model:reference/open <address>`. Initialize Model State, the preset file items (Load / Save Presets File, Edit Presets File, sent to the j.model of the model), Create New Preset (asks for the name; a taken name is numbered, an empty one
  * becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update and Delete Current Preset and the preset names (recall) act on the
- * model directly; the file and window items are sent out of the outlet as messages (`preset:read`, `preset:write/again`, `preset:write`, `preset:edit`,
- * `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. Edit Current State and Open Preset Interface are
+ * model directly; the reference, help and internal items are sent out of the outlet as messages (`model:reference/open`, `model:help/open`,
+ * `model:internal/open`) for a patch to act on. Edit Current State and Open Preset Interface are
  * not built and are grey. `menu:list presets|model` answers every line of a menu as `menu:item <text> <enabled>` and `menu:choose presets|model <text>`
  * chooses one. The text is drawn, not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then
  * `preset:count <n>`, `presets <name>...` and `preset:current <name>`, on the outlet; this is what the own test reads.
@@ -541,9 +541,7 @@ private:
             return {};
         }
         const auto to_model = [this](const char* selector) { return [this, selector] { send_symbol(selector, model_); }; };
-        const auto to_patch = [this](const char* selector) {
-            return [this, selector] { c74::max::outlet_anything(out.max_outlet(), c74::max::gensym(selector), 0, nullptr); }; // no argument: the model asks for a file
-        };
+        const auto in_model = [this](const char* selector) { return [this, selector] { call_model(selector); }; }; // as the old object: no cord needed
         const auto current = m->presets().current();
         std::vector<Line> lines = {
             {"Open Model Reference Page", to_model("model:reference/open")},
@@ -552,10 +550,10 @@ private:
             {"Edit Current State", {}},
             {"Initialize Model State", [this] { if (jamoma::Model* now = model()) { now->init(); } }},
             {"", {}},
-            {"Load Presets File", to_patch("preset:read")},
-            {"Save Presets File", to_patch("preset:write/again")},
-            {"Save Presets File As", to_patch("preset:write")},
-            {"Edit Presets File", to_patch("preset:edit")},
+            {"Load Presets File", in_model("preset:read")},
+            {"Save Presets File", in_model("preset:write/again")},
+            {"Save Presets File As", in_model("preset:write")},
+            {"Edit Presets File", in_model("preset:edit")},
             {"Create New Preset", [this] { ask_for_preset(); }},
             {"Update Current Preset", {}},
             {"Delete Current Preset", {}},
@@ -575,6 +573,32 @@ private:
             lines.push_back({names[i], [this, number] { if (jamoma::Model* now = model()) { now->presets().recall(number); } }, current && *current == i});
         }
         return lines;
+    }
+
+    /**
+     * Sends a message without arguments to the j.model object of the model (which asks for a file, or opens its editor).
+     * Nothing may be done after the call that needs this object: a file dialog runs its own event loop.
+     * @param selector The message.
+     */
+    void call_model(const char* selector)
+    {
+        jamoma::Model* m = model();
+        if (m == nullptr) {
+            return;
+        }
+        for (const auto& entry : jamoma::Registry::instance().contexts().all()) {
+            if (entry.second != m) {
+                continue;
+            }
+            auto* patcher = static_cast<c74::max::t_object*>(const_cast<void*>(static_cast<const void*>(entry.first)));
+            for (c74::max::t_object* box = c74::max::jpatcher_get_firstobject(patcher); box != nullptr; box = c74::max::jbox_get_nextobject(box)) {
+                c74::max::t_object* object = c74::max::jbox_get_object(box);
+                if (object != nullptr && c74::max::object_classname(object) == c74::max::gensym("j.model")) {
+                    c74::max::object_method_typed(object, c74::max::gensym(selector), 0, nullptr, nullptr);
+                    return;
+                }
+            }
+        }
     }
 
     /** @return The patcher of the view the panel is in, or null. */
