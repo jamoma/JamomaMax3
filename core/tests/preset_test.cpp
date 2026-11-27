@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "jamoma/data.hpp"
+#include "jamoma/model.hpp"
 #include "jamoma/preset.hpp"
 #include "manual_clock.hpp"
 
@@ -80,6 +81,35 @@ TEST_CASE("new preset stores every parameter in order")
     REQUIRE(entries[2].address.str() == "b");
     REQUIRE(entries[3].address.str() == "sub/x");
     REQUIRE(entries[1].value.at(0).as_double() == 1.0);
+}
+
+/** The "Priority" pane of the j.parameter help patcher: priorities order each level of nodes, and 0 comes last. */
+TEST_CASE("a preset is stored level by level in order of priority")
+{
+    Rig r;
+    jamoma::Model starter(r.ns, Address::parse("/m/starter"));
+    starter.set_priority(11);
+    jamoma::Model main_course(r.ns, Address::parse("/m/main_course"));
+    main_course.set_priority(12);
+    jamoma::Model dessert(r.ns, Address::parse("/m/dessert"));
+    r.add("zzz", 0.0, 0);
+    r.add("ccc_b", 0.0, 3);
+    r.add("ccc_a", 0.0, 3);
+    r.add("aaa", 0.0, 1);
+    r.add("bbb", 0.0, 2);
+    r.add("dessert/ice_cream", 0.0, 2);
+    r.add("dessert/cake", 0.0, 1);
+    r.add("main_course/vegetarian", 0.0, 2);
+    r.add("main_course/fish", 0.0, 1);
+    r.add("starter/salad", 0.0, 2);
+    r.add("starter/soup", 0.0, 1);
+    REQUIRE(r.presets.new_preset("default"));
+    std::vector<std::string> order;
+    for (const auto& entry : r.presets.presets().at(0).entries) {
+        order.push_back(entry.address.str());
+    }
+    REQUIRE(order == std::vector<std::string>{"aaa", "bbb", "ccc_a", "ccc_b", "starter/soup", "starter/salad", "main_course/fish",
+                                              "main_course/vegetarian", "dessert/cake", "dessert/ice_cream", "zzz"});
 }
 
 /** Recall sends the stored values in the stored order. */

@@ -6,6 +6,7 @@
  * @brief The model explorer (see explorer.hpp).
  */
 
+#include "jamoma/priority.hpp"
 #include "jamoma/explorer.hpp"
 
 #include <algorithm>
@@ -146,7 +147,7 @@ ModelContents ModelExplorer::contents() const
     }
     std::stable_sort(found.begin(), found.end(), [](const Found& a, const Found& b) {
         if (a.priority != b.priority) {
-            return a.priority < b.priority;
+            return priority_before(a.priority, b.priority);
         }
         if (a.name != b.name) {
             return a.name < b.name;

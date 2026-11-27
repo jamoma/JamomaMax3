@@ -56,6 +56,18 @@ struct World {
 
 } // namespace
 
+/** As the old objects: priority 0 means none, and comes after every other priority. */
+TEST_CASE("priority zero is initialised last")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    w.add("/m/aaa", 0);
+    w.add("/m/zzz", 3);
+    w.add("/m/mmm", 1);
+    m.init();
+    REQUIRE(w.log == std::vector<std::string>{"/m/mmm", "/m/zzz", "/m/aaa"});
+}
+
 /** Parameters are initialised in order of priority, lowest first. */
 TEST_CASE("init visits parameters in priority order")
 {
@@ -65,7 +77,7 @@ TEST_CASE("init visits parameters in priority order")
     w.add("/m/b", 0);
     w.add("/m/c", 1);
     m.init();
-    REQUIRE(w.log == std::vector<std::string>{"/m/b", "/m/c", "/m/a"});
+    REQUIRE(w.log == std::vector<std::string>{"/m/c", "/m/a", "/m/b"});
 }
 
 /** Equal priorities are ordered by name, then instance. */
@@ -179,10 +191,10 @@ TEST_CASE("nested model inits inside its parent slot")
     World w;
     Model parent(w.ns, Address::parse("/m"));
     Model child(w.ns, Address::parse("/m/sub"));
-    child.set_priority(1);
-    w.add("/m/first", 0);
+    child.set_priority(2);
+    w.add("/m/first", 1);
     w.add("/m/sub/inner", 0);
-    w.add("/m/last", 2);
+    w.add("/m/last", 3);
     parent.init();
     REQUIRE(w.log == std::vector<std::string>{"/m/first", "/m/sub/inner", "/m/last"});
 }
@@ -192,8 +204,8 @@ TEST_CASE("data removed during init is skipped")
 {
     World w;
     Model m(w.ns, Address::parse("/m"));
-    Data& a = w.add("/m/a", 0);
-    w.add("/m/b", 1);
+    Data& a = w.add("/m/a", 1);
+    w.add("/m/b", 2);
     a.set_output([&w](const Value&) {
         w.log.push_back("/m/a");
         w.subscriptions[1] = Subscription(); // the later sibling unsubscribes while a initialises

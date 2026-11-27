@@ -13,37 +13,59 @@
 #include <cstdlib>
 
 #include "jamoma/data.hpp"
+#include "jamoma/model.hpp"
+#include "jamoma/priority.hpp"
 
 namespace jamoma {
 
 namespace {
 
-/** A parameter found while storing. */
-struct Found {
-    int priority;       /**< Its priority. */
-    std::string name;   /**< Its address relative to the model. */
+/** One node below another, with what the order needs. */
+struct Child {
+    int priority;       /**< Its priority (of its parameter or model; 0 if it has none). */
+    std::string name;   /**< Its name. */
     int instance;       /**< Its instance number (0 if none). */
-    Data* data;         /**< The object. */
+    std::string text;   /**< Its address relative to the model of the preset. */
+    Node* node;         /**< The node. */
 };
 
 /**
- * Collects the parameters below a node.
+ * Collects the parameters below a node, level by level: the nodes of a level in order of priority (0 last), name and instance, each
+ * followed by what is below it.
  * @param node The node. @param prefix The relative address of the node. @param out Where to add them.
  */
-void collect(Node* node, const std::string& prefix, std::vector<Found>& out)
+void collect(Node* node, const std::string& prefix, std::vector<std::pair<std::string, Data*>>& out)
 {
+    std::vector<Child> children;
     for (Node* kid : node->children()) {
         std::string text = prefix.empty() ? kid->name() : prefix + "/" + kid->name();
         if (!kid->instance().empty()) {
             text += "." + kid->instance();
         }
+        int priority = 0;
         if (auto* data = dynamic_cast<Data*>(kid->object())) {
+            priority = data->priority();
+        } else if (auto* model = dynamic_cast<Model*>(kid->object())) {
+            priority = model->priority();
+        }
+        children.push_back({priority, kid->name(), kid->instance().empty() ? 0 : std::atoi(kid->instance().c_str()), std::move(text), kid});
+    }
+    std::stable_sort(children.begin(), children.end(), [](const Child& a, const Child& b) {
+        if (a.priority != b.priority) {
+            return priority_before(a.priority, b.priority);
+        }
+        if (a.name != b.name) {
+            return a.name < b.name;
+        }
+        return a.instance < b.instance;
+    });
+    for (const Child& child : children) {
+        if (auto* data = dynamic_cast<Data*>(child.node->object())) {
             if (data->service() == Service::Parameter) {
-                out.push_back({data->priority(), kid->name(), kid->instance().empty() ? 0 : std::atoi(kid->instance().c_str()), data});
-                out.back().name = text;
+                out.emplace_back(child.text, data);
             }
         }
-        collect(kid, text, out);
+        collect(child.node, child.text, out);
     }
 }
 
@@ -93,24 +115,15 @@ std::vector<std::string> PresetManager::names() const
 
 std::vector<PresetEntry> PresetManager::store() const
 {
-    std::vector<Found> found;
+    std::vector<std::pair<std::string, Data*>> found;
     if (Node* node = ns_.lookup(model_)) {
         collect(node, std::string(), found);
     }
-    std::stable_sort(found.begin(), found.end(), [](const Found& a, const Found& b) {
-        if (a.priority != b.priority) {
-            return a.priority < b.priority;
-        }
-        if (a.name != b.name) {
-            return a.name < b.name;
-        }
-        return a.instance < b.instance;
-    });
     std::vector<PresetEntry> entries;
-    for (const Found& f : found) {
-        Value value = f.data->value();
+    for (const auto& [text, data] : found) {
+        Value value = data->value();
         if (!value.empty()) {
-            entries.push_back({Address::parse(f.name), std::move(value)});
+            entries.push_back({Address::parse(text), std::move(value)});
         }
     }
     return entries;

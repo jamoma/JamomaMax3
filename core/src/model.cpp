@@ -6,6 +6,7 @@
  * @brief The model and the patcher-to-model map.
  */
 
+#include "jamoma/priority.hpp"
 #include "jamoma/model.hpp"
 
 #include <algorithm>
@@ -72,7 +73,7 @@ void init_children(Namespace& ns, const Address& parent, const Model* self)
     }
     std::stable_sort(children.begin(), children.end(), [](const Child& a, const Child& b) {
         if (a.priority != b.priority) {
-            return a.priority < b.priority;
+            return priority_before(a.priority, b.priority);
         }
         if (a.name != b.name) {
             return a.name < b.name;

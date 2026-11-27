@@ -124,7 +124,7 @@ TEST_CASE("explore_sort_priority_then_name", "[explore]")
     auto t = sample();
     ExploreOptions o;
     o.sort = ExploreSort::Priority;
-    CHECK(jamoma::explore(t->ns, Address::parse("/m"), o).items == v({"q", "audio/gain", "freq", "audio/mute"}));
+    CHECK(jamoma::explore(t->ns, Address::parse("/m"), o).items == v({"audio/gain", "freq", "audio/mute", "q"})); // q has priority 0 (none): last
     o.sort = ExploreSort::Alphabetic;
     CHECK(jamoma::explore(t->ns, Address::parse("/m"), o).items == v({"audio/gain", "audio/mute", "freq", "q"}));
 }
