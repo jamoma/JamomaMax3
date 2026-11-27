@@ -7,8 +7,9 @@
  *
  * What comes in (a number, a list, a message) is sent to the node as a command, in the unit the `unit` attribute names. The outlets are those of the
  * old object: changes of the node come out of the left outlet as `set <value>` (a UI object shows the value without sending it back) and out of the
- * second outlet as values; the third outlet is reserved (the old object used it to select a UI object) and the last is the dump outlet. The node's answer to the remote's own command is not shown again, and a UI object that is
- * dragged while a ramp runs stops the ramp. The message `set <value>` shows a value in the UI without sending it to the node.
+ * second outlet as values; the third outlet is reserved (the old object used it to select a UI object) and the last is the dump outlet. A UI object that is
+ * dragged while a ramp runs stops the ramp. The message `set <value>` sends a value to the node without output from this object (other j.remote objects
+ * of the node show it).
  * `highlight` is accepted and has no effect.
  */
 
@@ -146,7 +147,7 @@ public:
     }};
 
     /**
-     * Any other message: `set <value>` shows a value without sending it; `address <symbol>` sets the address; any other message is
+     * Any other message: `set <value>` sends a value without output here; `address <symbol>` sets the address; any other message is
      * sent to the node as it is.
      */
     message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
@@ -169,7 +170,7 @@ private:
         const std::string selector = static_cast<symbol>(message[0]).c_str();
         if (selector == "set" && message.size() >= 2) {
             if (remote_) {
-                remote_->set_without_echo(jamoma_max::to_value(atoms(message.begin() + 1, message.end())));
+                remote_->set_without_output(jamoma_max::to_value(atoms(message.begin() + 1, message.end())));
             }
         } else if (selector == "address" && message.size() >= 2) {
             text_ = std::string(static_cast<symbol>(message[1]).c_str());

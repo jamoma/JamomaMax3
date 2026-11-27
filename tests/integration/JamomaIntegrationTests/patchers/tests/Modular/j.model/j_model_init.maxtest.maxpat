@@ -167,7 +167,7 @@
                                     "numoutlets": 2,
                                     "outlettype": [ "", "" ],
                                     "patching_rect": [ 170.0, 190.0, 103.2, 22.0 ],
-                                    "text": "zl compare 2 1"
+                                    "text": "zl compare 1 2"
                                 }
                             },
                             {
