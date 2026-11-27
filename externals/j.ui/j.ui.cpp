@@ -3,11 +3,10 @@
 
 /**
  * @file j.ui.cpp
- * @brief j.ui: the panel of a model: its address, a menu of what is below it, and its presets.
+ * @brief j.ui: the panel of a model: its address, its menu and its presets.
  *
  * The panel shows the address of the model it is bound to (the model of its patcher, or the one a j.view in it is bound to), or
- * `waiting for a model:address`. A click on the address opens a menu of the parameters, messages and returns below the model; a choice is sent out of
- * the outlet as `model:reference/open <address>`. The menu arrow opens the utilities and presets menu: Create New Preset (asks for the name; a taken name is numbered,
+ * `waiting for a model:address`. The menu arrow opens the utilities and presets menu at the top of the panel: Create New Preset (asks for the name; a taken name is numbered,
  * an empty one becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
  * (Load / Save Presets File, Edit, Open Reference / Help / Internal) are sent out of the outlet as the old messages (`preset:read`, `preset:write/again`,
  * `preset:write`, `preset:edit`, `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. The text is drawn,
@@ -146,7 +145,7 @@ public:
         return {};
     }};
 
-    /** A click on the header opens a menu. */
+    /** A click on the header: the menu arrow opens the menu, the round buttons do what they show. */
     message<> mouseup{this, "mouseup", MIN_FUNCTION {
         event e{args};
         if (e.y() < kHeader) {
@@ -156,8 +155,6 @@ public:
                 open_panel();
             } else if (on_active_button(e.x(), e.target().width())) {
                 switch_active(-1);
-            } else {
-                open_nodes_menu(e);
             }
         }
         return {};
@@ -472,38 +469,27 @@ private:
         c74::max::jgraphics_stroke(g);
     }
 
-    /** Opens the menu of what is below the model. @param e The mouse event. */
-    void open_nodes_menu(const event& e)
+    /**
+     * Shows a menu with its top left corner at the top left corner of the panel, as the old object did.
+     * @param menu The menu. @param view The patcher view that was clicked. @return The chosen item, or 0.
+     */
+    int popup_at_top(c74::max::t_jpopupmenu* menu, c74::max::t_object* view)
     {
-        if (!explorer_ || model_.empty()) {
-            return;
+        c74::max::t_rect rect{};
+        c74::max::jbox_get_rect_for_view(maxobj(), view, &rect);
+        long x = 0, y = 0;
+        const c74::max::t_symbol* to_screen = c74::max::gensym("canvastoscreen");
+        const auto convert = reinterpret_cast<void (*)(c74::max::t_object*, double, double, long*, long*)>(
+            c74::max::object_method_direct_getmethod(view, const_cast<c74::max::t_symbol*>(to_screen)));
+        if (convert == nullptr) {
+            return c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), view, 0);
         }
-        const jamoma::ModelContents c = explorer_->contents();
-        std::vector<std::string> items;
-        c74::max::t_jpopupmenu* menu = c74::max::jpopupmenu_create();
-        const auto add = [&](const char* heading, const std::vector<std::string>& names) {
-            if (names.empty()) {
-                return;
-            }
-            c74::max::jpopupmenu_additem(menu, 0, heading, nullptr, 0, 1, nullptr);
-            for (const std::string& name : names) {
-                items.push_back(name);
-                c74::max::jpopupmenu_additem(menu, static_cast<int>(items.size()), name.c_str(), nullptr, 0, 0, nullptr);
-            }
-            c74::max::jpopupmenu_addseparator(menu);
-        };
-        add("Parameters", c.parameters);
-        add("Messages", c.messages);
-        add("Returns", c.returns);
-        const std::weak_ptr<int> alive = alive_.weak(); // the menu runs its own event loop: this object may be deleted meanwhile
-        const int choice = items.empty() ? 0 : c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
-        c74::max::jpopupmenu_destroy(menu);
-        if (alive.expired()) {
-            return;
-        }
-        if (choice >= 1 && choice <= static_cast<int>(items.size())) {
-            send_symbol("model:reference/open", model_ + "/" + items[static_cast<std::size_t>(choice - 1)]);
-        }
+        convert(static_cast<c74::max::t_object*>(c74::max::object_method_direct_getobject(view, const_cast<c74::max::t_symbol*>(to_screen))),
+                rect.x, rect.y, &x, &y);
+        c74::max::t_pt point{};
+        point.x = static_cast<double>(x);
+        point.y = static_cast<double>(y);
+        return c74::max::jpopupmenu_popup(menu, point, 0);
     }
 
     /** Opens the utilities and presets menu. @param e The mouse event. */
@@ -534,7 +520,7 @@ private:
             c74::max::jpopupmenu_additem(menu, static_cast<int>(200 + i), names[i].c_str(), nullptr, current ? 1 : 0, 0, nullptr);
         }
         const std::weak_ptr<int> alive = alive_.weak(); // the menu and the dialog run their own event loops: this object may be deleted meanwhile
-        const int choice = c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), e.target().view(), 0);
+        const int choice = popup_at_top(menu, e.target().view());
         c74::max::jpopupmenu_destroy(menu);
         if (alive.expired()) {
             return;

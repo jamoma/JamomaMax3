@@ -6,6 +6,9 @@ New features and notable changes for each release of JamomaMax3. Everything that
 
 ### New features
 
+- **Easing functions for ramps:** `ramp/function` takes the functions of the library, with their parameters.
+- **Model aliases:** `alias <address>` and `alias/remove` on `j.model`.
+- **Toggles and menus in the inspector** and in `attrui` for attributes that are true or false or have fixed values.
 - **`j.namespace`** lists what is below an address, for a menu, a table or a `coll`, and keeps a selection of the items.
 - **`j.map`** maps numbers, or the values of one parameter onto another, with the 38 functions of the old function library.
 - **`j.cue`** stores the state of chosen parameters of several models under names and recalls it, with text and XML files and an editor.
