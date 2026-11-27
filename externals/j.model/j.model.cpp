@@ -400,9 +400,16 @@ public:
                     place(true);
                 }
                 if (model_) {
-                    model_->init();
+                    // A model inside a model that has not been initialised yet is left to that one, which does it at its place in the order of
+                    // priority (as the old objects); else, as at the top or when it is added later, it initialises itself.
+                    const bool left_to_parent = !model_->initialized() && parent_pending();
+                    if (!left_to_parent && !model_->initialized()) {
+                        model_->init();
+                    }
                     load_default_presets();
-                    recall_default();
+                    if (!left_to_parent) {
+                        recall_default();
+                    }
                     init_watch_ = model_->on_init_changed([this](bool done) {
                         if (done && !in_default_) {
                             in_default_ = true;
@@ -551,6 +558,17 @@ private:
         active_data_.set_attribute("description", {"Activates or deactivates the model"});
         active_sub_ = jamoma::Registry::instance().names().subscribe(model_->address().append(jamoma::Address::parse("data/active")), active_data_);
         active_data_.command({1}); // set_type reset the value to 0
+    }
+
+    /** @return True if a model of an enclosing patcher is still to be initialised. */
+    bool parent_pending() const
+    {
+        for (const void* p = jamoma_max::parent_patcher(patcher_); p != nullptr; p = jamoma_max::parent_patcher(p)) {
+            if (const jamoma::Model* parent = jamoma::Registry::instance().contexts().find(p)) {
+                return !parent->initialized();
+            }
+        }
+        return false;
     }
 
     /** @return The address the model belongs at: below the model of the nearest enclosing patcher, else at the root. */

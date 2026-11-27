@@ -138,6 +138,6 @@ Corrections after the author went through the help patchers:
 - **Addresses** may name attributes with a slash (`x:ramp/function`).
 - **Attributes** that are true or false show as toggles, those with fixed values as menus (the unit of a parameter does not: it depends on the dataspace).
 - **`j.model alias` and `alias/remove`** are built: a model and what is below it can also be reached under a second address.
-- **`j.init`** follows its model when it moves while the patch loads (models inside models report again), and takes the address of a model as argument. The old version printed a few more start reports while a patch loaded; from the first full initialisation on, the order is the same.
+- **`j.init`** follows its model when it moves while the patch loads (models inside models report again), and takes the address of a model as argument. While a patch loads, a model inside a model is initialised by that one, in order of priority, and not on its own first (the old version printed a few more start reports then).
 - **`j.ui`:** the menu opens at the top of the panel; the second menu (on the address) is removed.
 
