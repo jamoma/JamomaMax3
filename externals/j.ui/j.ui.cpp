@@ -6,12 +6,16 @@
  * @brief j.ui: the panel of a model: its address, its menu and its presets.
  *
  * The panel shows the address of the model it is bound to (the model of its patcher, or the one a j.view in it is bound to), or
- * `waiting for a model:address`. The menu arrow opens the utilities and presets menu at the top of the panel: Create New Preset (asks for the name; a taken name is numbered,
- * an empty one becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update Current Preset, Delete Preset and the preset names (recall) act on the model's presets directly; the file and window items
- * (Load / Save Presets File, Edit, Open Reference / Help / Internal) are sent out of the outlet as the old messages (`preset:read`, `preset:write/again`,
- * `preset:write`, `preset:edit`, `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. The text is drawn,
- * not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then `preset:count <n>`, `presets <name>...` and
- * `preset:current <name>`, on the outlet; this is what the own test reads.
+ * `waiting for a model:address`. The header is laid out as in the old object (ui_header.hpp): at the far left a circle with a downward triangle opens
+ * the menu of the model and its presets; a click on the address next to it opens the menu of the model's class (the models of the same class, which a
+ * view can be turned to) and of what is below the model (user-defined and generic parameters, messages and returns); a choice there is sent out of the
+ * outlet as `model:reference/open <address>`. Initialize Model State, Create New Preset (asks for the name; a taken name is numbered, an empty one
+ * becomes `preset <n>`; `preset:name <name>` does the same from a patch), Update and Delete Current Preset and the preset names (recall) act on the
+ * model directly; the file and window items are sent out of the outlet as messages (`preset:read`, `preset:write/again`, `preset:write`, `preset:edit`,
+ * `model:reference/open`, `model:help/open`, `model:internal/open`) for a patch to route to the model. Edit Current State and Open Preset Interface are
+ * not built and are grey. `menu:list presets|model` answers every line of a menu as `menu:item <text> <enabled>` and `menu:choose presets|model <text>`
+ * chooses one. The text is drawn, not edited (Min has no text field). The message `dump` answers `model:address <address>` or `model:waiting`, then
+ * `preset:count <n>`, `presets <name>...` and `preset:current <name>`, on the outlet; this is what the own test reads.
  *
  * If the outlet feeds an inlet of a subpatcher (a second panel of the view), a round button with a plus sign is shown in the header; a click on it,
  * or the message `panel`, sends `bang` out of the outlet, gives the subpatcher the address of the model as its title and opens it. `dump` then
@@ -40,6 +44,7 @@
 #include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
 #include "jamoma/ui_grid.hpp"
+#include "jamoma/ui_header.hpp"
 #include "max_address.hpp"
 #include "max_attributes.hpp"
 #include "max_context.hpp"
@@ -145,16 +150,48 @@ public:
         return {};
     }};
 
-    /** A click on the header: the menu arrow opens the menu, the round buttons do what they show. */
+    /** A click on the header: the circle or the address opens a menu, the round buttons do what they show. */
     message<> mouseup{this, "mouseup", MIN_FUNCTION {
         event e{args};
-        if (e.y() < kHeader) {
-            if (e.x() > e.target().width() - kHeader) {
-                open_utilities_menu(e);
-            } else if (on_panel_button(e.x(), e.target().width())) {
-                open_panel();
-            } else if (on_active_button(e.x(), e.target().width())) {
-                switch_active(-1);
+        const double width = e.target().width();
+        if (width <= kButtonsFrom) {
+            return {};
+        }
+        switch (jamoma::header_part(e.x(), e.y(), width, active_data() != nullptr, panel_patcher() != nullptr)) {
+        case jamoma::HeaderPart::PresetMenu: open_menu(Menu::Presets, e); break;
+        case jamoma::HeaderPart::ModelMenu: open_menu(Menu::Model, e); break;
+        case jamoma::HeaderPart::Active: switch_active(-1); break;
+        case jamoma::HeaderPart::Panel: open_panel(); break;
+        case jamoma::HeaderPart::Nothing: break;
+        }
+        return {};
+    }};
+
+    /** `menu:list presets|model`: answers `menu:item <text> <enabled>` for every line of the menu (a separator is `-`). */
+    message<> menu_list{this, "menu:list", MIN_FUNCTION {
+        if (args.empty()) {
+            return {};
+        }
+        for (const Line& line : menu_lines(menu_named(args[0]))) {
+            c74::max::t_atom a[2];
+            c74::max::atom_setsym(&a[0], c74::max::gensym(line.text.empty() ? "-" : line.text.c_str()));
+            c74::max::atom_setlong(&a[1], line.action ? 1 : 0);
+            c74::max::outlet_anything(out.max_outlet(), c74::max::gensym("menu:item"), 2, a);
+        }
+        return {};
+    }};
+
+    /** `menu:choose presets|model <text>`: does what choosing the line with that text does (nothing for a grey or unknown one). */
+    message<> menu_choose{this, "menu:choose", MIN_FUNCTION {
+        if (args.size() < 2) {
+            return {};
+        }
+        const std::string text = static_cast<symbol>(args[1]).c_str();
+        for (const Line& line : menu_lines(menu_named(args[0]))) {
+            if (line.text == text && line.action) {
+                line.action();
+                redraw();
+                break;
             }
         }
         return {};
@@ -198,7 +235,8 @@ public:
     message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
 
 private:
-    static constexpr double kHeader = 22.0; /**< The height of the header. */
+    static constexpr double kHeader = jamoma::kHeaderHeight; /**< The height of the header. */
+    static constexpr double kButtonsFrom = 40.0; /**< A panel narrower than this shows nothing in its header. */
     static constexpr double kActiveRadius = 6.5; /**< The radius of the active button. */
 
     /** Asks for a redraw once the new value of an attribute is stored (Max itself redraws only for some colour attributes). */
@@ -331,15 +369,6 @@ private:
         redraw();
     }
 
-    /** @return The x position of the middle of the active button. @param width The width of the panel. */
-    static double active_centre(double width) { return width - kHeader - 12.0; }
-
-    /** @return True if a click at x is on the active button (the model has the parameter and the panel is wide enough). @param x The position. @param width The width. */
-    bool on_active_button(double x, double width) const
-    {
-        return width > kHeader * 2 && active_data() != nullptr && x >= active_centre(width) - 10.0 && x <= active_centre(width) + 10.0;
-    }
-
     /** @return The subpatcher an inlet of which the outlet feeds (the second panel), or null. */
     c74::max::t_object* panel_patcher() const
     {
@@ -393,15 +422,6 @@ private:
         }
     }
 
-    /** @return The x position of the middle of the panel button: left of the active button, if there is one. @param width The width of the panel. */
-    double panel_centre(double width) const { return active_centre(width) - (active_data() != nullptr ? 20.0 : 0.0); }
-
-    /** @return True if a click at x is on the panel button. @param x The position. @param width The width of the panel. */
-    bool on_panel_button(double x, double width) const
-    {
-        return width > kHeader * 2 && x >= panel_centre(width) - 10.0 && x < panel_centre(width) + 10.0 && panel_patcher() != nullptr;
-    }
-
     /** @return The model the panel is bound to, or null. */
     jamoma::Model* model() const
     {
@@ -430,16 +450,21 @@ private:
             c74::max::jgraphics_select_font_face(g, "Arial", c74::max::JGRAPHICS_FONT_SLANT_NORMAL, c74::max::JGRAPHICS_FONT_WEIGHT_NORMAL);
             c74::max::jgraphics_set_font_size(g, 12.0);
             const std::string title = model_.empty() ? "waiting for a model:address" : model_;
-            c74::max::jgraphics_move_to(g, 8.0, 15.0);
+            c74::max::jgraphics_move_to(g, jamoma::kHeaderAddressX + 2.0, 14.0);
             c74::max::jgraphics_show_text(g, title.c_str());
-            if (w > kHeader * 2) { // the menu arrow
-                c74::max::jgraphics_move_to(g, w - 17.0, 8.0);
-                c74::max::jgraphics_line_to(g, w - 7.0, 8.0);
-                c74::max::jgraphics_line_to(g, w - 12.0, 15.0);
+            { // the menu of the model and its presets: a circle with a downward triangle, as in the old object
+                c74::max::jgraphics_arc(g, 9.5, kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
+                c74::max::jgraphics_fill(g);
+                colour(g, colours.header);
+                c74::max::jgraphics_move_to(g, 5.5, kHeader / 2.0 - 2.0);
+                c74::max::jgraphics_line_to(g, 13.5, kHeader / 2.0 - 2.0);
+                c74::max::jgraphics_line_to(g, 9.5, kHeader / 2.0 + 4.0);
                 c74::max::jgraphics_close_path(g);
                 c74::max::jgraphics_fill(g);
+            }
+            {
                 if (panel_patcher() != nullptr) { // the button of the second panel: a ring with a plus sign
-                    const double x = panel_centre(w), y = kHeader / 2.0;
+                    const double x = jamoma::header_panel_x(w, active_data() != nullptr), y = kHeader / 2.0;
                     colour(g, colours.text);
                     c74::max::jgraphics_set_line_width(g, 1.5);
                     c74::max::jgraphics_arc(g, x, y, kActiveRadius, 0.0, JGRAPHICS_2PI);
@@ -452,7 +477,7 @@ private:
                 }
                 if (active_data() != nullptr) { // the active button: filled while the model is on, a ring while it is off
                     c74::max::jgraphics_set_line_width(g, 1.5);
-                    c74::max::jgraphics_arc(g, active_centre(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
+                    c74::max::jgraphics_arc(g, jamoma::header_active_x(w), kHeader / 2.0, kActiveRadius, 0.0, JGRAPHICS_2PI);
                     if (is_active()) {
                         colour(g, colours.highlight);
                         c74::max::jgraphics_fill(g);
@@ -470,10 +495,10 @@ private:
     }
 
     /**
-     * Shows a menu with its top left corner at the top left corner of the panel, as the old object did.
-     * @param menu The menu. @param view The patcher view that was clicked. @return The chosen item, or 0.
+     * Shows a menu with its top left corner at the top of the panel, as the old object did.
+     * @param menu The menu. @param view The patcher view that was clicked. @param from_left How far right of the panel's left edge. @return The chosen item, or 0.
      */
-    int popup_at_top(c74::max::t_jpopupmenu* menu, c74::max::t_object* view)
+    int popup_at_top(c74::max::t_jpopupmenu* menu, c74::max::t_object* view, double from_left)
     {
         c74::max::t_rect rect{};
         c74::max::jbox_get_rect_for_view(maxobj(), view, &rect);
@@ -485,77 +510,168 @@ private:
             return c74::max::jpopupmenu_popup_nearbox(menu, maxobj(), view, 0);
         }
         convert(static_cast<c74::max::t_object*>(c74::max::object_method_direct_getobject(view, const_cast<c74::max::t_symbol*>(to_screen))),
-                rect.x, rect.y, &x, &y);
+                rect.x + from_left, rect.y, &x, &y);
         c74::max::t_pt point{};
         point.x = static_cast<double>(x);
         point.y = static_cast<double>(y);
         return c74::max::jpopupmenu_popup(menu, point, 0);
     }
 
-    /** Opens the utilities and presets menu. @param e The mouse event. */
-    void open_utilities_menu(const event& e)
+    /** The two menus of the header. */
+    enum class Menu { Presets, Model };
+
+    /** One line of a menu. */
+    struct Line {
+        std::string text;             /**< What it says; empty for a separator. */
+        std::function<void()> action; /**< What choosing it does; empty for a heading, a separator or an item that is grey. */
+        bool ticked = false;          /**< Whether it has a tick. */
+    };
+
+    /** @return The menu of a name (`model`, else the one of the presets). @param name The name. */
+    static Menu menu_named(const atom& name) { return std::string(static_cast<symbol>(name).c_str()) == "model" ? Menu::Model : Menu::Presets; }
+
+    /** @return The lines of a menu as they are now (empty while there is no model). @param which The menu. */
+    std::vector<Line> menu_lines(Menu which) { return which == Menu::Model ? model_lines() : preset_lines(); }
+
+    /** @return The menu of the model and its presets, in the order of the old object. */
+    std::vector<Line> preset_lines()
     {
         jamoma::Model* m = model();
         if (m == nullptr) {
-            return;
+            return {};
         }
-        const std::vector<const char*> utilities = {"model:reference/open", "model:help/open", "model:internal/open", "preset:edit", "preset:read",
-                                                    "preset:write/again", "preset:write"};
-        const std::vector<const char*> titles = {"Open Model Reference Page", "Open Model Help Patch", "Open Model Internal", "Edit Current State",
-                                                 "Load Presets File", "Save Presets File", "Save Presets File As"};
-        c74::max::t_jpopupmenu* menu = c74::max::jpopupmenu_create();
-        for (std::size_t i = 0; i < titles.size(); ++i) {
-            c74::max::jpopupmenu_additem(menu, static_cast<int>(1 + i), titles[i], nullptr, 0, 0, nullptr);
+        const auto to_model = [this](const char* selector) { return [this, selector] { send_symbol(selector, model_); }; };
+        const auto to_patch = [this](const char* selector) {
+            return [this, selector] { c74::max::outlet_anything(out.max_outlet(), c74::max::gensym(selector), 0, nullptr); }; // no argument: the model asks for a file
+        };
+        const auto current = m->presets().current();
+        std::vector<Line> lines = {
+            {"Open Model Reference Page", to_model("model:reference/open")},
+            {"Open Model Help Patch", to_model("model:help/open")},
+            {"Open Model Internal", to_model("model:internal/open")},
+            {"Edit Current State", {}},
+            {"Initialize Model State", [this] { if (jamoma::Model* now = model()) { now->init(); } }},
+            {"", {}},
+            {"Load Presets File", to_patch("preset:read")},
+            {"Save Presets File", to_patch("preset:write/again")},
+            {"Save Presets File As", to_patch("preset:write")},
+            {"Edit Presets File", to_patch("preset:edit")},
+            {"Create New Preset", [this] { ask_for_preset(); }},
+            {"Update Current Preset", {}},
+            {"Delete Current Preset", {}},
+            {"Open Preset Interface", {}},
+        };
+        if (current) {
+            const std::string number = std::to_string(*current + 1);
+            lines[11].action = [this, number] { if (jamoma::Model* now = model()) { now->presets().update(number); } };
+            lines[12].action = [this, number] { if (jamoma::Model* now = model()) { now->presets().remove(number); } };
         }
-        c74::max::jpopupmenu_addseparator(menu);
-        c74::max::jpopupmenu_additem(menu, 100, "Create New Preset", nullptr, 0, 0, nullptr);
-        c74::max::jpopupmenu_additem(menu, 101, "Update Current Preset", nullptr, 0, m->presets().current() ? 0 : 1, nullptr);
-        c74::max::jpopupmenu_additem(menu, 102, "Delete Preset", nullptr, 0, m->presets().current() ? 0 : 1, nullptr);
         const std::vector<std::string> names = m->presets().names();
         if (!names.empty()) {
-            c74::max::jpopupmenu_addseparator(menu);
+            lines.push_back({"", {}});
         }
         for (std::size_t i = 0; i < names.size(); ++i) {
-            const bool current = m->presets().current() && *m->presets().current() == i;
-            c74::max::jpopupmenu_additem(menu, static_cast<int>(200 + i), names[i].c_str(), nullptr, current ? 1 : 0, 0, nullptr);
+            const std::string number = std::to_string(i + 1);
+            lines.push_back({names[i], [this, number] { if (jamoma::Model* now = model()) { now->presets().recall(number); } }, current && *current == i});
         }
-        const std::weak_ptr<int> alive = alive_.weak(); // the menu and the dialog run their own event loops: this object may be deleted meanwhile
-        const int choice = popup_at_top(menu, e.target().view());
-        c74::max::jpopupmenu_destroy(menu);
-        if (alive.expired()) {
+        return lines;
+    }
+
+    /** @return The patcher of the view the panel is in, or null. */
+    const void* own_view() const
+    {
+        for (const void* p = jamoma_max::patcher_of(const_cast<c74::max::t_object*>(static_cast<const c74::max::t_object*>(maxobj()))); p != nullptr;
+             p = jamoma_max::parent_patcher(p)) {
+            if (jamoma::Registry::instance().views().find(p)) {
+                return p;
+            }
+        }
+        return nullptr;
+    }
+
+    /** @return The menu of the model's class and of what is below the model, in the order of the old object. */
+    std::vector<Line> model_lines()
+    {
+        jamoma::Model* m = model();
+        if (m == nullptr || !explorer_) {
+            return {};
+        }
+        const auto all = jamoma::Registry::instance().contexts().all();
+        std::optional<std::string> own_class;
+        for (const auto& entry : all) {
+            if (entry.second == m) {
+                own_class = jamoma_max::patcher_class(entry.first);
+            }
+        }
+        std::vector<Line> lines{{"Model class: " + (own_class ? *own_class : std::string("?")), {}}};
+        const void* view = own_view();
+        for (const auto& entry : all) {
+            if (own_class && jamoma_max::patcher_class(entry.first) == own_class) {
+                const std::string address = entry.second->address().str();
+                Line line{address, {}, address == model_};
+                if (view != nullptr) { // a view can be turned to another model of the class
+                    line.action = [view, address] { jamoma::Registry::instance().views().set_argument(view, address); };
+                }
+                lines.push_back(std::move(line));
+            }
+        }
+        const jamoma::ModelContents c = explorer_->contents();
+        const std::pair<const char*, const std::vector<std::string>*> sections[] = {
+            {"User-Defined Parameters", &c.parameters},         {"User-Defined Messages", &c.messages},   {"User-Defined Returns", &c.returns},
+            {"Generic Parameters", &c.generic_parameters},      {"Generic Messages", &c.generic_messages}, {"Generic Returns", &c.generic_returns}};
+        for (const auto& [heading, names] : sections) {
+            lines.push_back({"", {}});
+            lines.push_back({heading, {}});
+            for (const std::string& name : *names) {
+                lines.push_back({name, [this, name] { send_symbol("model:reference/open", model_ + "/" + name); }});
+            }
+        }
+        return lines;
+    }
+
+    /** Asks for the name of a new preset and creates it. */
+    void ask_for_preset()
+    {
+        const std::weak_ptr<int> alive = alive_.weak(); // the dialog runs its own event loop: this object may be deleted meanwhile
+        const char* name = nullptr;
+        const long answer = c74::max::jdialog_showtext("Provide a name for this Preset", "Ch\xc3\xa2teau de Preset", 0, &name);
+        const std::string wanted = name != nullptr ? name : "";
+        if (name != nullptr) {
+            c74::max::sysmem_freeptr(const_cast<char*>(name));
+        }
+        if (!alive.expired() && answer == 1) {
+            create_preset(wanted); // looks the model up again: the dialog runs its own event loop
+        }
+    }
+
+    /** Opens a menu at the top of the panel and does what is chosen. @param which The menu. @param e The mouse event. */
+    void open_menu(Menu which, const event& e)
+    {
+        const std::vector<Line> shown = menu_lines(which);
+        if (shown.empty()) {
             return;
         }
-        m = model(); // the menu runs its own event loop: the model may have gone or been made again meanwhile
-        if (choice >= 1 && choice <= static_cast<int>(utilities.size())) {
-            const std::string item = utilities[static_cast<std::size_t>(choice - 1)];
-            if (item.compare(0, 7, "preset:") == 0) {
-                c74::max::outlet_anything(out.max_outlet(), c74::max::gensym(item.c_str()), 0, nullptr); // no argument: the model asks for a file
+        c74::max::t_jpopupmenu* menu = c74::max::jpopupmenu_create();
+        for (std::size_t i = 0; i < shown.size(); ++i) {
+            if (shown[i].text.empty()) {
+                c74::max::jpopupmenu_addseparator(menu);
             } else {
-                send_symbol(item.c_str(), model_);
+                c74::max::jpopupmenu_additem(menu, static_cast<int>(i + 1), shown[i].text.c_str(), nullptr, shown[i].ticked ? 1 : 0,
+                                             shown[i].action ? 0 : 1, nullptr);
             }
-        } else if (m == nullptr) {
-            return;
-        } else if (choice == 100) {
-            const char* name = nullptr;
-            const long answer = c74::max::jdialog_showtext("Provide a name for this Preset", "Ch\xc3\xa2teau de Preset", 0, &name);
-            const std::string wanted = name != nullptr ? name : "";
-            if (name != nullptr) {
-                c74::max::sysmem_freeptr(const_cast<char*>(name));
-            }
-            if (alive.expired()) {
-                return;
-            }
-            if (answer == 1) {
-                create_preset(wanted); // looks the model up again: the dialog runs its own event loop
-            }
-        } else if (choice == 101 && m->presets().current()) {
-            m->presets().update(std::to_string(*m->presets().current() + 1));
-        } else if (choice == 102 && m->presets().current()) {
-            m->presets().remove(std::to_string(*m->presets().current() + 1));
-        } else if (choice >= 200 && choice < 200 + static_cast<int>(names.size())) {
-            m->presets().recall(std::to_string(choice - 200 + 1));
         }
-        redraw();
+        const std::weak_ptr<int> alive = alive_.weak(); // the menu runs its own event loop: this object may be deleted meanwhile
+        const int choice = popup_at_top(menu, e.target().view(), which == Menu::Model ? jamoma::kHeaderAddressX : 0.0);
+        c74::max::jpopupmenu_destroy(menu);
+        if (alive.expired() || choice < 1 || choice > static_cast<int>(shown.size())) {
+            return;
+        }
+        if (shown[static_cast<std::size_t>(choice - 1)].action) {
+            shown[static_cast<std::size_t>(choice - 1)].action(); // the actions look the model up again
+            if (!alive.expired()) {
+                redraw();
+            }
+        }
     }
 
     /** Sends `<selector> <symbol>` out of the outlet. @param selector The message. @param argument The argument. */

@@ -108,7 +108,7 @@
                                         129.0,
                                         155.0
                                     ],
-                                    "text": "The arrow at the top right brings a dropdown menu displaying all of the model presets, preset management messages as well as other goodies"
+                                    "text": "The circle with a triangle at the top left brings a dropdown menu displaying all of the model presets, preset management messages as well as other goodies"
                                 }
                             },
                             {
@@ -130,7 +130,7 @@
                                         325.0,
                                         116.0
                                     ],
-                                    "text": "The header shows the address of the model the view currently binds to."
+                                    "text": "Click the model address the view currently binds to and see a dropdown menu of the parameters, messages and returns in the model."
                                 }
                             },
                             {

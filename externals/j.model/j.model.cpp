@@ -556,6 +556,7 @@ private:
         active_data_.set_attribute("range", {0, 1});
         active_data_.set_attribute("default", {1});
         active_data_.set_attribute("description", {"Activates or deactivates the model"});
+        active_data_.set_attribute("tags", {"generic"}); // the panel lists it under the generic parameters
         active_sub_ = jamoma::Registry::instance().names().subscribe(model_->address().append(jamoma::Address::parse("data/active")), active_data_);
         active_data_.command({1}); // set_type reset the value to 0
     }
