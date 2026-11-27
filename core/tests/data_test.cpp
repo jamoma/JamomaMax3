@@ -1086,11 +1086,13 @@ TEST_CASE("a ramp follows its easing function")
     REQUIRE(x.data.value().at(0).as_double() == 100.0);
 }
 
-/** `ramp/function/parameters` names the parameters of the function; `none` if it has none. */
+/** `ramp/function/parameters`: empty while no function is chosen (the old test of the defaults), else the parameters, or `none`. */
 TEST_CASE("the parameters of the ramp function are listed")
 {
     Data d;
     d.set_type(DataType::Decimal);
+    REQUIRE(d.get_attribute("ramp/function/parameters")->empty());
+    d.set_attribute("ramp/function", {Atom("linear")});
     REQUIRE(*d.get_attribute("ramp/function/parameters") == Value{Atom("none")});
     d.set_attribute("ramp/function", {Atom("tanh")});
     REQUIRE(*d.get_attribute("ramp/function/parameters") == Value{Atom("offset"), Atom("width")});

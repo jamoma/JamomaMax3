@@ -747,7 +747,9 @@ std::optional<Value> Data::get_attribute(std::string_view name) const
         for (const std::string& parameter : function_parameter_names()) {
             out.emplace_back(parameter);
         }
-        return out.empty() ? Value{Atom("none")} : out;
+        // As the old object: nothing while no function is chosen, `none` for a function without parameters.
+        const bool chosen = ramp_function() == "linear" || Function::create(ramp_function()) != nullptr;
+        return out.empty() && chosen ? Value{Atom("none")} : out;
     }
     if (name == "ramp/status") return Value{integer(ramp_running() ? 1 : 0)};
     if (name == "value") return initialized() ? value() : Value{};
