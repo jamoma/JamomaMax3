@@ -199,6 +199,15 @@ class ChainTests(unittest.TestCase):
         final = [l["patchline"]["source"] for l in p["lines"] if l["patchline"]["destination"][0] == done]
         self.assertEqual(final[0][1], 0)                                 # done hangs on the leftmost outlet of the last trigger
 
+    def test_a_start_value_that_is_not_a_number_is_a_message(self):
+        t = TestPatcher()
+        t.dut("m", "j.model pm", 1, 2, out={0: "x_from_m"})
+        t.chain(("loadbang", 0), "Jamoma/Modular/j.model/x", [step("a", expect=[expect("b", watch("x_from_m", hold="zl reg none"), "zl compare 1 2")])])
+        sub = next(e["box"]["patcher"] for e in t.boxes if "patcher" in e["box"])
+        c = cords(sub)
+        self.assertIn(("none", 0, "zl reg none", 1), c)
+        self.assertNotIn("none", " ".join(x for x in texts(sub).values() if x.startswith("t ")))
+
     def test_a_delay_needs_a_reason_and_shows_it(self):
         with self.assertRaises(AssertionError):
             delay(100, "")

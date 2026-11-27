@@ -86,6 +86,15 @@ def _number(value):
     return repr(value)
 
 
+def _is_number(word):
+    """True for the text of a number."""
+    try:
+        float(word)
+    except ValueError:
+        return False
+    return True
+
+
 def _texts(patcher):
     """Yields the texts of the objects of a patcher dictionary and its subpatchers."""
     for entry in patcher["boxes"]:
@@ -342,7 +351,7 @@ class TestPatcher:
         tokens = []
         for item in items:
             if item[0] == "reset":
-                tokens.append(item[2])
+                tokens.append(item[2] if _is_number(item[2]) else "b")
             elif item[0] == "send" and not isinstance(item[2], str):
                 tokens.append(_number(item[2]))
             else:
@@ -352,8 +361,13 @@ class TestPatcher:
             self.line(source, trigger)
         for k, item in enumerate(items):
             outlet = source if plain else (trigger, count - 1 - k)
-            if item[0] == "reset":
+            if item[0] == "reset" and _is_number(item[2]):
                 self.line(outlet, (item[1], 1))
+            elif item[0] == "reset":
+                mid = f"z{number}_{k}"
+                self.msg(mid, item[2])
+                self.line(outlet, mid)
+                self.line(mid, (item[1], 1))
             elif item[0] == "read":
                 self.line(outlet, item[1])
             elif item[0] == "done":
