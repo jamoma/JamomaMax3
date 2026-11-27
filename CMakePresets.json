@@ -14,8 +14,7 @@
     },
     {
       "name": "windows",
-      "displayName": "Windows (Visual Studio 2022, x64)",
-      "generator": "Visual Studio 17 2022",
+      "displayName": "Windows (newest installed Visual Studio, x64)",
       "architecture": "x64",
       "binaryDir": "${sourceDir}/build/windows",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }

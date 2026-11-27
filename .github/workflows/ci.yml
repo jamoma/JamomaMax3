@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 The Jamoma Group, http://jamoma.org
 #
 # Build, unit tests, Python tool tests and the Doxygen gate on macOS and Windows.
-# NOT YET RUN: the repository has no GitHub remote yet.
+# The windows preset names no generator, so CMake takes the newest Visual Studio of the runner.
 name: ci
 
 on:
