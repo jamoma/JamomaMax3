@@ -13,3 +13,17 @@ Proposed, as its own small feature, in this order:
 3. **Then try a question at closing time:** find out by a short experiment whether Max allows it reliably. If it does, ask once per patch (Save, Don't Save, Cancel), with an attribute that switches it off for installations.
 
 Things to keep in mind: an object learns that it goes away when it is freed and cannot stop the close from there; several models in one patch, quitting Max and scripts that remove a bpatcher must not give a row of dialogs; marking the patcher as changed would offer to save the patch, which does not write the presets file.
+
+## Menu items of `j.ui` that are not built (noted 28 November 2026)
+
+The two menus of the panel are in their old places, but some items do nothing yet. No milestone includes them.
+
+| Menu item | Today | In the old version |
+|---|---|---|
+| Open Model Reference Page, Open Model Help Patch, Open Model Internal | The message (`model:reference/open`, `model:help/open`, `model:internal/open`) only leaves the outlet of `j.ui`; `j.model` does not answer it | `j.model` opened the window |
+| Choosing a parameter, message or return (menu on the address) | `model:reference/open <address>` leaves the outlet | An inspector window showed all attributes (`Jamoma/patchers/components/data/reference_interface/j.reference_interface.maxpat`) |
+| Edit Current State | Grey | A text editor with the current state of the model |
+| Open Preset Interface | Grey | A window to handle the presets (`Jamoma/patchers/components/data/preset_interface/j.preset_interface.maxpat`) |
+
+The two old patchers use `j.receive`, `j.send`, `j.map`, `j.unit` and the script `Jamoma/javascript/j.interfaceArguments.js`, which now exist or can be imported (see the rules
+for imported patchers). The window of Edit Current State can build on the preset editor.
