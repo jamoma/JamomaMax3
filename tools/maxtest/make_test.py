@@ -13,11 +13,13 @@
 `obj` adds an object box (text, number of inlets and outlets), `msg` a message box, `line` a cord, `check` a `test.assert` with the name of the assertion
 fed from an outlet (a toggle is put in front by add_toggles), `step_chain` a row of messages that fire one after the other (a delay between them) and a
 `test.terminate` at the end (only for tests that must wait for postponed work). `blocks` builds the usual shape: one trigger running a block for each
-assertion, with `receive` for the object under test. `save` adds the toggles, lays the patcher out (layout_patcher) and writes it as Max does.
+assertion, with `receive` for the object under test. `chain` builds the shape for tests that must wait: a column of steps in subpatchers
+(`step`, with `send`, `wait`, `delay`, `watch` and `expect`), with `dut` for the objects under test. `save` adds the toggles, lays the patcher out (layout_patcher) and writes it as Max does.
 """
 
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -25,11 +27,73 @@ import add_toggles  # noqa: E402
 import layout_patcher  # noqa: E402
 
 
+def send(to, value):
+    """An action of a step: send `value` (a number, "bang", or the text of a message) to the receive named `to`."""
+    return ("send", to, value)
+
+
+def wait(times=1):
+    """An action of a step: let work that Max or an object has put off run first (one `deferlow` for each time)."""
+    return ("wait", times)
+
+
+def delay(ms, why):
+    """An action of a step: wait `ms` milliseconds, only for what takes real time (a ramp, the network, the scheduler). `why` is shown in the patcher."""
+    assert why, "a delay needs a reason"
+    return ("delay", ms, why)
+
+
+def watch(receive, *chain, hold="int 0", keep=False):
+    """What a step listens to: the values from `r receive`, through the objects of `chain`, into the holder `hold`.
+
+    An element of the chain is the text of an object, whose left outlet goes on, or `(text, [outlets])` to take other outlets. The last word of
+    `hold` is its start value, which the holder gets again when the step begins, unless `keep` is true (for values that arrive before the step).
+    """
+    return {"receive": receive, "chain": list(chain), "hold": hold, "keep": keep}
+
+
+def expect(case, watches, check=None):
+    """One assertion of a step: `case` completes its name; the held values of the watches go through `check` (an object text, or a list of them in a row;
+    several watches feed the inlets of the first one in order), which must give 1 for a pass. Without a check the held value is the result."""
+    return {"case": case, "watches": watches if isinstance(watches, list) else [watches],
+            "check": [] if check is None else (check if isinstance(check, list) else [check])}
+
+
+def step(name, do=(), expect=()):
+    """One step of a chain, a subpatcher `p name`: the actions `do` in order, then the assertions `expect`."""
+    return {"name": name, "do": list(do), "expect": list(expect)}
+
+
+def _ports(text):
+    """The numbers of inlets and outlets of the common objects of a step (what Max makes of the text)."""
+    words = text.split()
+    name, args = words[0], words[1:]
+    if name in ("route", "sel", "select"):
+        return 1 + (len(args) == 1), max(1, len(args)) + 1
+    if name in ("t", "trigger", "unpack"):
+        return 1, max(1, len(args))
+    if name == "expr":
+        return max([int(n) for n in re.findall(r"\$[ifs](\d)", text)] or [1]), 1
+    if name == "zl":
+        return 2, 2
+    return 2, 1
+
+
 def _number(value):
     """A number as Max writes it in a trigger: `2.` for a whole decimal number."""
     if isinstance(value, float) and value.is_integer():
         return f"{int(value)}."
     return repr(value)
+
+
+def _texts(patcher):
+    """Yields the texts of the objects of a patcher dictionary and its subpatchers."""
+    for entry in patcher["boxes"]:
+        box = entry["box"]
+        if box["maxclass"] == "newobj":
+            yield box.get("text", "")
+        if "patcher" in box:
+            yield from _texts(box["patcher"])
 
 
 class TestPatcher:
@@ -157,6 +221,156 @@ class TestPatcher:
         self.line(previous, f"{prefix}end")
         self.obj(f"{prefix}term", "test.terminate", 1, 0)
         self.line(f"{prefix}end", f"{prefix}term")
+
+    def comment(self, box_id, text):
+        """A comment box."""
+        self._add(box_id, text, "comment", 1, 0, [])
+
+    def dut(self, box_id, text, inlets=1, outlets=1, to=None, out=None, **extra):
+        """An object under test (or beside it): `to` names a receive for its left inlet (or is a dictionary inlet -> name),
+        `out` is a dictionary outlet -> name of the send that the outlet feeds."""
+        self.obj(box_id, text, inlets, outlets, **extra)
+        for inlet, name in ({0: to} if isinstance(to, str) else (to or {})).items():
+            self.obj(f"{box_id}_r{inlet}", f"r {name}", 0, 1)
+            self.line(f"{box_id}_r{inlet}", (box_id, inlet))
+        for outlet, name in (out or {}).items():
+            self.obj(f"{box_id}_s{outlet}", f"s {name}", 1, 0)
+            self.line((box_id, outlet), f"{box_id}_s{outlet}")
+
+    def chain(self, start, prefix, steps, external=()):
+        """A chain of steps from `start` (a starter object text or an outlet (box id, index)) to `test.terminate`, for tests that must wait.
+
+        Every step is a subpatcher; its left outlet starts the next step when it is done, every other outlet is the result of one assertion,
+        named `prefix/case`. `external` names sends and receives whose other end is in an abstraction of the test.
+        """
+        if isinstance(start, tuple) and start[0] not in self._ids:
+            self.obj(start[0], start[0], 1, 1)
+        previous = start
+        for number, one in enumerate(steps):
+            box_id = f"step{number}"
+            inner = self._step_patcher(one)
+            results = len(one["expect"])
+            self._add(box_id, f"p {one['name']}", "newobj", 1, results + 1, [""] * (results + 1), {"patcher": inner})
+            self.line(previous, box_id)
+            for k, wanted in enumerate(one["expect"]):
+                self.check(f"{box_id}_a{k}", f"{prefix}/{wanted['case']}", feed=(box_id, k + 1))
+            previous = (box_id, 0)
+        self.obj("term", "test.terminate", 1, 0)
+        self.line(previous, "term")
+        sends, receives = set(external), set(external)
+        for text in _texts(self.patcher()):
+            words = text.split()
+            if len(words) > 1 and words[0] in ("s", "r"):
+                (sends if words[0] == "s" else receives).add(words[1])
+        assert not receives - sends, f"receive without a send: {sorted(receives - sends)}"
+        assert not sends - receives, f"send without a receive: {sorted(sends - receives)}"
+
+    def _step_patcher(self, one):
+        """The patcher inside a step: triggers for the order, a `deferlow` or `delay` for every wait, holders, checks and outlets."""
+        p = TestPatcher(600.0, 500.0)
+        p._add("in", None, "inlet", 0, 1, [""])
+        resets = []     # (holder id, start value)
+        reads = []      # holder ids in the order they are read
+        results = []    # the (box, outlet) of each result
+        for k, wanted in enumerate(one["expect"]):
+            holders = []
+            for w, seen in enumerate(wanted["watches"]):
+                rid, hid = f"r{k}_{w}", f"h{k}_{w}"
+                p.obj(rid, f"r {seen['receive']}", 0, 1)
+                previous = [(rid, 0)]
+                for c, element in enumerate(seen["chain"]):
+                    text, outlets = element if isinstance(element, tuple) else (element, [0])
+                    oid = f"o{k}_{w}_{c}"
+                    p.obj(oid, text, *_ports(text))
+                    for source in previous:
+                        p.line(source, oid)
+                    previous = [(oid, o) for o in outlets]
+                p.obj(hid, seen["hold"], *_ports(seen["hold"]))
+                for source in previous:
+                    p.line(source, (hid, 1))
+                if not seen["keep"]:
+                    resets.append((hid, seen["hold"].split()[-1]))
+                holders.append(hid)
+            reads += holders[::-1]      # the left inlet of a check is hot, so its holder is read last
+            last = None
+            for c, text in enumerate(wanted["check"]):
+                cid = f"c{k}_{c}"
+                p.obj(cid, text, *_ports(text))
+                if c == 0:
+                    for w, hid in enumerate(holders):
+                        p.line(hid, (cid, w))
+                else:
+                    p.line(last, cid)
+                last = cid
+            results.append((last or holders[0], 0))
+
+        segments, waits = [[("reset", hid, value) for hid, value in resets]], []
+        for action in one["do"]:
+            if action[0] == "send":
+                segments[-1].append(action)
+            else:
+                for _ in range(action[1] if action[0] == "wait" else 1):
+                    waits.append(action)
+                    segments.append([])
+        segments[-1] += [("read", hid) for hid in reads] + [("done",)]
+        p._add("done", None, "outlet", 1, 0, [])
+        for k, source in enumerate(results):
+            p._add(f"out{k}", None, "outlet", 1, 0, [])
+            p.line(source, f"out{k}")
+        previous = ("in", 0)
+        for number, items in enumerate(segments):
+            if number < len(waits):
+                items = items + [("next",)]
+            p._segment(number, previous, items)
+            if number < len(waits):
+                action = waits[number]
+                wid = f"w{number}"
+                if action[0] == "wait":
+                    p.obj(wid, "deferlow", 1, 1)
+                else:
+                    p.obj(wid, f"delay {action[1]}", 2, 1)
+                    p.comment(f"{wid}_why", action[2])
+                p.line(p._next, wid)
+                previous = (wid, 0)
+        return p.patcher()
+
+    def _segment(self, number, source, items):
+        """The actions between two waits, fired in the order of `items` by one trigger (a single bang needs none). The outlet that leads on is left in `_next`."""
+        plain = len(items) == 1 and items[0][0] in ("next", "done", "read")
+        trigger = f"t{number}"
+        count = len(items)
+        tokens = []
+        for item in items:
+            if item[0] == "reset":
+                tokens.append(item[2])
+            elif item[0] == "send" and not isinstance(item[2], str):
+                tokens.append(_number(item[2]))
+            else:
+                tokens.append("b")
+        if not plain:
+            self.obj(trigger, "t " + " ".join(tokens[::-1]), 1, count)
+            self.line(source, trigger)
+        for k, item in enumerate(items):
+            outlet = source if plain else (trigger, count - 1 - k)
+            if item[0] == "reset":
+                self.line(outlet, (item[1], 1))
+            elif item[0] == "read":
+                self.line(outlet, item[1])
+            elif item[0] == "done":
+                self.line(outlet, "done")
+            elif item[0] == "next":
+                self._next = outlet
+            else:
+                _, to, value = item
+                sid = f"s{number}_{k}"
+                self.obj(sid, f"s {to}", 1, 0)
+                if isinstance(value, str) and value != "bang":
+                    mid = f"m{number}_{k}"
+                    self.msg(mid, value)
+                    self.line(outlet, mid)
+                    self.line(mid, sid)
+                else:
+                    self.line(outlet, sid)
 
     def patcher(self):
         """The patcher dictionary."""
