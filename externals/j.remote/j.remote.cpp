@@ -90,7 +90,7 @@ public:
     }}};
 
     /** Whether the remote works at all. */
-    attribute<int> active{this, "active", 1, setter{MIN_FUNCTION {
+    attribute<int> active{this, "active", 1, style::onoff, setter{MIN_FUNCTION {
         if (remote_) {
             remote_->set_active(static_cast<int>(args[0]) != 0);
         }
@@ -98,7 +98,7 @@ public:
     }}};
 
     /** Whether changes of the node are kept from the UI object. */
-    attribute<int> freeze{this, "freeze", 0, setter{MIN_FUNCTION {
+    attribute<int> freeze{this, "freeze", 0, style::onoff, setter{MIN_FUNCTION {
         if (remote_) {
             remote_->set_freeze(static_cast<int>(args[0]) != 0);
         }
@@ -106,7 +106,7 @@ public:
     }}};
 
     /** Accepted so that old patchers load; it has no effect. */
-    attribute<int> highlight{this, "highlight", 1};
+    attribute<int> highlight{this, "highlight", 1, style::onoff};
 
     /** After construction: registers the last outlet as the dumpout. */
     message<> setup{this, "setup", MIN_FUNCTION {

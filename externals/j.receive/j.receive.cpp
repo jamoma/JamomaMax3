@@ -76,7 +76,7 @@ public:
     }}};
 
     /** Whether new values are output (when off, only a bang outputs). */
-    attribute<int> active{this, "active", 1, setter{MIN_FUNCTION {
+    attribute<int> active{this, "active", 1, style::onoff, setter{MIN_FUNCTION {
         if (receiver_) {
             receiver_->set_active(static_cast<int>(args[0]) != 0);
         }

@@ -108,7 +108,7 @@ public:
     /** The alias of the model (accepted so that old patchers load; it has no effect yet). */
     attribute<symbol> alias{this, "alias", ""};
     /** Whether the model reports its activity (accepted so that old patchers load; it has no effect yet). */
-    attribute<int> activity{this, "activity", 0};
+    attribute<int> activity{this, "activity", 0, style::onoff};
     /** The tags of the model (accepted so that old patchers load; it has no effect yet). */
     attribute<symbol> tags{this, "tags", ""};
     /** The file the presets were last read from or written to (set by the preset messages). */

@@ -14,6 +14,17 @@
 
 using jamoma::Address;
 
+/** An attribute whose name has a slash, as `ramp/function`, is still the attribute. */
+TEST_CASE("an attribute with a slash in its name")
+{
+    const Address a = Address::parse("my_line:ramp/function");
+    REQUIRE(a.attribute() == "ramp/function");
+    REQUIRE(a.path().size() == 1);
+    REQUIRE(a.str() == "my_line:ramp/function");
+    REQUIRE(Address::parse("app:/m/x:repetitions/filter").attribute() == "repetitions/filter");
+    REQUIRE(Address::parse("/m").append(a).str() == "/m/my_line:ramp/function");
+}
+
 /** The full grammar: directory:/parent/name.instance:attribute. */
 TEST_CASE("parse reads path and instance and attribute")
 {

@@ -56,11 +56,11 @@ public:
 
     attribute<symbol> tags{this, "tags", ""};        /**< Accepted so that old patchers load (the old object used it to mark a Jitter matrix port); no effect. */
     /** When on, nothing passes. */
-    attribute<int> mute{this, "mute", 0, setter{MIN_FUNCTION {
+    attribute<int> mute{this, "mute", 0, style::onoff, setter{MIN_FUNCTION {
         mute_.store(static_cast<int>(args[0]));
         return args;
     }}};
-    attribute<int> bypass{this, "bypass", 0};   /**< Stored only: the link to the j.out of the same instance is not built yet. */
+    attribute<int> bypass{this, "bypass", 0, style::onoff};   /**< Stored only: the link to the j.out of the same instance is not built yet. */
 
     /** After construction: registers the dump outlet. */
     message<> setup{this, "setup", MIN_FUNCTION {
