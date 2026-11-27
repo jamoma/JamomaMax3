@@ -27,6 +27,9 @@ struct ModelContents {
     std::vector<std::string> parameters; /**< The nodes with the parameter service. */
     std::vector<std::string> messages;   /**< The nodes with the message service. */
     std::vector<std::string> returns;    /**< The nodes with the return service. */
+    std::vector<std::string> generic_parameters; /**< The parameters tagged `generic`, which are not listed in `parameters`. */
+    std::vector<std::string> generic_messages;   /**< The messages tagged `generic`. */
+    std::vector<std::string> generic_returns;    /**< The returns tagged `generic`. */
     std::vector<std::string> presets;    /**< The names of the presets of the model, in order. */
 };
 

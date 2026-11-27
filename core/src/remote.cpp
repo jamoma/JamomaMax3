@@ -77,18 +77,19 @@ void Remote::from_ui(const Value& value)
     sender_.send(command);
 }
 
-void Remote::set_without_echo(const Value& value)
+void Remote::set_without_output(const Value& value)
 {
     if (!active_ || value.empty()) {
         return;
     }
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        current_ = value;
-    }
-    if (!freeze_ && to_ui_) {
-        to_ui_(value);
-    }
+    // The node answers on this thread while the command is sent; changes from other threads (a ramp) are shown as usual.
+    const std::thread::id before = setting_.exchange(std::this_thread::get_id());
+    struct Restore {
+        std::atomic<std::thread::id>& flag; /**< The flag. */
+        std::thread::id value;              /**< What it was. */
+        ~Restore() { flag = value; }        /**< Puts it back, also if the command throws. */
+    } restore{setting_, before};
+    from_ui(value);
 }
 
 Value Remote::to_ui_unit(const Value& value) const
@@ -129,6 +130,9 @@ Value Remote::to_ui_unit(const Value& value) const
 void Remote::node_changed(const Value& value)
 {
     if (!active_) {
+        return;
+    }
+    if (setting_ == std::this_thread::get_id()) { // the answer to a `set` of this remote: remembered by from_ui, not shown
         return;
     }
     if (value.empty()) { // a bang of a node of type none: shown (a button blinks) but it is no value to remember

@@ -60,12 +60,12 @@ public:
 
     attribute<symbol> tags{this, "tags", ""};        /**< Accepted so that old patchers load (the old object used it to mark a Jitter matrix port); no effect. */
     /** When on, nothing passes. */
-    attribute<int> mute{this, "mute", 0, setter{MIN_FUNCTION {
+    attribute<int> mute{this, "mute", 0, style::onoff, setter{MIN_FUNCTION {
         mute_.store(static_cast<int>(args[0]));
         return args;
     }}};
     /** When on, the last value is output again instead of the new one. */
-    attribute<int> freeze{this, "freeze", 0, setter{MIN_FUNCTION {
+    attribute<int> freeze{this, "freeze", 0, style::onoff, setter{MIN_FUNCTION {
         freeze_.store(static_cast<int>(args[0]));
         return args;
     }}};

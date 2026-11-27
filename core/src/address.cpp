@@ -42,8 +42,9 @@ Address Address::parse(std::string_view text)
         address.directory_ = std::string(text.substr(0, directory_end));
         text.remove_prefix(directory_end + 1);
     }
-    const auto colon = text.rfind(':');
-    if (colon != std::string_view::npos && text.substr(colon + 1).find('/') == std::string_view::npos) {
+    // The attribute follows the first colon that is left: its name may hold slashes (`ramp/function`), a node name holds no colon.
+    const auto colon = text.find(':');
+    if (colon != std::string_view::npos) {
         address.attribute_ = std::string(text.substr(colon + 1));
         text = text.substr(0, colon);
     }

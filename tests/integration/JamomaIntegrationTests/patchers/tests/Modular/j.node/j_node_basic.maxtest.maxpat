@@ -282,7 +282,7 @@
           103.2,
           22.0
          ],
-         "text": "zl compare 1 2"
+         "text": "zl compare 2 1"
         }
        },
        {

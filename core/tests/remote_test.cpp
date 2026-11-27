@@ -160,16 +160,24 @@ TEST_CASE("deleted node is not touched")
     REQUIRE(r.shown.empty());
 }
 
-/** `set` shows a value in the UI and sends nothing. */
-TEST_CASE("set shows without sending")
+/** `set` (as the old object): the node gets the value and the other remotes show it, this remote shows nothing. */
+TEST_CASE("set updates the node without showing it here")
 {
     Rig r;
+    std::vector<Value> other;
+    Remote second(r.ns, [&other](const Value& v) { other.push_back(v); });
     r.remote.set_address(Address::parse("/m/x"));
+    second.set_address(Address::parse("/m/x"));
     r.shown.clear();
-    r.remote.set_without_echo({8.0});
-    REQUIRE(r.shown.size() == 1);
-    REQUIRE(r.value() == 1.0);
+    other.clear();
+    r.remote.set_without_output({8.0});
+    REQUIRE(r.value() == 8.0);
+    REQUIRE(r.shown.empty());
+    REQUIRE(other.size() == 1);
+    REQUIRE(other[0].at(0).as_double() == 8.0);
     REQUIRE(r.remote.current()->at(0).as_double() == 8.0);
+    r.node.command({3.0});           // later changes are shown here again
+    REQUIRE(r.shown.size() == 1);
 }
 
 /** Ticks of a node with a unit arrive on another thread while the node is removed on this one: nothing reads a freed node (the sanitizer builds are the ones that can fail this). */

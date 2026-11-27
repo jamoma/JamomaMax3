@@ -56,6 +56,18 @@ struct World {
 
 } // namespace
 
+/** As the old objects: priority 0 means none, and comes after every other priority. */
+TEST_CASE("priority zero is initialised last")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    w.add("/m/aaa", 0);
+    w.add("/m/zzz", 3);
+    w.add("/m/mmm", 1);
+    m.init();
+    REQUIRE(w.log == std::vector<std::string>{"/m/mmm", "/m/zzz", "/m/aaa"});
+}
+
 /** Parameters are initialised in order of priority, lowest first. */
 TEST_CASE("init visits parameters in priority order")
 {
@@ -65,7 +77,7 @@ TEST_CASE("init visits parameters in priority order")
     w.add("/m/b", 0);
     w.add("/m/c", 1);
     m.init();
-    REQUIRE(w.log == std::vector<std::string>{"/m/b", "/m/c", "/m/a"});
+    REQUIRE(w.log == std::vector<std::string>{"/m/c", "/m/a", "/m/b"});
 }
 
 /** Equal priorities are ordered by name, then instance. */
@@ -179,10 +191,10 @@ TEST_CASE("nested model inits inside its parent slot")
     World w;
     Model parent(w.ns, Address::parse("/m"));
     Model child(w.ns, Address::parse("/m/sub"));
-    child.set_priority(1);
-    w.add("/m/first", 0);
+    child.set_priority(2);
+    w.add("/m/first", 1);
     w.add("/m/sub/inner", 0);
-    w.add("/m/last", 2);
+    w.add("/m/last", 3);
     parent.init();
     REQUIRE(w.log == std::vector<std::string>{"/m/first", "/m/sub/inner", "/m/last"});
 }
@@ -192,8 +204,8 @@ TEST_CASE("data removed during init is skipped")
 {
     World w;
     Model m(w.ns, Address::parse("/m"));
-    Data& a = w.add("/m/a", 0);
-    w.add("/m/b", 1);
+    Data& a = w.add("/m/a", 1);
+    w.add("/m/b", 2);
     a.set_output([&w](const Value&) {
         w.log.push_back("/m/a");
         w.subscriptions[1] = Subscription(); // the later sibling unsubscribes while a initialises
@@ -365,4 +377,48 @@ TEST_CASE("view map observers may call the map and their handles may outlive it"
         REQUIRE(seen == "/two");
     }
     handle.reset();
+}
+
+/** An alias (as the old objects): the model can also be addressed by another name; its own address stays. */
+TEST_CASE("a model can be addressed by an alias")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    Data& p = w.add("/m/p");
+    std::vector<std::string> events;
+    auto watch = w.ns.observe(Address::parse("/other/p"), [&events](const Address& a, jamoma::Object*, bool created) {
+        events.push_back((created ? "+" : "-") + a.str());
+    });
+    REQUIRE(m.set_alias("/other"));
+    REQUIRE(m.alias() == "/other");
+    REQUIRE(events == std::vector<std::string>{"+/other/p"});
+    REQUIRE(w.ns.lookup(Address::parse("/other/p"))->object() == &p);
+    REQUIRE(w.ns.lookup(Address::parse("/m/p"))->object() == &p);
+    REQUIRE(w.ns.find(Address::parse("/other/p")).size() == 1);
+    REQUIRE(w.ns.read_object(Address::parse("/other/p"), [](jamoma::Object&) {}));
+    w.add("/m/late");
+    REQUIRE(w.ns.lookup(Address::parse("/other/late")) != nullptr);
+    m.set_alias("");
+    REQUIRE(m.alias().empty());
+    REQUIRE(events == std::vector<std::string>{"+/other/p", "-/other/p"});
+    REQUIRE(w.ns.lookup(Address::parse("/other/p")) == nullptr);
+}
+
+/** A relative alias is beside the model; a taken name is refused; the alias goes with the model. */
+TEST_CASE("a relative alias sits beside the model and goes with it")
+{
+    World w;
+    Model outer(w.ns, Address::parse("/outer"));
+    w.add("/taken/x");
+    auto m = std::make_unique<Model>(w.ns, Address::parse("/outer/m"));
+    Data& p = w.add("/outer/m/p");
+    REQUIRE_FALSE(m->set_alias("/taken"));
+    REQUIRE_FALSE(m->set_alias("/outer/m/inside"));
+    REQUIRE(m->set_alias("second"));
+    REQUIRE(m->alias() == "/outer/second");
+    REQUIRE(w.ns.lookup(Address::parse("/outer/second/p"))->object() == &p);
+    REQUIRE(m->set_alias("third"));
+    REQUIRE(w.ns.lookup(Address::parse("/outer/second/p")) == nullptr);
+    m.reset();
+    REQUIRE(w.ns.lookup(Address::parse("/outer/third/p")) == nullptr);
 }

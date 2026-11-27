@@ -153,7 +153,7 @@ public:
     }}};
 
     /** Whether the mapping is on. */
-    attribute<int> active{this, "active", 1, setter{MIN_FUNCTION {
+    attribute<int> active{this, "active", 1, style::onoff, setter{MIN_FUNCTION {
         mapper_.set_active(static_cast<int>(args[0]) != 0);
         return args;
     }}};
@@ -166,7 +166,7 @@ public:
     }}};
 
     /** Whether the curve is flipped. */
-    attribute<int> inverse{this, "inverse", 0, setter{MIN_FUNCTION {
+    attribute<int> inverse{this, "inverse", 0, style::onoff, setter{MIN_FUNCTION {
         mapper_.set_inverse(static_cast<int>(args[0]) != 0);
         return args;
     }}};

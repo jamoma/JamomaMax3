@@ -6,6 +6,7 @@
  * @brief Implementation of the data object (a port of the old TTData typed methods).
  */
 
+#include "jamoma/function_library.hpp"
 #include "jamoma/data.hpp"
 
 #include <algorithm>
@@ -81,6 +82,12 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
     bool ramp_drive_explicit = false;      /**< Whether the drive was set by the user. */
     std::string ramp_function = "none";    /**< The ramp function name (the old default, which behaves as linear). */
     std::shared_ptr<Ramp> ramp;            /**< The ramp engine, created on the first ramp (shared so a command that starts a ramp keeps it alive). */
+    /** The easing function of the ramps, shared with a ramp that is running (so that its parameters can be changed meanwhile). */
+    struct Curve {
+        std::mutex mutex;                   /**< Guards the function (taken last: nothing else is locked inside). */
+        std::unique_ptr<Function> function; /**< The function. */
+    };
+    std::shared_ptr<Curve> curve;          /**< The function in use, or null for a linear ramp. */
     std::string ramp_unit;                 /**< The unit of the values of the running ramp; empty means the object's unit. */
 
     /** One observer of an attribute. */
@@ -114,7 +121,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
         std::vector<double> from;          /**< The start vector, in the ramp's unit. */
         std::vector<double> to;            /**< The target vector, in the ramp's unit. */
         double duration_ms = 0.0;          /**< The duration. */
-        std::string function;              /**< The function name. */
+        std::shared_ptr<Curve> curve;      /**< The easing function, or null for linear. */
     };
 
     /** @return The unit the value is kept in: the one set, else the neutral unit of a valid dataspace, else empty. */
@@ -213,7 +220,7 @@ struct Data::Impl : std::enable_shared_from_this<Data::Impl> {
             plan.from.push_back(atom.as_double());
         }
         plan.duration_ms = *command.ramp_ms;
-        plan.function = ramp_function;
+        plan.curve = curve;
         return plan;
     }
 
@@ -599,8 +606,64 @@ std::string Data::ramp_drive() const
 
 void Data::set_ramp_function(std::string function)
 {
+    std::shared_ptr<Impl::Curve> curve;
+    if (function != "linear") {
+        if (std::unique_ptr<Function> made = Function::create(function)) {
+            curve = std::make_shared<Impl::Curve>();
+            curve->function = std::move(made);
+        }
+    }
     std::lock_guard<std::mutex> lock(impl_->mutex);
     impl_->ramp_function = std::move(function);
+    impl_->curve = std::move(curve);
+}
+
+std::vector<std::string> Data::function_parameter_names() const
+{
+    std::shared_ptr<Impl::Curve> curve;
+    {
+        std::lock_guard<std::mutex> lock(impl_->mutex);
+        curve = impl_->curve;
+    }
+    if (!curve) {
+        return {};
+    }
+    std::lock_guard<std::mutex> lock(curve->mutex);
+    return curve->function->parameter_names();
+}
+
+bool Data::has_function_parameter(std::string_view name) const
+{
+    const auto names = function_parameter_names();
+    return std::find(names.begin(), names.end(), name) != names.end();
+}
+
+Value Data::function_parameter(std::string_view name) const
+{
+    std::shared_ptr<Impl::Curve> curve;
+    {
+        std::lock_guard<std::mutex> lock(impl_->mutex);
+        curve = impl_->curve;
+    }
+    if (!curve) {
+        return {};
+    }
+    std::lock_guard<std::mutex> lock(curve->mutex);
+    return curve->function->get(name);
+}
+
+bool Data::set_function_parameter(std::string_view name, const Value& value)
+{
+    std::shared_ptr<Impl::Curve> curve;
+    {
+        std::lock_guard<std::mutex> lock(impl_->mutex);
+        curve = impl_->curve;
+    }
+    if (!curve) {
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(curve->mutex);
+    return curve->function->set(name, value);
 }
 
 std::string Data::ramp_function() const
@@ -679,7 +742,15 @@ std::optional<Value> Data::get_attribute(std::string_view name) const
     if (name == "unit") return Value{Atom(unit().empty() ? std::string("none") : unit())};
     if (name == "ramp/drive") return Value{Atom(ramp_drive())};
     if (name == "ramp/function") return Value{Atom(ramp_function())};
-    if (name == "ramp/function/parameters") return Value{};
+    if (name == "ramp/function/parameters") {
+        Value out;
+        for (const std::string& parameter : function_parameter_names()) {
+            out.emplace_back(parameter);
+        }
+        // As the old object: nothing while no function is chosen, `none` for a function without parameters.
+        const bool chosen = ramp_function() == "linear" || Function::create(ramp_function()) != nullptr;
+        return out.empty() && chosen ? Value{Atom("none")} : out;
+    }
     if (name == "ramp/status") return Value{integer(ramp_running() ? 1 : 0)};
     if (name == "value") return initialized() ? value() : Value{};
     if (name == "service") {
@@ -783,7 +854,18 @@ void Data::command(const Value& input)
         }
     } // the guard is released here, so the ramp's first value can pass through it
     if (plan && ramp) {
-        ramp->start(plan->from, plan->to, plan->duration_ms, plan->function);
+        Ramp::Shape shape;
+        if (const std::shared_ptr<Impl::Curve> curve = plan->curve) {
+            {
+                std::lock_guard<std::mutex> lock(curve->mutex);
+                curve->function->reset();
+            }
+            shape = [curve](double x) {
+                std::lock_guard<std::mutex> lock(curve->mutex);
+                return curve->function->apply(x);
+            };
+        }
+        ramp->start(plan->from, plan->to, plan->duration_ms, std::move(shape));
     }
 }
 

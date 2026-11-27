@@ -79,7 +79,7 @@
 				Send a message to the node
 			</digest>
 			<description>
-				Any other message is sent to the node as a command; <m>set value</m> shows a value without sending it and <m>address symbol</m> sets the address.
+				Any other message is sent to the node as a command; <m>set value</m> sends a value without output from this object and <m>address symbol</m> sets the address.
 			</description>
 		</method>
 		<method name="dump">
@@ -96,10 +96,10 @@
 				<arg name="value" optional="1" type="list" />
 			</arglist>
 			<digest>
-				Show a value without sending it
+				Set the node without output from this object
 			</digest>
 			<description>
-				The <m>set</m> message shows a value in the UI object (out of both outlets) without sending it to the node.
+				The <m>set</m> message sends the value to the node without any output from this <o>j.remote</o>. Other <o>j.remote</o> objects of the node show the new value.
 			</description>
 		</method>
 		<method name="address">

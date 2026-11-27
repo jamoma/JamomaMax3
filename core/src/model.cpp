@@ -6,6 +6,7 @@
  * @brief The model and the patcher-to-model map.
  */
 
+#include "jamoma/priority.hpp"
 #include "jamoma/model.hpp"
 
 #include <algorithm>
@@ -23,6 +24,8 @@ struct Model::Impl {
     std::string description;                                         /**< The description. */
     int priority = 0;                                                /**< The priority. */
     bool initialized = false;                                        /**< Whether init has finished. */
+    std::string alias;                                               /**< The alias as an absolute address, or empty. */
+    std::shared_ptr<void> alias_handle;                              /**< Keeps the alias in the namespace. */
     unsigned next_id = 1;                                            /**< The id for the next observer. */
     std::vector<std::pair<unsigned, std::function<void(bool)>>> observers; /**< The observers. */
 
@@ -72,7 +75,7 @@ void init_children(Namespace& ns, const Address& parent, const Model* self)
     }
     std::stable_sort(children.begin(), children.end(), [](const Child& a, const Child& b) {
         if (a.priority != b.priority) {
-            return a.priority < b.priority;
+            return priority_before(a.priority, b.priority);
         }
         if (a.name != b.name) {
             return a.name < b.name;
@@ -111,11 +114,33 @@ Model::Model(Namespace& ns, const Address& address) : impl_(std::make_shared<Imp
 
 PresetManager& Model::presets() { return *impl_->presets; }
 
-Model::~Model() = default;
 
 const Address& Model::address() const noexcept { return impl_->subscription.address(); }
 void Model::set_description(std::string text) { impl_->description = std::move(text); }
 std::string Model::description() const { return impl_->description; }
+bool Model::set_alias(const std::string& alias)
+{
+    impl_->alias_handle.reset();
+    impl_->alias.clear();
+    if (alias.empty() || alias == "none") {
+        return true;
+    }
+    Address other = Address::parse(alias);
+    if (!other.absolute()) {
+        other = address().parent().append(other);
+    }
+    impl_->alias_handle = impl_->ns->add_alias(other, address());
+    if (!impl_->alias_handle) {
+        return false;
+    }
+    impl_->alias = other.str();
+    return true;
+}
+
+std::string Model::alias() const { return impl_->alias; }
+
+Model::~Model() { impl_->alias_handle.reset(); } // while what is below the model can still be listed
+
 void Model::set_priority(int priority) { impl_->priority = priority; }
 int Model::priority() const { return impl_->priority; }
 bool Model::initialized() const { return impl_->initialized; }

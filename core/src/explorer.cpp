@@ -6,6 +6,7 @@
  * @brief The model explorer (see explorer.hpp).
  */
 
+#include "jamoma/priority.hpp"
 #include "jamoma/explorer.hpp"
 
 #include <algorithm>
@@ -38,6 +39,7 @@ struct Found {
     std::string name;   /**< Its address relative to the model. */
     int instance;       /**< Its instance number. */
     Service service;    /**< Its service. */
+    bool generic;       /**< Whether it is tagged `generic`. */
 };
 
 /** Tells the owner of a state that something changed, if it still exists. @tparam W A weak pointer to the state. @param weak The state. */
@@ -139,14 +141,16 @@ ModelContents ModelExplorer::contents() const
     std::vector<Found> found;
     if (!state_->ns->visit_below(model, [&found](const std::string& relative, const std::string&, const std::string& instance, Object* object) {
             if (auto* data = dynamic_cast<Data*>(object)) {
-                found.push_back({data->priority(), relative, instance.empty() ? 0 : std::atoi(instance.c_str()), data->service()});
+                const auto tags = data->tags();
+                const bool generic = std::find(tags.begin(), tags.end(), "generic") != tags.end();
+                found.push_back({data->priority(), relative, instance.empty() ? 0 : std::atoi(instance.c_str()), data->service(), generic});
             }
         })) {
         return out;
     }
     std::stable_sort(found.begin(), found.end(), [](const Found& a, const Found& b) {
         if (a.priority != b.priority) {
-            return a.priority < b.priority;
+            return priority_before(a.priority, b.priority);
         }
         if (a.name != b.name) {
             return a.name < b.name;
@@ -154,7 +158,9 @@ ModelContents ModelExplorer::contents() const
         return a.instance < b.instance;
     });
     for (const Found& f : found) {
-        (f.service == Service::Parameter ? out.parameters : f.service == Service::Message ? out.messages : out.returns).push_back(f.name);
+        auto& own = f.service == Service::Parameter ? out.parameters : f.service == Service::Message ? out.messages : out.returns;
+        auto& generic = f.service == Service::Parameter ? out.generic_parameters : f.service == Service::Message ? out.generic_messages : out.generic_returns;
+        (f.generic ? generic : own).push_back(f.name);
     }
     Node* node = state_->ns->lookup(model);
     if (auto* m = node != nullptr ? dynamic_cast<Model*>(node->object()) : nullptr) {

@@ -5,7 +5,7 @@
 		The panel of a model
 	</digest>
 	<description>
-		j.ui shows the address of the model of its patcher (or of the model a <o>j.view</o> in it is bound to), a menu of what is below the model, and its presets. A click on the address opens the menu of parameters, messages and returns; the menu arrow opens the utilities and presets menu. If the model has the parameter <m>data/active</m>, a round button next to the menu arrow shows whether the model is active (filled) or not (a ring), and a click on it switches the model. While there is no model it says that it is waiting for one.
+		j.ui shows the address of the model of its patcher (or of the model a <o>j.view</o> in it is bound to) and its presets. The circle with a downward triangle at the far left of the header opens the menu of the model and its presets; a click on the address opens the menu of the models of the same class and of the parameters, messages and returns of the model. If the model has the parameter <m>data/active</m>, a round button next to the menu arrow shows whether the model is active (filled) or not (a ring), and a click on it switches the model. While there is no model it says that it is waiting for one.
 	</description>
 	<metadatalist>
 		<metadata name="author">
@@ -52,6 +52,29 @@
 				Creates a preset of the model with this name; a name that is taken is numbered, an empty one becomes <m>preset</m> and a number. The menu item Create New Preset asks for the name in a dialog.
 			</description>
 		</method>
+		<method name="menu:list">
+			<arglist>
+				<arg name="menu" optional="0" type="symbol" />
+			</arglist>
+			<digest>
+				Report the lines of a menu
+			</digest>
+			<description>
+				<m>menu:list presets</m> or <m>menu:list model</m> answers <m>menu:item</m> with the text of each line and 1 if it can be chosen.
+			</description>
+		</method>
+		<method name="menu:choose">
+			<arglist>
+				<arg name="menu" optional="0" type="symbol" />
+				<arg name="text" optional="0" type="symbol" />
+			</arglist>
+			<digest>
+				Choose a line of a menu
+			</digest>
+			<description>
+				Does what choosing the line with this text in the menu <m>presets</m> or <m>model</m> does.
+			</description>
+		</method>
 		<method name="dump">
 			<arglist />
 			<digest>
@@ -76,7 +99,7 @@
 				Open a menu
 			</digest>
 			<description>
-				A click on the header opens the menu of nodes (on the address) or the utilities and presets menu (on the arrow).
+				A click on the circle opens the menu of the model and its presets, a click on the address the menu of what is below the model; both open at the top of the panel.
 			</description>
 		</method>
 	</methodlist>

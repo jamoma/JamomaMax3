@@ -6,6 +6,7 @@
  * @brief Exploration of the namespace, the output formats of j.namespace and the shared selection.
  */
 
+#include "jamoma/priority.hpp"
 #include "jamoma/explore.hpp"
 
 #include <algorithm>
@@ -86,7 +87,7 @@ ExploreResult explore(const Namespace& ns, const Address& address, const Explore
     if (options.sort == ExploreSort::Alphabetic)
         std::stable_sort(items.begin(), items.end(), [](const Item& a, const Item& b) { return a.text < b.text; });
     else if (options.sort == ExploreSort::Priority)
-        std::stable_sort(items.begin(), items.end(), [](const Item& a, const Item& b) { return a.priority != b.priority ? a.priority < b.priority : a.text < b.text; });
+        std::stable_sort(items.begin(), items.end(), [](const Item& a, const Item& b) { return a.priority != b.priority ? priority_before(a.priority, b.priority) : a.text < b.text; });
     for (auto& i : items)
         result.items.push_back(std::move(i.text));
     return result;

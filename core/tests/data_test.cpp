@@ -1070,3 +1070,55 @@ TEST_CASE("ramp in another unit matches a parameter in that unit")
         }
     }
 }
+
+/** A ramp follows the easing function that is set (the old objects used the function library for it). */
+TEST_CASE("a ramp follows its easing function")
+{
+    ManualClock clock;
+    Fixture x(DataType::Decimal);
+    x.data.set_clock(&clock);
+    x.data.command({f(0.0)});
+    REQUIRE(x.data.set_attribute("ramp/function", {Atom("easeInQuadratic")}));
+    x.data.command({f(100.0), Atom("ramp"), i(100)});
+    clock.advance(40.0);
+    REQUIRE(std::fabs(x.data.value().at(0).as_double() - 16.0) < 1e-9); // (40/100)^2
+    clock.advance(60.0);
+    REQUIRE(x.data.value().at(0).as_double() == 100.0);
+}
+
+/** `ramp/function/parameters`: empty while no function is chosen (the old test of the defaults), else the parameters, or `none`. */
+TEST_CASE("the parameters of the ramp function are listed")
+{
+    Data d;
+    d.set_type(DataType::Decimal);
+    REQUIRE(d.get_attribute("ramp/function/parameters")->empty());
+    d.set_attribute("ramp/function", {Atom("linear")});
+    REQUIRE(*d.get_attribute("ramp/function/parameters") == Value{Atom("none")});
+    d.set_attribute("ramp/function", {Atom("tanh")});
+    REQUIRE(*d.get_attribute("ramp/function/parameters") == Value{Atom("offset"), Atom("width")});
+    d.set_attribute("ramp/function", {Atom("easeInQuadratic")});
+    REQUIRE(*d.get_attribute("ramp/function/parameters") == Value{Atom("none")});
+}
+
+/** A parameter of the function is set and read by its name, and changes a ramp that is running. */
+TEST_CASE("a parameter of the ramp function can be changed")
+{
+    ManualClock clock;
+    Fixture x(DataType::Decimal);
+    x.data.set_clock(&clock);
+    x.data.command({f(0.0)});
+    REQUIRE_FALSE(x.data.has_function_parameter("width"));
+    x.data.set_attribute("ramp/function", {Atom("tanh")});
+    REQUIRE(x.data.has_function_parameter("width"));
+    REQUIRE(x.data.function_parameter("width") == Value{f(0.5)});
+    x.data.command({f(100.0), Atom("ramp"), i(100)});
+    clock.advance(20.0);
+    const double wide = x.data.value().at(0).as_double();
+    x.data.command({f(0.0)});
+    REQUIRE(x.data.set_function_parameter("width", {f(0.1)}));
+    REQUIRE(x.data.function_parameter("width") == Value{f(0.1)});
+    x.data.command({f(100.0), Atom("ramp"), i(100)});
+    clock.advance(20.0);
+    REQUIRE(x.data.value().at(0).as_double() < wide - 1.0); // a narrower step starts more slowly
+    REQUIRE_FALSE(x.data.set_function_parameter("nonsense", {f(1.0)}));
+}

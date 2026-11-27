@@ -6,7 +6,7 @@
  * @brief j.unit: converts numbers between the units of a dataspace (jamoma::Dataspace).
  *
  * Attributes: `dataspace` (default temperature), `input` and `output` (the units, which start at the dataspace's neutral unit). A number is
- * output as a float, a list as a list of floats. `dataspaces.get` and `units.get` send the menu contents to the dump outlet.
+ * output as a float, a list as a list of floats. `dataspaces.get` sends `DataspacesMenu` lines and `units.get [dataspace]` sends `UnitMenu` lines to the dump outlet.
  */
 
 #include <string>
@@ -87,11 +87,32 @@ public:
         return {};
     }};
 
-    /** Sends the names of the units of the current dataspace to the dump outlet as the lines of a menu. */
+    /** Sends the names of the units of a dataspace (the argument, else the current one) to the dump outlet as the lines of a menu. */
     message<> units_get{this, "units.get", MIN_FUNCTION {
-        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(converter_.dataspace())) {
-            menu("UnitsMenu", d->unit_names());
+        const std::string name = args.empty() ? converter_.dataspace() : std::string(static_cast<symbol>(args[0]).c_str());
+        if (const jamoma::Dataspace* d = jamoma::Dataspace::find(name)) {
+            menu("UnitMenu", d->unit_names());
+        } else {
+            c74::max::object_error(maxobj(), "j.unit: unknown dataspace %s", name.c_str());
         }
+        return {};
+    }};
+
+    /** Answers `dataspace <name>` on the dump outlet (Max does not answer the attribute queries of this object by itself). */
+    message<> get_dataspace{this, "getdataspace", MIN_FUNCTION {
+        answer("dataspace", converter_.dataspace());
+        return {};
+    }};
+
+    /** Answers `input <unit>`: the unit the incoming numbers are taken in. */
+    message<> get_input{this, "getinput", MIN_FUNCTION {
+        answer("input", converter_.input());
+        return {};
+    }};
+
+    /** Answers `output <unit>`: the unit the numbers are converted to. */
+    message<> get_output{this, "getoutput", MIN_FUNCTION {
+        answer("output", converter_.output());
         return {};
     }};
 
@@ -131,6 +152,14 @@ private:
         }
         c74::max::outlet_list(y_out.max_outlet(), nullptr, static_cast<short>(list.size()),
                               const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&list[0])));
+    }
+
+    /** Sends `<name> <value>` to the dump outlet. @param name The attribute. @param value Its value. */
+    void answer(const char* name, const std::string& value)
+    {
+        c74::max::t_atom a;
+        c74::max::atom_setsym(&a, c74::max::gensym(value.c_str()));
+        c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym(name), 1, &a);
     }
 
     /** Sends `<name> clear` and then `<name> append <entry>` for every entry to the dump outlet. @param name The menu. @param entries Its lines. */

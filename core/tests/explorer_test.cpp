@@ -55,12 +55,13 @@ TEST_CASE("explorer lists parameters messages returns sorted")
     r.add("/m/b");
     r.add("/m/a");
     r.add("/m/z", -1);
+    r.add("/m/y", 2);
     r.add("/m/go", 0, Service::Message);
     r.add("/m/out", 0, Service::Return);
     r.add("/m/sub/x");
     r.explorer.set_model(Address::parse("/m"));
     const auto c = r.explorer.contents();
-    REQUIRE(c.parameters == std::vector<std::string>{"z", "a", "b", "sub/x"});
+    REQUIRE(c.parameters == std::vector<std::string>{"z", "y", "a", "b", "sub/x"}); // priority 0 (none) comes last
     REQUIRE(c.messages == std::vector<std::string>{"go"});
     REQUIRE(c.returns == std::vector<std::string>{"out"});
     model.presets().new_preset("p");
@@ -156,4 +157,26 @@ TEST_CASE("contents while nodes change is race free")
     stop = true;
     worker.join();
     REQUIRE(seen >= 0);
+}
+
+/** Data tagged `generic` (as the amenities) is listed apart from the model's own (the two kinds of sections of the panel's menu). */
+TEST_CASE("explorer lists generic data apart")
+{
+    Rig r;
+    jamoma::Model model(r.ns, Address::parse("/m"));
+    r.add("/m/own");
+    const std::size_t p = r.add("/m/data/active");
+    const std::size_t m = r.add("/m/data/do", 0, Service::Message);
+    const std::size_t o = r.add("/m/data/got", 0, Service::Return);
+    for (const std::size_t i : {p, m, o}) {
+        r.data[i]->set_tags({"generic"});
+    }
+    r.explorer.set_model(Address::parse("/m"));
+    const auto c = r.explorer.contents();
+    REQUIRE(c.parameters == std::vector<std::string>{"own"});
+    REQUIRE(c.messages.empty());
+    REQUIRE(c.returns.empty());
+    REQUIRE(c.generic_parameters == std::vector<std::string>{"data/active"});
+    REQUIRE(c.generic_messages == std::vector<std::string>{"data/do"});
+    REQUIRE(c.generic_returns == std::vector<std::string>{"data/got"});
 }

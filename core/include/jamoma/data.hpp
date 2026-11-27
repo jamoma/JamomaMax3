@@ -125,10 +125,21 @@ public:
     void set_ramp_drive(std::string drive);
     /** @return The ramp drive name. */
     std::string ramp_drive() const;
-    /** @brief Sets the ramp function; only linear exists, none (the default) and any other name behave as linear. @param function The function name. */
+    /**
+     * @brief Sets the easing function of the ramps: a name of the function library, made with its default parameters.
+     * `none` (the default), `linear` and an unknown name ramp linearly. @param function The function name.
+     */
     void set_ramp_function(std::string function);
     /** @return The ramp function name. */
     std::string ramp_function() const;
+    /** @return The names of the parameters of the ramp function (empty if it has none). */
+    std::vector<std::string> function_parameter_names() const;
+    /** @param name A name. @return True if the ramp function has a parameter of that name. */
+    bool has_function_parameter(std::string_view name) const;
+    /** @param name A parameter of the ramp function. @return Its value, or an empty value if there is none. */
+    Value function_parameter(std::string_view name) const;
+    /** @brief Sets a parameter of the ramp function, also for a ramp that is running. @param name The parameter. @param value The value. @return False if refused. */
+    bool set_function_parameter(std::string_view name, const Value& value);
     /** @return True while a ramp is running. */
     bool ramp_running() const;
 

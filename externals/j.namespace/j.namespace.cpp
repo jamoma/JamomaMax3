@@ -107,14 +107,14 @@ public:
     }}};
 
     /** Whether a relative address is taken relative to the model of the patcher. */
-    attribute<int> relative{this, "relative", 0, setter{MIN_FUNCTION {
+    attribute<int> relative{this, "relative", 0, style::onoff, setter{MIN_FUNCTION {
         relative_ = static_cast<int>(args[0]) != 0;
         start();
         return args;
     }}};
 
     /** Whether the result is sent again when the namespace changes. */
-    attribute<int> update{this, "update", 1, setter{MIN_FUNCTION {
+    attribute<int> update{this, "update", 1, style::onoff, setter{MIN_FUNCTION {
         update_ = static_cast<int>(args[0]) != 0;
         start();
         return args;

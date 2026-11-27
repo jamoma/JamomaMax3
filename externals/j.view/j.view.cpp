@@ -68,7 +68,7 @@ public:
     /** The tags of the view. */
     attribute<symbol> tags{this, "tags", ""};
     /** Whether the view reports activity (accepted so that old patchers load; it has no effect yet). */
-    attribute<int> activity{this, "activity", 0};
+    attribute<int> activity{this, "activity", 0, style::onoff};
 
     /** After construction: registers the dump outlet and the view. */
     message<> setup{this, "setup", MIN_FUNCTION {

@@ -56,6 +56,7 @@ class j_model : public c74::min::object<j_model> {
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
+    std::string alias_text_;                   /**< The alias as written (kept for the model that replaces this one). */
     jamoma_max::ContextWatch watch_;           /**< Moves the model below its parent model when that one appears later, is replaced or goes. */
     std::unique_ptr<jamoma::ModelExplorer> explorer_;                        /**< Tells when parameters below the model come or go. */
     std::map<std::string, std::unique_ptr<jamoma::Receiver>> watches_;      /**< One receiver per parameter below the model, by its address relative to the model. */
@@ -105,10 +106,23 @@ public:
         return args;
     }}};
 
-    /** The alias of the model (accepted so that old patchers load; it has no effect yet). */
-    attribute<symbol> alias{this, "alias", ""};
+    /**
+     * Another address under which the model and everything below it can be reached too (an absolute address, or a name beside the model).
+     * The model keeps its own address. Empty removes the alias.
+     */
+    attribute<symbol> alias{this, "alias", "", setter{MIN_FUNCTION {
+        alias_text_ = args.empty() ? std::string() : std::string(static_cast<symbol>(args[0]).c_str());
+        apply_alias();
+        return args;
+    }}};
+
+    /** Removes the alias. */
+    message<> alias_remove{this, "alias/remove", MIN_FUNCTION {
+        alias = "";
+        return {};
+    }};
     /** Whether the model reports its activity (accepted so that old patchers load; it has no effect yet). */
-    attribute<int> activity{this, "activity", 0};
+    attribute<int> activity{this, "activity", 0, style::onoff};
     /** The tags of the model (accepted so that old patchers load; it has no effect yet). */
     attribute<symbol> tags{this, "tags", ""};
     /** The file the presets were last read from or written to (set by the preset messages). */
@@ -386,9 +400,16 @@ public:
                     place(true);
                 }
                 if (model_) {
-                    model_->init();
+                    // A model inside a model that has not been initialised yet is left to that one, which does it at its place in the order of
+                    // priority (as the old objects); else, as at the top or when it is added later, it initialises itself.
+                    const bool left_to_parent = !model_->initialized() && parent_pending();
+                    if (!left_to_parent && !model_->initialized()) {
+                        model_->init();
+                    }
                     load_default_presets();
-                    recall_default();
+                    if (!left_to_parent) {
+                        recall_default();
+                    }
                     init_watch_ = model_->on_init_changed([this](bool done) {
                         if (done && !in_default_) {
                             in_default_ = true;
@@ -535,8 +556,20 @@ private:
         active_data_.set_attribute("range", {0, 1});
         active_data_.set_attribute("default", {1});
         active_data_.set_attribute("description", {"Activates or deactivates the model"});
+        active_data_.set_attribute("tags", {"generic"}); // the panel lists it under the generic parameters
         active_sub_ = jamoma::Registry::instance().names().subscribe(model_->address().append(jamoma::Address::parse("data/active")), active_data_);
         active_data_.command({1}); // set_type reset the value to 0
+    }
+
+    /** @return True if a model of an enclosing patcher is still to be initialised. */
+    bool parent_pending() const
+    {
+        for (const void* p = jamoma_max::parent_patcher(patcher_); p != nullptr; p = jamoma_max::parent_patcher(p)) {
+            if (const jamoma::Model* parent = jamoma::Registry::instance().contexts().find(p)) {
+                return !parent->initialized();
+            }
+        }
+        return false;
     }
 
     /** @return The address the model belongs at: below the model of the nearest enclosing patcher, else at the root. */
@@ -581,6 +614,7 @@ private:
         model_ = std::make_unique<jamoma::Model>(jamoma::Registry::instance().names(), jamoma::Address::parse(prefix + "/" + name_));
         model_->set_description(description);
         model_->set_priority(priority_value);
+        apply_alias();
         if (!kept.empty()) {
             model_->presets().replace_all(std::move(kept));
         }
@@ -590,6 +624,14 @@ private:
         if (explorer_) {
             explorer_->set_model(model_->address());
             sync_watches();
+        }
+    }
+
+    /** Gives the model its alias (nothing happens while there is no model yet: place() calls this again). */
+    void apply_alias()
+    {
+        if (model_ && !model_->set_alias(alias_text_)) {
+            c74::max::object_error(maxobj(), "alias %s: the address is taken, or lies in or around the model", alias_text_.c_str());
         }
     }
 

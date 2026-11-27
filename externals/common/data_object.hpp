@@ -16,6 +16,8 @@
 #include "c74_min.h"
 
 #include "jamoma/data.hpp"
+#include "jamoma/dataspace.hpp"
+#include "jamoma/function_library.hpp"
 #include "jamoma/registry.hpp"
 #include "jamoma/version.hpp"
 #include "max_atoms.hpp"
@@ -140,6 +142,8 @@ public:
             data_.dec(to_value(rest(message)));
         } else if (c74::max::object_attr_get(this->maxobj(), name) != nullptr) {
             attribute_message(name, message);
+        } else if (data_.has_function_parameter(selector)) {
+            function_parameter_message(name, message);
         } else {
             data_.command(to_value(message));
         }
@@ -207,6 +211,22 @@ public:
         add_attribute<Attr::RampStatus>(c);
         add_attribute<Attr::Value>(c);
         add_attribute<Attr::Service>(c);
+        // What the inspector and attrui show: a toggle for the true or false ones, a menu for those with a fixed set of values.
+        show_toggle<Attr::RepetitionsFilter>(c);
+        show_toggle<Attr::Active>(c);
+        show_menu<Attr::Type>(c, {"none", "generic", "string", "boolean", "integer", "decimal", "array"});
+        show_menu<Attr::Clipmode>(c, {"none", "low", "high", "both"});
+        show_menu<Attr::RampDrive>(c, {"max", "system", "none"});
+        std::vector<std::string> functions{"none"};
+        for (const std::string& function : jamoma::function_names()) {
+            functions.push_back(function);
+        }
+        show_menu<Attr::RampFunction>(c, functions);
+        std::vector<std::string> dataspaces{"none"};
+        for (const std::string& dataspace : jamoma::Dataspace::names()) {
+            dataspaces.push_back(dataspace);
+        }
+        show_menu<Attr::Dataspace>(c, dataspaces);
         return {};
     }};
 
@@ -239,6 +259,21 @@ private:
                 }
                 return;
             }
+        }
+    }
+
+    /**
+     * Handles `<parameter of the ramp function> [values]`: alone it answers `<name> <value>` on the dump outlet, with values it sets.
+     * @param name The parameter name. @param message The whole message (the name first).
+     */
+    void function_parameter_message(c74::max::t_symbol* name, const c74::min::atoms& message)
+    {
+        if (message.size() == 1) {
+            const c74::min::atoms atoms = to_atoms(data_.function_parameter(name->s_name));
+            c74::max::outlet_anything(dump_out.max_outlet(), name, static_cast<short>(atoms.size()),
+                                      atoms.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&atoms[0])));
+        } else if (!data_.set_function_parameter(name->s_name, to_value(rest(message)))) {
+            c74::max::object_error(this->maxobj(), "%s: the value is not accepted by the ramp function", name->s_name);
         }
     }
 
@@ -311,13 +346,50 @@ private:
         return c74::max::MAX_ERR_NONE;
     }
 
+    /** @param a Which attribute. @return Its Max type: a number for the true or false ones, a symbol for those with a menu, else atoms. */
+    static const char* attribute_type(Attr a)
+    {
+        switch (a) {
+        case Attr::RepetitionsFilter:
+        case Attr::Active: return "long";
+        case Attr::Type:
+        case Attr::Clipmode:
+        case Attr::RampDrive:
+        case Attr::RampFunction:
+        case Attr::Dataspace: return "symbol";
+        default: return "atom";
+        }
+    }
+
+    /** Shows an attribute as a toggle. @tparam A Which attribute. @param c The class. */
+    template <Attr A>
+    static void show_toggle(c74::max::t_class* c)
+    {
+        c74::max::class_attr_addattr_parse(c, attribute_name(A).c_str(), "style", c74::max::gensym("symbol"), 0, "onoff");
+    }
+
+    /** Shows an attribute as a menu. @tparam A Which attribute. @param c The class. @param values The lines of the menu. */
+    template <Attr A>
+    static void show_menu(c74::max::t_class* c, const std::vector<std::string>& values)
+    {
+        std::string text;
+        for (const std::string& value : values) {
+            text += (text.empty() ? "" : " ") + value;
+        }
+        c74::max::class_attr_addattr_parse(c, attribute_name(A).c_str(), "style", c74::max::gensym("symbol"), 0, "enum");
+        c74::max::class_attr_addattr_parse(c, attribute_name(A).c_str(), "enumvals", c74::max::gensym("atom"), 0, text.c_str());
+    }
+
     /** Adds an attribute (a list of atoms of any length) to the class. @tparam A Which attribute. @param c The class. */
     template <Attr A>
     static void add_attribute(c74::max::t_class* c)
     {
-        c74::max::t_object* attr = c74::max::attr_offset_array_new(
-            attribute_name(A).c_str(), c74::max::gensym("atom"), 256, 0,
-            reinterpret_cast<c74::max::method>(&attr_getter<A>), reinterpret_cast<c74::max::method>(&attr_setter<A>), 0, 0);
+        const char* type = attribute_type(A);
+        const auto get = reinterpret_cast<c74::max::method>(&attr_getter<A>);
+        const auto set = reinterpret_cast<c74::max::method>(&attr_setter<A>);
+        c74::max::t_object* attr = std::string(type) == "atom"
+            ? c74::max::attr_offset_array_new(attribute_name(A).c_str(), c74::max::gensym(type), 256, 0, get, set, 0, 0)
+            : c74::max::attr_offset_new(attribute_name(A).c_str(), c74::max::gensym(type), 0, get, set, 0);
         c74::max::class_addattr(c, attr);
     }
 

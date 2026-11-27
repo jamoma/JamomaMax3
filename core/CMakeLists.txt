@@ -62,6 +62,7 @@ add_executable(jamoma_core_tests
     tests/receiver_test.cpp
     tests/sender_test.cpp
     tests/ui_grid_test.cpp
+    tests/ui_header_test.cpp
     tests/function_library_test.cpp
     tests/mapper_test.cpp
     tests/explore_nodes_test.cpp
