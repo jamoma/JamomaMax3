@@ -67,7 +67,7 @@
                             "modernui": 1
                         },
                         "classnamespace": "box",
-                        "rect": [ 0.0, 26.0, 1108.0, 617.0 ],
+                        "rect": [ 102.0, 111.0, 1108.0, 617.0 ],
                         "gridsize": [ 10.0, 10.0 ],
                         "toolbarvisible": 0,
                         "showontab": 1,
@@ -150,7 +150,7 @@
                                     "numoutlets": 1,
                                     "outlettype": [ "" ],
                                     "patching_rect": [ 306.0, 501.0, 201.0, 22.0 ],
-                                    "text": "UnitsMenu append db-raw"
+                                    "text": "output second"
                                 }
                             },
                             {
@@ -343,17 +343,6 @@
                                             },
                                             {
                                                 "box": {
-                                                    "id": "obj-4",
-                                                    "maxclass": "newobj",
-                                                    "numinlets": 1,
-                                                    "numoutlets": 1,
-                                                    "outlettype": [ "" ],
-                                                    "patching_rect": [ 43.5, 88.0, 56.0, 22.0 ],
-                                                    "text": "deferlow"
-                                                }
-                                            },
-                                            {
-                                                "box": {
                                                     "id": "obj-2",
                                                     "maxclass": "newobj",
                                                     "numinlets": 1,
@@ -365,96 +354,45 @@
                                             },
                                             {
                                                 "box": {
-                                                    "angle": 270.0,
-                                                    "bgcolor": [ 0.17213714979609188, 0.1721371000440022, 0.17213711304501805, 1 ],
-                                                    "border": 1,
-                                                    "id": "obj-31",
-                                                    "maxclass": "panel",
-                                                    "mode": 0,
-                                                    "numinlets": 1,
-                                                    "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 188.5, 128.0, 128.0 ],
-                                                    "presentation": 1,
-                                                    "presentation_rect": [ 324.0, 0.0, 53.0, 22.0 ],
-                                                    "proportion": 0.39,
-                                                    "rounded": 0
-                                                }
-                                            },
-                                            {
-                                                "box": {
-                                                    "angle": 270.0,
-                                                    "bgcolor": [ 0.17213714979609188, 0.1721371000440022, 0.17213711304501805, 1 ],
-                                                    "border": 1,
-                                                    "id": "obj-30",
-                                                    "maxclass": "panel",
-                                                    "mode": 0,
-                                                    "numinlets": 1,
-                                                    "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 188.5, 128.0, 128.0 ],
-                                                    "presentation": 1,
-                                                    "presentation_rect": [ 176.0, 0.0, 42.0, 22.0 ],
-                                                    "proportion": 0.39,
-                                                    "rounded": 0
-                                                }
-                                            },
-                                            {
-                                                "box": {
-                                                    "angle": 270.0,
-                                                    "bgcolor": [ 0.17213714979609188, 0.1721371000440022, 0.17213711304501805, 1 ],
-                                                    "border": 1,
-                                                    "id": "obj-27",
-                                                    "maxclass": "panel",
-                                                    "mode": 0,
-                                                    "numinlets": 1,
-                                                    "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 188.5, 128.0, 128.0 ],
-                                                    "presentation": 1,
-                                                    "presentation_rect": [ 1.0, 0.0, 70.0, 22.0 ],
-                                                    "proportion": 0.39,
-                                                    "rounded": 0
-                                                }
-                                            },
-                                            {
-                                                "box": {
-                                                    "fontface": 1,
+                                                    "fontface": 0,
                                                     "fontname": "Arial",
                                                     "id": "obj-26",
                                                     "maxclass": "comment",
                                                     "numinlets": 1,
                                                     "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 242.0, 53.0, 20.0 ],
+                                                    "patching_rect": [ 922.0, 242.0, 49.0, 20.0 ],
                                                     "presentation": 1,
-                                                    "presentation_rect": [ 324.0, 0.0, 53.0, 20.0 ],
+                                                    "presentation_rect": [ 324.0, 0.0, 49.0, 20.0 ],
                                                     "text": "Output:"
                                                 }
                                             },
                                             {
                                                 "box": {
-                                                    "fontface": 1,
+                                                    "fontface": 0,
                                                     "fontname": "Arial",
                                                     "fontsize": 12.0,
                                                     "id": "obj-23",
                                                     "maxclass": "comment",
                                                     "numinlets": 1,
                                                     "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 195.0, 42.0, 20.0 ],
+                                                    "patching_rect": [ 922.0, 195.0, 39.0, 20.0 ],
                                                     "presentation": 1,
-                                                    "presentation_rect": [ 176.0, 0.0, 42.0, 20.0 ],
+                                                    "presentation_rect": [ 176.0, 0.0, 39.0, 20.0 ],
                                                     "text": "Input:"
                                                 }
                                             },
                                             {
                                                 "box": {
-                                                    "fontface": 1,
+                                                    "fontface": 0,
                                                     "fontname": "Arial",
                                                     "fontsize": 12.0,
                                                     "id": "obj-19",
                                                     "maxclass": "comment",
                                                     "numinlets": 1,
                                                     "numoutlets": 0,
-                                                    "patching_rect": [ 922.0, 101.0, 73.0, 20.0 ],
+                                                    "patching_rect": [ 922.0, 101.0, 69.0, 20.0 ],
                                                     "presentation": 1,
-                                                    "presentation_rect": [ 1.0, 0.0, 73.0, 20.0 ],
+                                                    "presentation_rect": [ 1.0, 0.0, 69.0, 20.0 ],
                                                     "text": "Dataspace:"
                                                 }
                                             },
@@ -569,7 +507,7 @@
                                                 "box": {
                                                     "allowdrag": 0,
                                                     "id": "obj-22",
-                                                    "items": [ "dB-raw", ",", "db", ",", "midigain", ",", "linear", ",", "db-raw", ",", "dB" ],
+                                                    "items": [ "second", ",", "ms", ",", "sample", ",", "bpm", ",", "Hz", ",", "midinote", ",", "cents", ",", "mel", ",", "bark" ],
                                                     "labelclick": 1,
                                                     "maxclass": "umenu",
                                                     "numinlets": 1,
@@ -611,7 +549,7 @@
                                                 "box": {
                                                     "allowdrag": 0,
                                                     "id": "obj-28",
-                                                    "items": [ "dB-raw", ",", "db", ",", "midigain", ",", "linear", ",", "db-raw", ",", "dB" ],
+                                                    "items": [ "second", ",", "ms", ",", "sample", ",", "bpm", ",", "Hz", ",", "midinote", ",", "cents", ",", "mel", ",", "bark" ],
                                                     "labelclick": 1,
                                                     "maxclass": "umenu",
                                                     "numinlets": 1,
@@ -865,15 +803,7 @@
                                             },
                                             {
                                                 "patchline": {
-                                                    "destination": [ "obj-4", 0 ],
-                                                    "order": 0,
-                                                    "source": [ "obj-5", 1 ]
-                                                }
-                                            },
-                                            {
-                                                "patchline": {
                                                     "destination": [ "obj-6", 0 ],
-                                                    "order": 1,
                                                     "source": [ "obj-5", 1 ]
                                                 }
                                             },
@@ -2717,7 +2647,7 @@
                             "modernui": 1
                         },
                         "classnamespace": "box",
-                        "rect": [ 102.0, 111.0, 1108.0, 617.0 ],
+                        "rect": [ 0.0, 26.0, 1108.0, 617.0 ],
                         "gridsize": [ 5.0, 5.0 ],
                         "style": "default",
                         "showontab": 1,
@@ -2859,7 +2789,7 @@
                                     "numinlets": 1,
                                     "numoutlets": 2,
                                     "outlettype": [ "", "" ],
-                                    "patching_rect": [ 93.0, 313.0, 105.0, 62.0 ],
+                                    "patching_rect": [ 93.0, 313.0, 108.0, 62.0 ],
                                     "text": "j.unit @dataspace gain @input midigain @output linear"
                                 }
                             },
@@ -2952,7 +2882,6 @@
                                     "numinlets": 1,
                                     "numoutlets": 0,
                                     "patching_rect": [ 12.0, 90.0, 36.0, 74.0 ],
-                                    "presentation_linecount": 5,
                                     "text": "cmy:\nhsl:\nhsv:\nrgb:\nrgb8:"
                                 }
                             },
