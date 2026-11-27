@@ -16,6 +16,9 @@ ctest --preset macos
 cmake --build --preset macos --target docs   # Doxygen; any warning is an error
 ```
 
+On Windows use the `windows` preset in every command; it needs Visual Studio with C++ (the newest installed one
+is used). CI builds and unit-tests the Windows version; it has not yet been run in Max.
+
 ## Install the package in Max 9
 
 The Max package folder must be named `Jamoma`. Link the package folder into Max:

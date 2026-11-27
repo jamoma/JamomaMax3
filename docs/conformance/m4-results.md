@@ -47,4 +47,4 @@ A read-only review of the whole branch by a fresh Opus reviewer gave no critical
 - `osc_receive`: the default of its parameter `print` is not asserted.
 - Arguments of `poly~` voices do not name a model (the old objects read them).
 - A locked patcher background set in a patcher file was read back as the theme's colour in a probe; the header of `j.ui` may follow the theme there.
-- **Windows is untested** (no Windows machine yet), for this milestone as for the earlier ones.
+- **Windows is untested** (no Windows machine yet), for this milestone as for the earlier ones. Update of 27 November 2026, after the tag: CI now builds the externals on Windows and runs the unit tests there; nothing has been run in Max.

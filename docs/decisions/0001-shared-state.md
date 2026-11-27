@@ -1,6 +1,6 @@
 # 0001: How externals share one namespace
 
-Date: 2026-11-21. Status: **decided for macOS (verified); Windows mechanism untested.**
+Date: 2026-11-21. Status: **decided for macOS (verified); Windows builds in CI, but its mechanism is untested in Max.**
 
 ## Question
 
@@ -28,13 +28,13 @@ Both externals see the same registry id, so state is not split between binaries.
 
 Rpath: `@loader_path/../../../../support` (four levels up from `<name>.mxo/Contents/MacOS` to the package root).
 
-## Windows: not verified
+## Windows: builds, not verified in Max
 
-No Windows machine was available. The Windows branch of `jamoma_add_external`, the `windows` preset, `ci.yml` and `scripts/max-smoke.ps1` are written but have never been built or run.
+No Windows machine was available when this was written. Since 27 November 2026 CI builds the core and every external on Windows (Visual Studio 2026, x64) and runs the unit tests, the tool tests and the Doxygen gate there. The externals have never been loaded in Max on Windows, and `scripts/max-smoke.ps1` has never been run.
 
 The mechanism chosen: Windows looks for a DLL next to the module that needs it, not in `../support`, and the loader itself links the DLL implicitly, so it cannot call `SetDllDirectory` first. So `jamoma_core.dll` is copied next to every external and extension (post-build), and the design relies on Windows mapping a DLL name once per process, so all externals share the first copy loaded (the loader's, from `extensions/`). **This rests on an unverified premise.** Whether a dependency DLL is found next to the external depends on the flags Max passes to `LoadLibraryEx` (with a plain `LoadLibrary(fullpath)` the external's own folder is not searched), and Max's package conventions describe `support/` as the place for such DLLs, so the copies may be unnecessary. **The first Windows step is to test the single-copy layout (DLL only in `support/`); keep the copies only if that fails.** If the copies stay, they drift: each is refreshed only when an external relinks, a core-only change may leave the copy beside the loader (the one loaded first) stale, and copies from removed targets linger; the ABI number cannot catch a same-ABI stale build. Then make each copy depend on the core target. Fallback if the test shows split state: delay-load `jamoma_core` in `j.loader` and call `AddDllDirectory` for `support/` before first use; or link the core statically into one external that registers every class.
 
-The Windows build now uses the dynamic C runtime (`/MD`) for the core and every external (see rule 2 below; the original text said `/MT`). **Untested on Windows.**
+The Windows build now uses the dynamic C runtime (`/MD`) for the core and every external (see rule 2 below; the original text said `/MT`). **Untested in Max on Windows.**
 
 ## Findings that shaped the runner
 
@@ -48,7 +48,7 @@ The Windows build now uses the dynamic C runtime (`/MD`) for the core and every 
 ## Rules for milestone 1 (from the whole-branch review)
 
 1. **Exit and teardown (decided in milestone 1, task 3: leaked registry).** `Registry::instance()` returns a deliberately leaked heap object, so externals that unsubscribe while Max quits always find the registry and its namespace intact; the test `registry_outlives_static_destruction` aborts with an ordinary function-local static registry and passes with the leak. Original rule, kept for history: `Registry` has a trivial destructor today. Before it holds anything that references Max or externals, decide the exit policy: either a deliberately leaked singleton (`static Registry* = new Registry`) or an explicit shutdown from a quit task installed in `maxclass_setup` (`c74::max::quittask_install`). Static destruction at `exit()` / `DLL_PROCESS_DETACH` that calls into externals or Max will crash.
-2. **Standard-library types across the core API (superseded in milestone 1, task 2).** The Windows build now links the dynamic C runtime (`/MD`) for the core and every external, so they share one heap and `std::string`, `std::vector` and the like may cross the boundary (`Atom`, `Value`, `Address`). Core and externals must always be built together with the same compiler and standard library, which the frozen ABI check and one release per package already imply. **Untested on Windows.** (The original rule, plain data only under `/MT`, is kept here for history.)
+2. **Standard-library types across the core API (superseded in milestone 1, task 2).** The Windows build now links the dynamic C runtime (`/MD`) for the core and every external, so they share one heap and `std::string`, `std::vector` and the like may cross the boundary (`Atom`, `Value`, `Address`). Core and externals must always be built together with the same compiler and standard library, which the frozen ABI check and one release per package already imply. **Untested in Max on Windows.** (The original rule, plain data only under `/MT`, is kept here for history.)
 3. **ABI entry points are frozen.** `jamoma::abi_version()`, `Registry::check_abi()` and `Registry::try_attach_loader()` are never removed or changed; every external calls the check first in its setup. A symbol the installed library lacks is rejected by the dynamic loader before any Jamoma code runs (a generic dyld or Windows error 127, not the Jamoma ABI message), so the clean refusal only covers "same symbols, different layout or semantics". Giving `jamoma_core` a compatibility version equal to the ABI so older libraries are rejected too is open.
 4. **Warn once per process.** An external that starts without the loader logs the warning only if `Registry::claim_missing_loader_warning()` returns true.
 5. **Duplicate installs.** Two copies of the package in one Max process (for example the Packages folder plus a search path) could load two libraries and split state silently. Optional hardening: publish the registry's address through a process-wide anchor on first `instance()` and report an error if a second copy finds one set.
