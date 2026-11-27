@@ -71,7 +71,7 @@ function(jamoma_add_external)
             VERBATIM)
     endif()
     if(WIN32)
-        # Windows branch: UNTESTED (no Windows machine available when written); mirrors max-sdk-base's settings.
+        # Windows branch: built in CI, never loaded in Max; mirrors max-sdk-base's settings.
         target_compile_definitions(${target} PRIVATE MAXAPI_USE_MSCRT WIN_VERSION _USE_MATH_DEFINES NOMINMAX)
         target_compile_options(${target} PRIVATE /MP /Zc:__cplusplus /permissive-)
         target_link_libraries(${target} PRIVATE
