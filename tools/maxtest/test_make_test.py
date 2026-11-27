@@ -184,13 +184,33 @@ class ChainTests(unittest.TestCase):
         c = cords(p)
         first = next(d for s, o, d, i in c if s == "inlet")
         outlets = {o: d for s, o, d, i in c if s == first}
-        top_outlet = max(outlets)
-        self.assertEqual(outlets[top_outlet], "int 0")                   # the rightmost outlet fires first: a reset (of the first holder)
-        self.assertEqual(outlets[0], "deferlow")                         # the leftmost fires last: wait
-        self.assertIn((first, top_outlet, "int 0", 1), c)               # a constant of the trigger, into the cold inlet
+        self.assertEqual(outlets[max(outlets)], "s j_view_x_binds_begin")  # the rightmost outlet fires first: reset every holder
+        self.assertEqual(outlets[0], "deferlow")                           # the leftmost fires last: wait
+        self.assertEqual(sum(1 for s, o, d, i in c if s == "r j_view_x_binds_begin"), 3)
+        self.assertIn(("0", 0, "int 0", 1), c)                             # each holder is given its start value
         self.assertIn(("int -1", 0, "expr $i1*10+$i2", 0), c)
         self.assertIn(("int -1", 0, "expr $i1*10+$i2", 1), c)
         self.assertIn(("== 12", 0, "outlet", 0), c)
+
+    def test_a_step_is_arranged_with_what_it_does_left_of_what_it_watches(self):
+        for name, p in self.sub.items():
+            boxes = [e["box"] for e in p["boxes"]]
+            for i, a in enumerate(boxes):
+                for b in boxes[i + 1:]:
+                    ax, ay, aw, ah = a["patching_rect"]
+                    bx, by, bw, bh = b["patching_rect"]
+                    self.assertFalse(ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah, (name, a.get("text"), b.get("text")))
+        boxes = [e["box"] for e in self.sub["p binds"]["boxes"]]
+        acting = max(b["patching_rect"][0] + b["patching_rect"][2] for b in boxes if str(b.get("text", "")).startswith(("deferlow", "s j_view", "s x_")))
+        watching = min(b["patching_rect"][0] for b in boxes if str(b.get("text", "")).startswith(("r ", "int", "route", "sel", "expr")))
+        self.assertLess(acting, watching)
+        holders = {b["patching_rect"][1] for b in boxes if str(b.get("text", "")).startswith("int ")}
+        self.assertEqual(len(holders), 1)                                  # the holders stand on one line
+        feeding = max(b["patching_rect"][1] for b in boxes if str(b.get("text", "")).startswith(("route", "sel", "t 1")))
+        self.assertLess(feeding, holders.pop())
+        outlets = [b["patching_rect"] for b in boxes if b["maxclass"] == "outlet"]
+        self.assertEqual([r[0] for r in outlets], sorted(r[0] for r in outlets))
+        self.assertEqual(len({r[1] for r in outlets}), 1)
 
     def test_results_come_out_before_the_step_is_done(self):
         p = self.sub["p binds"]

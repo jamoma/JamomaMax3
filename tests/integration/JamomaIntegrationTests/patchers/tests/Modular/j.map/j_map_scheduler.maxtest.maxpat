@@ -133,8 +133,8 @@
       "rect": [
        34.0,
        96.0,
-       609.6,
-       474.0
+       941.8,
+       410.0
       ],
       "boxes": [
        {
@@ -149,8 +149,8 @@
          "patching_rect": [
           30.0,
           30.0,
-          40.0,
-          22.0
+          30.0,
+          30.0
          ]
         }
        },
@@ -164,8 +164,8 @@
           ""
          ],
          "patching_rect": [
-          94.0,
-          30.0,
+          525.2,
+          190.0,
           126.4,
           22.0
          ],
@@ -182,12 +182,48 @@
           ""
          ],
          "patching_rect": [
-          232.8,
-          286.0,
+          525.2,
+          230.0,
           74.2,
           22.0
          ],
          "text": "float -1."
+        }
+       },
+       {
+        "box": {
+         "id": "zr0_0",
+         "maxclass": "newobj",
+         "numinlets": 0,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          663.6,
+          150.0,
+          248.2,
+          22.0
+         ],
+         "text": "r map_sch_on_the_scheduler_thread_begin"
+        }
+       },
+       {
+        "box": {
+         "id": "zv0_0",
+         "maxclass": "message",
+         "numinlets": 2,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          663.6,
+          190.0,
+          40.0,
+          22.0
+         ],
+         "text": "-1."
         }
        },
        {
@@ -200,8 +236,8 @@
           ""
          ],
          "patching_rect": [
-          232.8,
-          350.0,
+          525.2,
+          270.0,
           196.0,
           22.0
          ],
@@ -217,7 +253,7 @@
          "outlettype": [],
          "patching_rect": [
           30.0,
-          414.0,
+          350.0,
           30.0,
           30.0
          ]
@@ -231,8 +267,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          120.0,
-          414.0,
+          525.2,
+          350.0,
           30.0,
           30.0
          ]
@@ -250,11 +286,27 @@
          ],
          "patching_rect": [
           30.0,
-          94.0,
-          62.6,
+          70.0,
+          51.0,
           22.0
          ],
-         "text": "t b -1."
+         "text": "t b b"
+        }
+       },
+       {
+        "box": {
+         "id": "s0_0",
+         "maxclass": "newobj",
+         "numinlets": 1,
+         "numoutlets": 0,
+         "outlettype": [],
+         "patching_rect": [
+          150.0,
+          110.0,
+          248.2,
+          22.0
+         ],
+         "text": "s map_sch_on_the_scheduler_thread_begin"
         }
        },
        {
@@ -268,7 +320,7 @@
          ],
          "patching_rect": [
           30.0,
-          158.0,
+          150.0,
           68.4,
           22.0
          ],
@@ -283,8 +335,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          244.4,
-          30.0,
+          150.0,
+          150.0,
           335.2,
           20.0
          ],
@@ -304,7 +356,7 @@
          ],
          "patching_rect": [
           30.0,
-          222.0,
+          190.0,
           80.0,
           22.0
          ],
@@ -319,8 +371,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          94.0,
-          286.0,
+          150.0,
+          230.0,
           114.8,
           22.0
          ],
@@ -333,6 +385,30 @@
         "patchline": {
          "source": [
           "r0_0",
+          0
+         ],
+         "destination": [
+          "h0_0",
+          1
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zr0_0",
+          0
+         ],
+         "destination": [
+          "zv0_0",
+          0
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zv0_0",
           0
          ],
          "destination": [
@@ -384,8 +460,8 @@
           1
          ],
          "destination": [
-          "h0_0",
-          1
+          "s0_0",
+          0
          ]
         }
        },

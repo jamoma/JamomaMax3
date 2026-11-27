@@ -10,7 +10,7 @@ its receives in a column to the right.
 
 A test patcher built as a chain of steps (the starter feeds a subpatcher, whose left outlet feeds the next one, down to the `test.terminate`) is
 arranged as one column: comments on top, then starter, steps and terminate, each result as a toggle and its assertion below the step, and the objects
-under test to the right. The outlets of a step are kept in one line, in their order. Everything below holds inside a block, and for any other patcher.
+under test to the right. The inside of a step is left as it is (make_test arranges it; Max numbers its outlets by their position). Everything below holds inside a block, and for any other patcher.
 
     layout_patcher.py <path>/<name>.maxtest.maxpat
 
@@ -143,17 +143,6 @@ def _chain(patcher):
     return None
 
 
-def _order_outlets(patcher):
-    """Puts the outlets of a step in one line at the bottom, left to right in the order of the file (Max numbers outlets by their position)."""
-    outlets = [e["box"] for e in patcher["boxes"] if e["box"]["maxclass"] == "outlet"]
-    others = [e["box"]["patching_rect"] for e in patcher["boxes"] if e["box"]["maxclass"] != "outlet"]
-    bottom = max(r[1] + r[3] for r in others) + ROW - HEIGHT
-    for k, box in enumerate(outlets):
-        box["patching_rect"] = [MARGIN + k * 90.0, round(bottom, 1), 30.0, 30.0]
-    patcher["rect"][2] = max(patcher["rect"][2], MARGIN * 2 + len(outlets) * 90.0)
-    patcher["rect"][3] = max(patcher["rect"][3], bottom + 30.0 + MARGIN)
-
-
 def _layout_chain(patcher, column):
     """Lays out a chain of steps: the column on the left, each result as a toggle and its assertion under the outlet, everything else to the right."""
     boxes = {e["box"]["id"]: e["box"] for e in patcher["boxes"]}
@@ -171,9 +160,6 @@ def _layout_chain(patcher, column):
     right = 0.0
     for ident in column:
         box = boxes[ident]
-        if "patcher" in box:
-            layout(box["patcher"])
-            _order_outlets(box["patcher"])
         results = []
         for k in range(1, box.get("numoutlets", 1)) if "patcher" in box else []:
             toggle = out.get((ident, k), [None])[0]

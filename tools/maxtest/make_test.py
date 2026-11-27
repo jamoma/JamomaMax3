@@ -86,15 +86,6 @@ def _number(value):
     return repr(value)
 
 
-def _is_number(word):
-    """True for the text of a number."""
-    try:
-        float(word)
-    except ValueError:
-        return False
-    return True
-
-
 def _texts(patcher):
     """Yields the texts of the objects of a patcher dictionary and its subpatchers."""
     for entry in patcher["boxes"]:
@@ -246,18 +237,20 @@ class TestPatcher:
             self.obj(f"{box_id}_s{outlet}", f"s {name}", 1, 0)
             self.line((box_id, outlet), f"{box_id}_s{outlet}")
 
-    def chain(self, start, prefix, steps, external=()):
+    def chain(self, start, prefix, steps, external=(), tag=None):
         """A chain of steps from `start` (a starter object text or an outlet (box id, index)) to `test.terminate`, for tests that must wait.
 
         Every step is a subpatcher; its left outlet starts the next step when it is done, every other outlet is the result of one assertion,
-        named `prefix/case`. `external` names sends and receives whose other end is in an abstraction of the test.
+        named `prefix/case`. `external` names sends and receives whose other end is in an abstraction of the test. `tag` is a short name of the test
+        for the sends that give the holders of a step their start values (without it the name comes from the prefix).
         """
         if isinstance(start, tuple) and start[0] not in self._ids:
             self.obj(start[0], start[0], 1, 1)
         previous = start
         for number, one in enumerate(steps):
             box_id = f"step{number}"
-            inner = self._step_patcher(one)
+            begin = "_".join(([tag] if tag else prefix.split("/")[2:]) + [one["name"], "begin"]).replace(".", "_")
+            inner = self._step_patcher(one, begin)
             results = len(one["expect"])
             self._add(box_id, f"p {one['name']}", "newobj", 1, results + 1, [""] * (results + 1), {"patcher": inner})
             self.line(previous, box_id)
@@ -274,11 +267,14 @@ class TestPatcher:
         assert not receives - sends, f"receive without a send: {sorted(receives - sends)}"
         assert not sends - receives, f"send without a receive: {sorted(sends - receives)}"
 
-    def _step_patcher(self, one):
-        """The patcher inside a step: triggers for the order, a `deferlow` or `delay` for every wait, holders, checks and outlets."""
+    def _step_patcher(self, one, begin):
+        """The patcher inside a step: triggers for the order, a `deferlow` or `delay` for every wait, holders, checks and outlets.
+
+        `begin` is the name of the send that tells the holders to take their start values."""
         p = TestPatcher(600.0, 500.0)
         p._add("in", None, "inlet", 0, 1, [""])
-        resets = []     # (holder id, start value)
+        resets = False
+        columns = []    # for every watch: (ids of its chain from the receive down, ids of its reset from the receive down, holder id, ids of checks, result number)
         reads = []      # holder ids in the order they are read
         results = []    # the (box, outlet) of each result
         for k, wanted in enumerate(one["expect"]):
@@ -297,8 +293,15 @@ class TestPatcher:
                 p.obj(hid, seen["hold"], *_ports(seen["hold"]))
                 for source in previous:
                     p.line(source, (hid, 1))
+                start = []
                 if not seen["keep"]:
-                    resets.append((hid, seen["hold"].split()[-1]))
+                    resets = True
+                    start = [f"zr{k}_{w}", f"zv{k}_{w}"]
+                    p.obj(start[0], f"r {begin}", 0, 1)
+                    p.msg(start[1], seen["hold"].split()[-1])
+                    p.line(start[0], start[1])
+                    p.line(start[1], (hid, 1))
+                columns.append(([rid] + [f"o{k}_{w}_{c}" for c in range(len(seen["chain"]))], start, hid, [], k))
                 holders.append(hid)
             reads += holders[::-1]      # the left inlet of a check is hot, so its holder is read last
             last = None
@@ -311,9 +314,10 @@ class TestPatcher:
                 else:
                     p.line(last, cid)
                 last = cid
+                columns[-len(holders)][3].append(cid)
             results.append((last or holders[0], 0))
 
-        segments, waits = [[("reset", hid, value) for hid, value in resets]], []
+        segments, waits = [[("send", begin, "bang")] if resets else []], []
         for action in one["do"]:
             if action[0] == "send":
                 segments[-1].append(action)
@@ -327,10 +331,11 @@ class TestPatcher:
             p._add(f"out{k}", None, "outlet", 1, 0, [])
             p.line(source, f"out{k}")
         previous = ("in", 0)
+        flow = []       # for every segment: (trigger id or None, [ids of each action from the message down], [ids of the wait and its comment])
         for number, items in enumerate(segments):
             if number < len(waits):
                 items = items + [("next",)]
-            p._segment(number, previous, items)
+            flow.append((*p._segment(number, previous, items), []))
             if number < len(waits):
                 action = waits[number]
                 wid = f"w{number}"
@@ -339,36 +344,93 @@ class TestPatcher:
                 else:
                     p.obj(wid, f"delay {action[1]}", 2, 1)
                     p.comment(f"{wid}_why", action[2])
+                    flow[-1][2].append(f"{wid}_why")
+                flow[-1][2].insert(0, wid)
                 p.line(p._next, wid)
                 previous = (wid, 0)
+        p._arrange_step(flow, columns, len(results))
         return p.patcher()
 
+    def _arrange_step(self, flow, columns, count):
+        """Positions of the boxes of a step: what it does in a column on the left (in the order of time, the actions of a trigger beside each other),
+        what it watches in columns to the right (chain and start value above the holder, check below it), the outlets on one line at the bottom."""
+        boxes = {e["box"]["id"]: e["box"] for e in self.boxes}
+        width = {i: layout_patcher.box_width(b) for i, b in boxes.items()}
+        height = 40.0
+        bottom = [0.0]
+
+        def put(ident, x, row):
+            box = boxes[ident]
+            size = (30.0, 30.0) if box["maxclass"] in ("inlet", "outlet") else (round(width[ident], 1), 20.0 if box["maxclass"] == "comment" else 22.0)
+            box["patching_rect"] = [round(x, 1), 30.0 + row * height, *size]
+            bottom[0] = max(bottom[0], row)
+            return x + size[0]
+
+        longest = max((len(chain) for chain, *_ in columns), default=0)
+        put("in", 30.0, 0)
+        row, right, holder_row = 1, 130.0, None
+        for number, (trigger, actions, waiting) in enumerate(flow):
+            last = number == len(flow) - 1
+            if last and columns:
+                row = max(row, longest, 2)      # room above the holders for their chains
+                holder_row = row + 1
+            if trigger:
+                right = max(right, put(trigger, 30.0, row))
+                row += 1
+            x, deepest = 150.0, 0
+            for ids in actions:
+                for depth, ident in enumerate(ids):
+                    put(ident, x, row + depth)
+                x += max(width[i] for i in ids) + 16.0
+                deepest = max(deepest, len(ids))
+                right = max(right, x - 16.0)
+            row += deepest
+            if waiting:
+                right = max(right, put(waiting[0], 30.0, row))
+                for comment in waiting[1:]:
+                    right = max(right, put(comment, 150.0, row))
+                row += 1
+        x = right + 40.0
+        places = {}
+        for chain, start, holder, checks, result in columns:
+            main = max([width[i] for i in chain] + [width[holder]])
+            for depth, ident in enumerate(reversed(chain)):
+                put(ident, x, holder_row - 1 - depth)
+            for depth, ident in enumerate(reversed(start)):
+                put(ident, x + main + 12.0, holder_row - 1 - depth)
+            put(holder, x, holder_row)
+            for depth, ident in enumerate(checks):
+                put(ident, x, holder_row + 1 + depth)
+            places.setdefault(result, x)
+            taken = main + (12.0 + max(width[i] for i in start) if start else 0.0)
+            x += max([taken] + [width[i] for i in checks]) + 24.0
+        last_row = int(bottom[0]) + 2
+        put("done", 30.0, last_row)
+        for k in range(count):
+            put(f"out{k}", places[k], last_row)
+        far = max(b["patching_rect"][0] + b["patching_rect"][2] for b in boxes.values())
+        self.rect = [34.0, 96.0, max(400.0, round(far + 30.0, 1)), 30.0 + last_row * height + 60.0]
+
     def _segment(self, number, source, items):
-        """The actions between two waits, fired in the order of `items` by one trigger (a single bang needs none). The outlet that leads on is left in `_next`."""
+        """The actions between two waits, fired in the order of `items` by one trigger (a single bang needs none). The outlet that leads on is left in `_next`.
+
+        Returns (id of the trigger or None, the ids of every send from its message down, in the order of the trigger's outlets from the left)."""
         plain = len(items) == 1 and items[0][0] in ("next", "done", "read")
         trigger = f"t{number}"
         count = len(items)
         tokens = []
         for item in items:
-            if item[0] == "reset":
-                tokens.append(item[2] if _is_number(item[2]) else "b")
-            elif item[0] == "send" and not isinstance(item[2], str):
+            if item[0] == "send" and not isinstance(item[2], str):
                 tokens.append(_number(item[2]))
             else:
                 tokens.append("b")
         if not plain:
             self.obj(trigger, "t " + " ".join(tokens[::-1]), 1, count)
             self.line(source, trigger)
+        actions = []
         for k, item in enumerate(items):
             outlet = source if plain else (trigger, count - 1 - k)
-            if item[0] == "reset" and _is_number(item[2]):
-                self.line(outlet, (item[1], 1))
-            elif item[0] == "reset":
-                mid = f"z{number}_{k}"
-                self.msg(mid, item[2])
-                self.line(outlet, mid)
-                self.line(mid, (item[1], 1))
-            elif item[0] == "read":
+            if item[0] == "read":
                 self.line(outlet, item[1])
             elif item[0] == "done":
                 self.line(outlet, "done")
@@ -383,8 +445,11 @@ class TestPatcher:
                     self.msg(mid, value)
                     self.line(outlet, mid)
                     self.line(mid, sid)
+                    actions.insert(0, [mid, sid])
                 else:
                     self.line(outlet, sid)
+                    actions.insert(0, [sid])
+        return (None if plain else trigger), actions
 
     def patcher(self):
         """The patcher dictionary."""

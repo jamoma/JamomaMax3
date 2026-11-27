@@ -661,8 +661,8 @@
       "rect": [
        34.0,
        96.0,
-       702.6,
-       602.0
+       1641.8,
+       490.0
       ],
       "boxes": [
        {
@@ -677,8 +677,8 @@
          "patching_rect": [
           30.0,
           30.0,
-          40.0,
-          22.0
+          30.0,
+          30.0
          ]
         }
        },
@@ -692,8 +692,8 @@
           ""
          ],
          "patching_rect": [
-          94.0,
-          30.0,
+          560.6,
+          150.0,
           120.6,
           22.0
          ],
@@ -711,8 +711,8 @@
           ""
          ],
          "patching_rect": [
-          128.2,
-          94.0,
+          560.6,
+          190.0,
           132.2,
           22.0
          ],
@@ -730,8 +730,8 @@
           ""
          ],
          "patching_rect": [
-          128.2,
-          158.0,
+          560.6,
+          230.0,
           109.0,
           22.0
          ],
@@ -748,8 +748,8 @@
           ""
          ],
          "patching_rect": [
-          128.2,
-          222.0,
+          560.6,
+          270.0,
           40.0,
           22.0
          ],
@@ -766,12 +766,48 @@
           ""
          ],
          "patching_rect": [
-          301.6,
-          414.0,
+          560.6,
+          310.0,
           51.0,
           22.0
          ],
          "text": "int 0"
+        }
+       },
+       {
+        "box": {
+         "id": "zr0_0",
+         "maxclass": "newobj",
+         "numinlets": 0,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          704.8,
+          230.0,
+          190.2,
+          22.0
+         ],
+         "text": "r vw_bpa_ask_every_view_begin"
+        }
+       },
+       {
+        "box": {
+         "id": "zv0_0",
+         "maxclass": "message",
+         "numinlets": 2,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          704.8,
+          270.0,
+          40.0,
+          22.0
+         ],
+         "text": "0"
         }
        },
        {
@@ -784,8 +820,8 @@
           ""
          ],
          "patching_rect": [
-          238.6,
-          30.0,
+          919.0,
+          150.0,
           120.6,
           22.0
          ],
@@ -803,8 +839,8 @@
           ""
          ],
          "patching_rect": [
-          284.4,
-          94.0,
+          919.0,
+          190.0,
           132.2,
           22.0
          ],
@@ -822,8 +858,8 @@
           ""
          ],
          "patching_rect": [
-          284.4,
-          158.0,
+          919.0,
+          230.0,
           109.0,
           22.0
          ],
@@ -840,8 +876,8 @@
           ""
          ],
          "patching_rect": [
-          284.4,
-          222.0,
+          919.0,
+          270.0,
           40.0,
           22.0
          ],
@@ -858,12 +894,48 @@
           ""
          ],
          "patching_rect": [
-          376.6,
-          414.0,
+          919.0,
+          310.0,
           51.0,
           22.0
          ],
          "text": "int 0"
+        }
+       },
+       {
+        "box": {
+         "id": "zr1_0",
+         "maxclass": "newobj",
+         "numinlets": 0,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          1063.2,
+          230.0,
+          190.2,
+          22.0
+         ],
+         "text": "r vw_bpa_ask_every_view_begin"
+        }
+       },
+       {
+        "box": {
+         "id": "zv1_0",
+         "maxclass": "message",
+         "numinlets": 2,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          1063.2,
+          270.0,
+          40.0,
+          22.0
+         ],
+         "text": "0"
         }
        },
        {
@@ -876,8 +948,8 @@
           ""
          ],
          "patching_rect": [
-          383.2,
-          30.0,
+          1277.4,
+          150.0,
           132.2,
           22.0
          ],
@@ -895,8 +967,8 @@
           ""
          ],
          "patching_rect": [
-          440.6,
-          94.0,
+          1277.4,
+          190.0,
           132.2,
           22.0
          ],
@@ -914,8 +986,8 @@
           ""
          ],
          "patching_rect": [
-          440.6,
-          158.0,
+          1277.4,
+          230.0,
           109.0,
           22.0
          ],
@@ -932,8 +1004,8 @@
           ""
          ],
          "patching_rect": [
-          440.6,
-          222.0,
+          1277.4,
+          270.0,
           40.0,
           22.0
          ],
@@ -950,12 +1022,48 @@
           ""
          ],
          "patching_rect": [
-          451.6,
-          414.0,
+          1277.4,
+          310.0,
           51.0,
           22.0
          ],
          "text": "int 0"
+        }
+       },
+       {
+        "box": {
+         "id": "zr2_0",
+         "maxclass": "newobj",
+         "numinlets": 0,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          1421.6,
+          230.0,
+          190.2,
+          22.0
+         ],
+         "text": "r vw_bpa_ask_every_view_begin"
+        }
+       },
+       {
+        "box": {
+         "id": "zv2_0",
+         "maxclass": "message",
+         "numinlets": 2,
+         "numoutlets": 1,
+         "outlettype": [
+          ""
+         ],
+         "patching_rect": [
+          1421.6,
+          270.0,
+          40.0,
+          22.0
+         ],
+         "text": "0"
         }
        },
        {
@@ -967,7 +1075,7 @@
          "outlettype": [],
          "patching_rect": [
           30.0,
-          542.0,
+          430.0,
           30.0,
           30.0
          ]
@@ -981,8 +1089,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          120.0,
-          542.0,
+          560.6,
+          430.0,
           30.0,
           30.0
          ]
@@ -996,8 +1104,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          210.0,
-          542.0,
+          919.0,
+          430.0,
           30.0,
           30.0
          ]
@@ -1011,8 +1119,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          300.0,
-          542.0,
+          1277.4,
+          430.0,
           30.0,
           30.0
          ]
@@ -1023,20 +1131,34 @@
          "id": "t0",
          "maxclass": "newobj",
          "numinlets": 1,
-         "numoutlets": 4,
+         "numoutlets": 2,
          "outlettype": [
-          "",
-          "",
           "",
           ""
          ],
          "patching_rect": [
           30.0,
-          94.0,
-          74.2,
+          70.0,
+          51.0,
           22.0
          ],
-         "text": "t b 0 0 0"
+         "text": "t b b"
+        }
+       },
+       {
+        "box": {
+         "id": "s0_0",
+         "maxclass": "newobj",
+         "numinlets": 1,
+         "numoutlets": 0,
+         "outlettype": [],
+         "patching_rect": [
+          150.0,
+          110.0,
+          190.2,
+          22.0
+         ],
+         "text": "s vw_bpa_ask_every_view_begin"
         }
        },
        {
@@ -1050,7 +1172,7 @@
          ],
          "patching_rect": [
           30.0,
-          158.0,
+          150.0,
           68.4,
           22.0
          ],
@@ -1068,7 +1190,7 @@
          ],
          "patching_rect": [
           30.0,
-          222.0,
+          190.0,
           68.4,
           22.0
          ],
@@ -1086,7 +1208,7 @@
          ],
          "patching_rect": [
           30.0,
-          286.0,
+          230.0,
           68.4,
           22.0
          ],
@@ -1110,7 +1232,7 @@
          ],
          "patching_rect": [
           30.0,
-          350.0,
+          270.0,
           109.0,
           22.0
          ],
@@ -1125,8 +1247,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          371.6,
-          478.0,
+          411.6,
+          350.0,
           109.0,
           22.0
          ],
@@ -1143,8 +1265,8 @@
           ""
          ],
          "patching_rect": [
-          232.4,
-          414.0,
+          411.6,
+          310.0,
           45.2,
           22.0
          ],
@@ -1159,8 +1281,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          238.6,
-          478.0,
+          286.6,
+          350.0,
           109.0,
           22.0
          ],
@@ -1177,8 +1299,8 @@
           ""
          ],
          "patching_rect": [
-          163.2,
-          414.0,
+          286.6,
+          310.0,
           45.2,
           22.0
          ],
@@ -1193,8 +1315,8 @@
          "numoutlets": 0,
          "outlettype": [],
          "patching_rect": [
-          94.0,
-          478.0,
+          150.0,
+          350.0,
           120.6,
           22.0
          ],
@@ -1211,8 +1333,8 @@
           ""
          ],
          "patching_rect": [
-          94.0,
-          414.0,
+          150.0,
+          310.0,
           45.2,
           22.0
          ],
@@ -1272,6 +1394,30 @@
        {
         "patchline": {
          "source": [
+          "zr0_0",
+          0
+         ],
+         "destination": [
+          "zv0_0",
+          0
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zv0_0",
+          0
+         ],
+         "destination": [
+          "h0_0",
+          1
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
           "r1_0",
           0
          ],
@@ -1320,6 +1466,30 @@
        {
         "patchline": {
          "source": [
+          "zr1_0",
+          0
+         ],
+         "destination": [
+          "zv1_0",
+          0
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zv1_0",
+          0
+         ],
+         "destination": [
+          "h1_0",
+          1
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
           "r2_0",
           0
          ],
@@ -1357,6 +1527,30 @@
         "patchline": {
          "source": [
           "o2_0_2",
+          0
+         ],
+         "destination": [
+          "h2_0",
+          1
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zr2_0",
+          0
+         ],
+         "destination": [
+          "zv2_0",
+          0
+         ]
+        }
+       },
+       {
+        "patchline": {
+         "source": [
+          "zv2_0",
           0
          ],
          "destination": [
@@ -1417,35 +1611,11 @@
         "patchline": {
          "source": [
           "t0",
-          3
-         ],
-         "destination": [
-          "h0_0",
-          1
-         ]
-        }
-       },
-       {
-        "patchline": {
-         "source": [
-          "t0",
-          2
-         ],
-         "destination": [
-          "h1_0",
-          1
-         ]
-        }
-       },
-       {
-        "patchline": {
-         "source": [
-          "t0",
           1
          ],
          "destination": [
-          "h2_0",
-          1
+          "s0_0",
+          0
          ]
         }
        },
