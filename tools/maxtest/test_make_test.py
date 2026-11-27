@@ -7,7 +7,7 @@ import os
 import tempfile
 import unittest
 
-from make_test import TestPatcher
+from make_test import TestPatcher, delay, expect, send, step, wait, watch
 
 
 def build():
@@ -123,6 +123,154 @@ class BlockTests(unittest.TestCase):
     def test_receive_feeds_its_targets(self):
         r = next(i for i, b in self.boxes.items() if b.get("text") == "r to_map")
         self.assertIn((r, 0, "m", 0), self.cords)
+
+
+def build_chain():
+    """A chain of steps in subpatchers: one that waits and checks two things, one that only sets up."""
+    t = TestPatcher()
+    t.dut("m", "j.view", 1, 2, to="x_to_view", out={1: "x_from_view"})
+    t.chain(("loadbang", 0), "Jamoma/Modular/j.view/x", [
+        step("set_up", do=[wait(), send("x_to_view", "bang")]),
+        step("binds", do=[send("x_to_view", "dump"), wait(2), send("x_to_view", 5)], expect=[
+            expect("reports_its_model", watch("x_from_view", "route model:address", "sel /vu", "t 1")),
+            expect("counts", [watch("x_from_view", "route a", hold="int -1"), watch("x_from_view", "route b", hold="int -1")],
+                   check=["expr $i1*10+$i2", "== 12"]),
+        ]),
+    ])
+    return t
+
+
+def texts(patcher):
+    """id -> text of the boxes of a patcher dictionary."""
+    return {e["box"]["id"]: e["box"].get("text", e["box"]["maxclass"]) for e in patcher["boxes"]}
+
+
+def cords(patcher):
+    """The cords of a patcher dictionary as (source text, outlet, destination text, inlet)."""
+    names = texts(patcher)
+    return [(names[l["patchline"]["source"][0]], l["patchline"]["source"][1],
+             names[l["patchline"]["destination"][0]], l["patchline"]["destination"][1]) for l in patcher["lines"]]
+
+
+class ChainTests(unittest.TestCase):
+    def setUp(self):
+        self.t = build_chain()
+        self.top = self.t.patcher()
+        self.sub = {e["box"]["text"]: e["box"]["patcher"] for e in self.t.boxes if "patcher" in e["box"]}
+
+    def test_steps_are_chained_through_their_left_outlets_to_the_terminate(self):
+        c = cords(self.top)
+        self.assertIn(("loadbang", 0, "p set_up", 0), c)
+        self.assertIn(("p set_up", 0, "p binds", 0), c)
+        self.assertIn(("p binds", 0, "test.terminate", 0), c)
+
+    def test_every_result_leaves_on_its_own_outlet_into_its_assertion(self):
+        c = cords(self.top)
+        self.assertIn(("p binds", 1, "test.assert Jamoma/Modular/j.view/x/reports_its_model", 0), c)
+        self.assertIn(("p binds", 2, "test.assert Jamoma/Modular/j.view/x/counts", 0), c)
+
+    def test_the_object_under_test_has_its_receive_and_send(self):
+        c = cords(self.top)
+        self.assertIn(("r x_to_view", 0, "j.view", 0), c)
+        self.assertIn(("j.view", 1, "s x_from_view", 0), c)
+
+    def test_a_wait_is_a_deferlow_between_two_triggers_and_never_a_delay(self):
+        all_texts = [t for p in self.sub.values() for t in texts(p).values()]
+        self.assertEqual(sum(1 for t in all_texts if t == "deferlow"), 3)
+        self.assertFalse([t for t in all_texts if t.startswith("delay")])
+
+    def test_holders_are_reset_first_and_read_last(self):
+        p = self.sub["p binds"]
+        c = cords(p)
+        first = next(d for s, o, d, i in c if s == "inlet")
+        outlets = {o: d for s, o, d, i in c if s == first}
+        self.assertEqual(outlets[max(outlets)], "s j_view_x_binds_begin")  # the rightmost outlet fires first: reset every holder
+        self.assertEqual(outlets[0], "deferlow")                           # the leftmost fires last: wait
+        self.assertEqual(sum(1 for s, o, d, i in c if s == "r j_view_x_binds_begin"), 3)
+        self.assertIn(("0", 0, "int 0", 1), c)                             # each holder is given its start value
+        self.assertIn(("int -1", 0, "expr $i1*10+$i2", 0), c)
+        self.assertIn(("int -1", 0, "expr $i1*10+$i2", 1), c)
+        self.assertIn(("== 12", 0, "outlet", 0), c)
+
+    def test_a_step_is_arranged_with_what_it_does_left_of_what_it_watches(self):
+        for name, p in self.sub.items():
+            boxes = [e["box"] for e in p["boxes"]]
+            for i, a in enumerate(boxes):
+                for b in boxes[i + 1:]:
+                    ax, ay, aw, ah = a["patching_rect"]
+                    bx, by, bw, bh = b["patching_rect"]
+                    self.assertFalse(ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah, (name, a.get("text"), b.get("text")))
+        boxes = [e["box"] for e in self.sub["p binds"]["boxes"]]
+        acting = max(b["patching_rect"][0] + b["patching_rect"][2] for b in boxes if str(b.get("text", "")).startswith(("deferlow", "s j_view", "s x_")))
+        watching = min(b["patching_rect"][0] for b in boxes if str(b.get("text", "")).startswith(("r ", "int", "route", "sel", "expr")))
+        self.assertLess(acting, watching)
+        holders = {b["patching_rect"][1] for b in boxes if str(b.get("text", "")).startswith("int ")}
+        self.assertEqual(len(holders), 1)                                  # the holders stand on one line
+        feeding = max(b["patching_rect"][1] for b in boxes if str(b.get("text", "")).startswith(("route", "sel", "t 1")))
+        self.assertLess(feeding, holders.pop())
+        outlets = [b["patching_rect"] for b in boxes if b["maxclass"] == "outlet"]
+        self.assertEqual([r[0] for r in outlets], sorted(r[0] for r in outlets))
+        self.assertEqual(len({r[1] for r in outlets}), 1)
+
+    def test_results_come_out_before_the_step_is_done(self):
+        p = self.sub["p binds"]
+        outlets = sorted((e["box"] for e in p["boxes"] if e["box"]["maxclass"] == "outlet"), key=lambda b: b["patching_rect"][0])
+        done = outlets[0]["id"]
+        final = [l["patchline"]["source"] for l in p["lines"] if l["patchline"]["destination"][0] == done]
+        self.assertEqual(final[0][1], 0)                                 # done hangs on the leftmost outlet of the last trigger
+
+    def test_a_start_value_that_is_not_a_number_is_a_message(self):
+        t = TestPatcher()
+        t.dut("m", "j.model pm", 1, 2, out={0: "x_from_m"})
+        t.chain(("loadbang", 0), "Jamoma/Modular/j.model/x", [step("a", expect=[expect("b", watch("x_from_m", hold="zl reg none"), "zl compare 1 2")])])
+        sub = next(e["box"]["patcher"] for e in t.boxes if "patcher" in e["box"])
+        c = cords(sub)
+        self.assertIn(("none", 0, "zl reg none", 1), c)
+        self.assertNotIn("none", " ".join(x for x in texts(sub).values() if x.startswith("t ")))
+
+    def test_a_delay_needs_a_reason_and_shows_it(self):
+        with self.assertRaises(AssertionError):
+            delay(100, "")
+        t = TestPatcher()
+        t.chain(("loadbang", 0), "Jamoma/Modular/j.map/x", [step("ramps", do=[delay(100, "the ramp needs time")])])
+        sub = next(e["box"]["patcher"] for e in t.boxes if "patcher" in e["box"])
+        self.assertIn("delay 100", texts(sub).values())
+        self.assertIn("the ramp needs time", texts(sub).values())
+
+    def test_a_receive_without_a_sender_is_refused(self):
+        t = TestPatcher()
+        with self.assertRaises(AssertionError):
+            t.chain(("loadbang", 0), "Jamoma/Modular/j.map/x",
+                    [step("a", expect=[expect("b", watch("x_from_nowhere", "== 1"))])])
+
+    def test_a_send_without_a_receiver_is_refused(self):
+        t = TestPatcher()
+        with self.assertRaises(AssertionError):
+            t.chain(("loadbang", 0), "Jamoma/Modular/j.map/x", [step("a", do=[send("x_to_nowhere", 1)])])
+
+    def test_the_saved_chain_is_a_straight_column_with_apart_assertions(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "x.maxtest.maxpat")
+            self.t.save(path)
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)["patcher"]
+        boxes = [e["box"] for e in data["boxes"]]
+        column = [b for b in boxes if b.get("text") in ("loadbang", "p set_up", "p binds", "test.terminate")]
+        self.assertEqual(len({b["patching_rect"][0] for b in column}), 1)
+        ys = [b["patching_rect"][1] for b in column]
+        self.assertEqual(ys, sorted(ys))
+        for i, a in enumerate(boxes):
+            for b in boxes[i + 1:]:
+                ax, ay, aw, ah = a["patching_rect"]
+                bx, by, bw, bh = b["patching_rect"]
+                self.assertFalse(ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah, (a.get("text"), b.get("text")))
+        for b in boxes:
+            if str(b.get("text", "")).startswith("test.assert"):
+                feeder = next(l["patchline"]["source"][0] for l in data["lines"] if l["patchline"]["destination"][0] == b["id"])
+                toggle = next(x for x in boxes if x["id"] == feeder)
+                self.assertEqual(toggle["maxclass"], "toggle")
+                self.assertEqual(toggle["patching_rect"][0], b["patching_rect"][0])
+                self.assertLess(toggle["patching_rect"][1], b["patching_rect"][1])
 
 
 if __name__ == "__main__":

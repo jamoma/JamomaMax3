@@ -6,7 +6,11 @@
 A test patcher built as the tests of this project are (a `loadbang` or `j.init` feeding one trigger whose outlets run a block for each assertion and,
 last, the `test.terminate`) is arranged by blocks: starter and trigger at the top left, the blocks side by side in the order of the trigger's outlets,
 every stage of the blocks on the same line with all `test.assert` boxes on one line, `test.terminate` at the bottom left, and the object under test with
-its receives in a column to the right. Everything below holds inside a block, and for any other patcher.
+its receives in a column to the right.
+
+A test patcher built as a chain of steps (the starter feeds a subpatcher, whose left outlet feeds the next one, down to the `test.terminate`) is
+arranged as one column: comments on top, then starter, steps and terminate, each result as a toggle and its assertion below the step, and the objects
+under test to the right. The inside of a step is left as it is (make_test arranges it; Max numbers its outlets by their position). Everything below holds inside a block, and for any other patcher.
 
     layout_patcher.py <path>/<name>.maxtest.maxpat
 
@@ -79,6 +83,10 @@ def _forward_edges(count, edges):
 
 def layout(patcher) -> None:
     """Lays out a patcher dictionary (and the patchers inside it) in place."""
+    column = _chain(patcher)
+    if column:
+        _layout_chain(patcher, column)
+        return
     boxes, index = _order_boxes(patcher.get("boxes", []))
     for b in boxes:
         if "patcher" in b:
@@ -108,6 +116,79 @@ def layout(patcher) -> None:
         b["patching_rect"] = [x, y, round(width[i], 1), h]
         right = max(right, x + width[i])
         bottom = max(bottom, y + h)
+    rect = patcher.get("rect", [60.0, 60.0, 400.0, 300.0])
+    patcher["rect"] = [rect[0], rect[1], max(400.0, round(right + MARGIN, 1)), max(240.0, round(bottom + MARGIN, 1))]
+
+
+def _chain(patcher):
+    """The ids of the column of a chain of steps (starter, steps, terminate), or None if the patcher does not have that shape.
+
+    The shape: the starter feeds a subpatcher, whose left outlet feeds the next one, and the last one's feeds the `test.terminate`.
+    """
+    boxes = {e["box"]["id"]: e["box"] for e in patcher.get("boxes", [])}
+    following = {}
+    for entry in patcher.get("lines", []):
+        s, d = entry["patchline"]["source"], entry["patchline"]["destination"]
+        following.setdefault((s[0], s[1]), []).append(d[0])
+    for start, box in boxes.items():
+        if _first_word(box) not in ("loadbang", "j.init"):
+            continue
+        column = [start]
+        targets = following.get((start, 1 if _first_word(box) == "j.init" else 0), [])
+        while len(targets) == 1 and "patcher" in boxes[targets[0]] and targets[0] not in column:
+            column.append(targets[0])
+            targets = following.get((targets[0], 0), [])
+        if len(column) > 1 and len(targets) == 1 and _first_word(boxes[targets[0]]) == "test.terminate":
+            return column + [targets[0]]
+    return None
+
+
+def _layout_chain(patcher, column):
+    """Lays out a chain of steps: the column on the left, each result as a toggle and its assertion under the outlet, everything else to the right."""
+    boxes = {e["box"]["id"]: e["box"] for e in patcher["boxes"]}
+    out = {}
+    for entry in patcher["lines"]:
+        s, d = entry["patchline"]["source"], entry["patchline"]["destination"]
+        out.setdefault((s[0], s[1]), []).append(d[0])
+    placed = set(column)
+    y = MARGIN
+    for box in boxes.values():
+        if box["maxclass"] == "comment":
+            box["patching_rect"] = [MARGIN, y, round(box_width(box), 1), 20.0]
+            placed.add(box["id"])
+            y += 30.0
+    right = 0.0
+    for ident in column:
+        box = boxes[ident]
+        results = []
+        for k in range(1, box.get("numoutlets", 1)) if "patcher" in box else []:
+            toggle = out.get((ident, k), [None])[0]
+            check = out.get((toggle, 0), [None])[0] if toggle and boxes[toggle]["maxclass"] == "toggle" else None
+            results.append((toggle, check))
+        spacing = max([box_width(boxes[c]) for _, c in results if c] or [0.0]) + GAP
+        width = max(box_width(box), spacing * len(results) + 20.0)
+        box["patching_rect"] = [MARGIN, y, round(width, 1), HEIGHT]
+        for k, (toggle, check) in enumerate(results, start=1):
+            # Where Max draws outlet k of n on a box of this width.
+            x = round(MARGIN + k * (width - 19.0) / len(results), 1)
+            if check:
+                boxes[toggle]["patching_rect"] = [x, y + 36.0, 24.0, 24.0]
+                boxes[check]["patching_rect"] = [x, y + 70.0, round(box_width(boxes[check]), 1), HEIGHT]
+                placed.update((toggle, check))
+                right = max(right, x + box_width(boxes[check]))
+        right = max(right, MARGIN + width)
+        y += 120.0 if results else ROW
+    bottom = y
+    rest = [e for e in patcher["boxes"] if e["box"]["id"] not in placed]
+    if rest:
+        ids = {e["box"]["id"] for e in rest}
+        side = {"boxes": rest, "lines": [l for l in patcher["lines"] if l["patchline"]["source"][0] in ids and l["patchline"]["destination"][0] in ids]}
+        layout(side)
+        for e in rest:
+            r = e["box"]["patching_rect"]
+            r[0] = round(r[0] + right + GAP * 2, 1)
+            bottom = max(bottom, r[1] + r[3])
+        right = max(e["box"]["patching_rect"][0] + e["box"]["patching_rect"][2] for e in rest)
     rect = patcher.get("rect", [60.0, 60.0, 400.0, 300.0])
     patcher["rect"] = [rect[0], rect[1], max(400.0, round(right + MARGIN, 1)), max(240.0, round(bottom + MARGIN, 1))]
 
