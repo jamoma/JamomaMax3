@@ -30,8 +30,22 @@ struct NamespaceState {
     std::vector<Observer> observers; /**< The observers. */
     unsigned next_observer = 1;      /**< The id of the next observer. */
 
-    /** Tells the matching observers; call with the namespace lock released. @param address The node. @param object The object or null. @param created Appeared or went. */
+    /** One alias. */
+    struct Alias {
+        unsigned id;     /**< Identifies it for removal. */
+        Address alias;   /**< The other address. */
+        Address target;  /**< What it stands for. */
+    };
+    std::vector<Alias> aliases;      /**< The aliases (guarded by `mutex`). */
+    unsigned next_alias = 1;         /**< The id of the next alias. */
+
+    /** @return The address with an alias at its beginning replaced by the target; call with `mutex` held. @param address An address. */
+    Address resolved(const Address& address) const;
+
+    /** Tells the matching observers about the address and its aliases; call with the namespace lock released. @param address The node. @param object The object or null. @param created Appeared or went. */
     void notify(const Address& address, Object* object, bool created);
+    /** Tells the observers that match exactly this address. @param address The node. @param object The object or null. @param created Appeared or went. */
+    void tell(const Address& address, Object* object, bool created);
 };
 
 namespace {
@@ -59,9 +73,61 @@ bool pattern_matches(const Address& pattern, const Address& address)
     return true;
 }
 
+/** @return Whether an address begins with all the segments of another. @param address The address. @param start The beginning. */
+bool begins_with(const Address& address, const Address& start)
+{
+    const auto& a = address.path();
+    const auto& s = start.path();
+    return s.size() <= a.size() && std::equal(s.begin(), s.end(), a.begin(), [](const Segment& x, const Segment& y) {
+        return x.name == y.name && x.instance == y.instance;
+    });
+}
+
+/** @return The text of `address` with its beginning `from` replaced by `to` (absolute). */
+Address moved(const Address& address, const Address& from, const Address& to)
+{
+    std::string text;
+    const auto add = [&text](const Segment& s) { text += "/" + s.name + (s.instance.empty() ? "" : "." + s.instance); };
+    for (const Segment& s : to.path()) {
+        add(s);
+    }
+    for (std::size_t i = from.path().size(); i < address.path().size(); ++i) {
+        add(address.path()[i]);
+    }
+    Address out = Address::parse(text.empty() ? "/" : text);
+    return address.attribute().empty() ? out : out.with_attribute(address.attribute());
+}
+
 } // namespace
 
+Address NamespaceState::resolved(const Address& address) const
+{
+    for (const Alias& a : aliases) {
+        if (begins_with(address, a.alias)) {
+            return moved(address, a.alias, a.target);
+        }
+    }
+    return address;
+}
+
 void NamespaceState::notify(const Address& address, Object* object, bool created)
+{
+    std::vector<Address> also;
+    {
+        std::shared_lock lock(mutex);
+        for (const Alias& a : aliases) {
+            if (begins_with(address, a.target)) {
+                also.push_back(moved(address, a.target, a.alias));
+            }
+        }
+    }
+    tell(address, object, created);
+    for (const Address& other : also) {
+        tell(other, object, created);
+    }
+}
+
+void NamespaceState::tell(const Address& address, Object* object, bool created)
 {
     std::vector<std::function<void(const Address&, Object*, bool)>> calls;
     {
@@ -224,7 +290,8 @@ Node* Namespace::lookup(const Address& address) const
     }
     std::shared_lock lock(state_->mutex);
     Node* current = state_->root.get();
-    for (const Segment& segment : address.path()) {
+    const Address real = state_->resolved(address);
+    for (const Segment& segment : real.path()) {
         current = find_child(*current, segment.name, segment.instance, current->kids_);
         if (current == nullptr) {
             return nullptr;
@@ -298,6 +365,61 @@ std::shared_ptr<void> Namespace::observe(const Address& pattern, std::function<v
     });
 }
 
+std::shared_ptr<void> Namespace::add_alias(const Address& alias, const Address& target)
+{
+    if (alias.path().empty() || target.path().empty() || begins_with(alias, target) || begins_with(target, alias) || lookup(alias) != nullptr) {
+        return nullptr;
+    }
+    // What is below the target now: the target's own object and those of its descendants.
+    const auto objects = [this, target]() {
+        std::vector<std::pair<Address, Object*>> found;
+        Object* own = nullptr;
+        read_object(target, [&own](Object& o) { own = &o; });
+        if (own != nullptr) {
+            found.emplace_back(target, own);
+        }
+        const std::string base = target.str();
+        visit_below(target, [&found, &base](const std::string& relative, const std::string&, const std::string&, Object* object) {
+            if (object != nullptr) {
+                found.emplace_back(Address::parse(base + "/" + relative), object);
+            }
+        });
+        return found;
+    };
+    const auto there = objects();
+    unsigned id;
+    {
+        std::unique_lock lock(state_->mutex);
+        for (const NamespaceState::Alias& a : state_->aliases) {
+            if (begins_with(alias, a.alias) || begins_with(a.alias, alias)) {
+                return nullptr;
+            }
+        }
+        id = state_->next_alias++;
+        state_->aliases.push_back({id, alias, target});
+    }
+    for (const auto& [address, object] : there) {
+        state_->tell(moved(address, target, alias), object, true);
+    }
+    static int token = 0;
+    std::weak_ptr<NamespaceState> weak = state_;
+    return std::shared_ptr<void>(&token, [this, weak, id, alias, target, objects](void*) {
+        const auto state = weak.lock();
+        if (!state) {
+            return;
+        }
+        const auto gone = objects();
+        {
+            std::unique_lock lock(state->mutex);
+            auto& list = state->aliases;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const NamespaceState::Alias& a) { return a.id == id; }), list.end());
+        }
+        for (const auto& entry : gone) {
+            state->tell(moved(entry.first, target, alias), nullptr, false);
+        }
+    });
+}
+
 bool Namespace::read_object(const Address& address, const std::function<void(Object&)>& use) const
 {
     if (address.empty()) {
@@ -305,7 +427,8 @@ bool Namespace::read_object(const Address& address, const std::function<void(Obj
     }
     std::shared_lock lock(state_->mutex);
     Node* current = state_->root.get();
-    for (const Segment& segment : address.path()) {
+    const Address real = state_->resolved(address);
+    for (const Segment& segment : real.path()) {
         current = find_child(*current, segment.name, segment.instance, current->kids_);
         if (current == nullptr) {
             return false;
@@ -322,7 +445,8 @@ bool Namespace::visit_below(const Address& root, const std::function<void(const 
 {
     std::shared_lock lock(state_->mutex);
     Node* current = state_->root.get();
-    for (const Segment& segment : root.path()) {
+    const Address real = state_->resolved(root);
+    for (const Segment& segment : real.path()) {
         current = find_child(*current, segment.name, segment.instance, current->kids_);
         if (current == nullptr) {
             return false;
@@ -347,7 +471,8 @@ std::vector<Node*> Namespace::find(const Address& pattern) const
 {
     std::shared_lock lock(state_->mutex);
     std::vector<Node*> level{state_->root.get()};
-    for (const Segment& segment : pattern.path()) {
+    const Address real = state_->resolved(pattern);
+    for (const Segment& segment : real.path()) {
         std::vector<Node*> next;
         for (Node* parent : level) {
             for (const auto& kid : parent->kids_) {

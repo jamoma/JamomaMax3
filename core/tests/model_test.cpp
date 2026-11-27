@@ -378,3 +378,47 @@ TEST_CASE("view map observers may call the map and their handles may outlive it"
     }
     handle.reset();
 }
+
+/** An alias (as the old objects): the model can also be addressed by another name; its own address stays. */
+TEST_CASE("a model can be addressed by an alias")
+{
+    World w;
+    Model m(w.ns, Address::parse("/m"));
+    Data& p = w.add("/m/p");
+    std::vector<std::string> events;
+    auto watch = w.ns.observe(Address::parse("/other/p"), [&events](const Address& a, jamoma::Object*, bool created) {
+        events.push_back((created ? "+" : "-") + a.str());
+    });
+    REQUIRE(m.set_alias("/other"));
+    REQUIRE(m.alias() == "/other");
+    REQUIRE(events == std::vector<std::string>{"+/other/p"});
+    REQUIRE(w.ns.lookup(Address::parse("/other/p"))->object() == &p);
+    REQUIRE(w.ns.lookup(Address::parse("/m/p"))->object() == &p);
+    REQUIRE(w.ns.find(Address::parse("/other/p")).size() == 1);
+    REQUIRE(w.ns.read_object(Address::parse("/other/p"), [](jamoma::Object&) {}));
+    w.add("/m/late");
+    REQUIRE(w.ns.lookup(Address::parse("/other/late")) != nullptr);
+    m.set_alias("");
+    REQUIRE(m.alias().empty());
+    REQUIRE(events == std::vector<std::string>{"+/other/p", "-/other/p"});
+    REQUIRE(w.ns.lookup(Address::parse("/other/p")) == nullptr);
+}
+
+/** A relative alias is beside the model; a taken name is refused; the alias goes with the model. */
+TEST_CASE("a relative alias sits beside the model and goes with it")
+{
+    World w;
+    Model outer(w.ns, Address::parse("/outer"));
+    w.add("/taken/x");
+    auto m = std::make_unique<Model>(w.ns, Address::parse("/outer/m"));
+    Data& p = w.add("/outer/m/p");
+    REQUIRE_FALSE(m->set_alias("/taken"));
+    REQUIRE_FALSE(m->set_alias("/outer/m/inside"));
+    REQUIRE(m->set_alias("second"));
+    REQUIRE(m->alias() == "/outer/second");
+    REQUIRE(w.ns.lookup(Address::parse("/outer/second/p"))->object() == &p);
+    REQUIRE(m->set_alias("third"));
+    REQUIRE(w.ns.lookup(Address::parse("/outer/second/p")) == nullptr);
+    m.reset();
+    REQUIRE(w.ns.lookup(Address::parse("/outer/third/p")) == nullptr);
+}

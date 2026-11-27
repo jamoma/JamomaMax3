@@ -166,6 +166,18 @@ public:
     bool read_object(const Address& address, const std::function<void(Object&)>& use) const;
 
     /**
+     * @brief Makes the node at one address, and everything below it, reachable at another address too.
+     *
+     * lookup, find, read_object and visit_below take an address that begins with the alias as the same address below the target.
+     * Observers of alias addresses hear of objects below the target as if they were there, also of those that are there already
+     * (and, when the handle is dropped, that they went).
+     * @param alias The other address. @param target The address it stands for.
+     * @return A handle that removes the alias when dropped (it may outlive the namespace), or null if the alias is empty or the root,
+     * is a node or an alias already, or lies below the target or above it.
+     */
+    std::shared_ptr<void> add_alias(const Address& alias, const Address& target);
+
+    /**
      * @brief Finds nodes by a pattern.
      * @param pattern An address whose segments may use `*`: as a name it matches any name (and any instance unless one is given), as an instance any instance (including none).
      * @return The matching nodes.

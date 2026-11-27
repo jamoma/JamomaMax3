@@ -47,6 +47,14 @@ public:
     void set_description(std::string text);
     /** @return The description. */
     std::string description() const;
+    /**
+     * @brief Gives the model another name under which it and everything below it can be addressed too (its own address stays).
+     * @param alias An absolute address, or a name beside the model; empty or `none` removes the alias.
+     * @return False if the address is taken or lies in or around the model (the alias before is removed all the same).
+     */
+    bool set_alias(const std::string& alias);
+    /** @return The alias as an absolute address, or an empty string. */
+    std::string alias() const;
     /** @brief Sets the priority used when a parent model initialises. @param priority The priority. */
     void set_priority(int priority);
     /** @return The priority. */

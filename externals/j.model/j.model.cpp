@@ -56,6 +56,7 @@ class j_model : public c74::min::object<j_model> {
     bool placing_ = false;                     /**< True while place() runs. */
     std::string prefix_;                       /**< The address of the parent model the model sits below (empty: at the root). */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
+    std::string alias_text_;                   /**< The alias as written (kept for the model that replaces this one). */
     jamoma_max::ContextWatch watch_;           /**< Moves the model below its parent model when that one appears later, is replaced or goes. */
     std::unique_ptr<jamoma::ModelExplorer> explorer_;                        /**< Tells when parameters below the model come or go. */
     std::map<std::string, std::unique_ptr<jamoma::Receiver>> watches_;      /**< One receiver per parameter below the model, by its address relative to the model. */
@@ -105,8 +106,21 @@ public:
         return args;
     }}};
 
-    /** The alias of the model (accepted so that old patchers load; it has no effect yet). */
-    attribute<symbol> alias{this, "alias", ""};
+    /**
+     * Another address under which the model and everything below it can be reached too (an absolute address, or a name beside the model).
+     * The model keeps its own address. Empty removes the alias.
+     */
+    attribute<symbol> alias{this, "alias", "", setter{MIN_FUNCTION {
+        alias_text_ = args.empty() ? std::string() : std::string(static_cast<symbol>(args[0]).c_str());
+        apply_alias();
+        return args;
+    }}};
+
+    /** Removes the alias. */
+    message<> alias_remove{this, "alias/remove", MIN_FUNCTION {
+        alias = "";
+        return {};
+    }};
     /** Whether the model reports its activity (accepted so that old patchers load; it has no effect yet). */
     attribute<int> activity{this, "activity", 0, style::onoff};
     /** The tags of the model (accepted so that old patchers load; it has no effect yet). */
@@ -581,6 +595,7 @@ private:
         model_ = std::make_unique<jamoma::Model>(jamoma::Registry::instance().names(), jamoma::Address::parse(prefix + "/" + name_));
         model_->set_description(description);
         model_->set_priority(priority_value);
+        apply_alias();
         if (!kept.empty()) {
             model_->presets().replace_all(std::move(kept));
         }
@@ -590,6 +605,14 @@ private:
         if (explorer_) {
             explorer_->set_model(model_->address());
             sync_watches();
+        }
+    }
+
+    /** Gives the model its alias (nothing happens while there is no model yet: place() calls this again). */
+    void apply_alias()
+    {
+        if (model_ && !model_->set_alias(alias_text_)) {
+            c74::max::object_error(maxobj(), "alias %s: the address is taken, or lies in or around the model", alias_text_.c_str());
         }
     }
 
