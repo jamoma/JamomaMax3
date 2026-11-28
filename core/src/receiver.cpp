@@ -8,6 +8,8 @@
 
 #include "jamoma/receiver.hpp"
 
+#include "jamoma/model.hpp"
+
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -22,7 +24,8 @@ struct Receiver::Impl : std::enable_shared_from_this<Receiver::Impl> {
     /** One bound node. */
     struct Binding {
         Address node;                    /**< The address of the node (no attribute). */
-        Data* data;                      /**< The data object (valid while the namespace observer has not reported it gone). */
+        Data* data;                      /**< The data object (valid while the namespace observer has not reported it gone), or null. */
+        Model* model;                    /**< The model, for its attribute `initialized`, or null. */
         std::shared_ptr<void> observer;  /**< Keeps the attribute observer registered. */
     };
 
@@ -102,6 +105,53 @@ void wait_idle(Receiver::Impl& impl)
     impl.idle.wait(lock, [&impl, mine] { return impl.in_flight.load() <= mine; });
 }
 
+/** @param model A model. @return Its attribute `initialized` as a value. */
+Value initialized_value(const Model& model)
+{
+    return Value{Atom(model.initialized() ? 1 : 0)};
+}
+
+/**
+ * Binds a model whose attribute `initialized` is followed: 0 when it starts to initialise, 1 when it is done, and 1 at once if it is.
+ * @param impl The receiver state. @param node The model's address. @param model The model. @param gen The generation this binding belongs to.
+ */
+void bind_model(const std::shared_ptr<Receiver::Impl>& impl, const Address& node, Model& model, unsigned gen)
+{
+    {
+        std::lock_guard<std::mutex> lock(impl->mutex);
+        const auto same = [&node](const Receiver::Impl::Binding& b) { return b.node == node; };
+        if (gen != impl->generation || impl->attribute != "initialized"
+            || std::any_of(impl->bindings.begin(), impl->bindings.end(), same)) {
+            return;
+        }
+        impl->bindings.push_back({node, nullptr, &model, nullptr}); // before observing: the model may report at once
+    }
+    std::weak_ptr<Receiver::Impl> weak = impl;
+    std::shared_ptr<void> observer = model.on_init_changed([weak, node, gen](bool done) {
+        const auto keep = weak.lock();
+        if (!keep) {
+            return;
+        }
+        const Flight flight(keep.get());
+        if (!keep->active.load()) {
+            return;
+        }
+        {
+            std::lock_guard<std::mutex> lock(keep->mutex);
+            if (gen != keep->generation) {
+                return;
+            }
+        }
+        keep->emit(node, "initialized", Value{Atom(done ? 1 : 0)});
+    });
+    std::lock_guard<std::mutex> lock(impl->mutex);
+    for (Receiver::Impl::Binding& b : impl->bindings) {
+        if (gen == impl->generation && b.node == node) {
+            b.observer = observer;
+        }
+    }
+}
+
 /**
  * Binds one node: observes the attribute and, if asked, reports the current value once.
  * @param impl The receiver state. @param node The node's address. @param object Its object. @param gen The generation this binding belongs to.
@@ -109,6 +159,10 @@ void wait_idle(Receiver::Impl& impl)
  */
 void bind_node(const std::shared_ptr<Receiver::Impl>& impl, const Address& node, Object* object, unsigned gen, bool report_now)
 {
+    if (Model* model = dynamic_cast<Model*>(object)) {
+        bind_model(impl, node, *model, gen);
+        return;
+    }
     Data* data = dynamic_cast<Data*>(object);
     if (data == nullptr) {
         return;
@@ -152,7 +206,7 @@ void bind_node(const std::shared_ptr<Receiver::Impl>& impl, const Address& node,
         if (std::any_of(impl->bindings.begin(), impl->bindings.end(), same)) {
             return; // already bound (the namespace observer and the first lookup can both find it)
         }
-        impl->bindings.push_back({node, data, observer});
+        impl->bindings.push_back({node, data, nullptr, observer});
     }
     if (report_now && impl->active.load()) {
         const std::optional<Value> v = data->get_attribute(attr);
@@ -266,6 +320,7 @@ bool Receiver::bang()
     const Flight flight(impl_.get());
     Address node;
     Data* data = nullptr;
+    Model* model = nullptr;
     std::string attr;
     {
         std::lock_guard<std::mutex> lock(impl_->mutex);
@@ -274,9 +329,10 @@ bool Receiver::bang()
         }
         node = impl_->bindings.front().node;
         data = impl_->bindings.front().data;
+        model = impl_->bindings.front().model;
         attr = impl_->attribute;
     }
-    const std::optional<Value> v = data->get_attribute(attr);
+    const std::optional<Value> v = model != nullptr ? std::optional<Value>(initialized_value(*model)) : data->get_attribute(attr);
     if (!v || v->empty()) {
         return false;
     }
@@ -287,6 +343,7 @@ bool Receiver::bang()
 std::optional<Value> Receiver::grab() const
 {
     Data* data = nullptr;
+    Model* model = nullptr;
     std::string attr;
     {
         std::lock_guard<std::mutex> lock(impl_->mutex);
@@ -294,9 +351,10 @@ std::optional<Value> Receiver::grab() const
             return std::nullopt;
         }
         data = impl_->bindings.front().data;
+        model = impl_->bindings.front().model;
         attr = impl_->attribute;
     }
-    return data->get_attribute(attr);
+    return model != nullptr ? std::optional<Value>(initialized_value(*model)) : data->get_attribute(attr);
 }
 
 } // namespace jamoma

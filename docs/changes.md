@@ -158,3 +158,4 @@ Corrections after the author went through the help patchers:
 - `dump` answers the attributes of the watched instance and `format` on the dump outlet (the old arrays answered nothing).
 - `set` and `setArray` of `j.remote_array` show nothing here for any instance (the old object held back only the first answer when all were selected).
 - `j.remote_array` has no `description` and `tags` attributes, like `j.remote`.
+- `<model>:initialized` can be followed by `j.receive` and `j.initialized` as before (0 while the model initialises, 1 when it is done). Models have no other attribute that can be followed this way.

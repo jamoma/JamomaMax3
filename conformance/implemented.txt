@@ -19,3 +19,10 @@ j.namespace
 j.map
 j.cue
 j.textslider
+j.parameter_array
+j.message_array
+j.return_array
+j.remote_array
+j.oscinstance
+j.oscroute
+j.initialized

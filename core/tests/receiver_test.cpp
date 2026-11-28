@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "jamoma/data.hpp"
+#include "jamoma/model.hpp"
 #include "jamoma/receiver.hpp"
 
 using jamoma::Address;
@@ -289,4 +290,55 @@ TEST_CASE("a bang of a node of type none is output as an empty value")
     w.data.back()->command(Value{});
     w.data.back()->command(Value{});
     REQUIRE(w.log == std::vector<std::string>{"address /m/trigger", "value ", "address /m/trigger", "value "});
+}
+
+/** `<model>:initialized` follows the model's initialisation. */
+TEST_CASE("receiver_model_initialized_reports_start_and_end", "[receiver]")
+{
+    World w;
+    jamoma::Model model(w.ns, Address::parse("/m"));
+    w.receiver->set_address(Address::parse("/m:initialized"));
+    CHECK(w.values.empty()); // nothing to report before the first init
+    model.init();
+    CHECK(w.values == std::vector<Value>{Value{0}, Value{1}});
+    CHECK(w.addresses.back() == "/m:initialized");
+    w.values.clear();
+    CHECK(w.receiver->bang());
+    CHECK(w.values == std::vector<Value>{Value{1}});
+    CHECK(w.receiver->grab() == std::optional<Value>(Value{1}));
+    w.receiver->set_active(false);
+    w.values.clear();
+    model.init();
+    CHECK(w.values.empty());
+}
+
+/** Bound after the init (or before the model exists) it hears of it all the same. */
+TEST_CASE("receiver_model_initialized_bound_after_init_reports_1", "[receiver]")
+{
+    World w;
+    jamoma::Model model(w.ns, Address::parse("/m"));
+    model.init();
+    w.receiver->set_address(Address::parse("/m:initialized"));
+    CHECK(w.values == std::vector<Value>{Value{1}});
+    w.values.clear();
+    w.receiver->set_address(Address::parse("/late:initialized"));
+    jamoma::Model late(w.ns, Address::parse("/late"));
+    CHECK(w.values.empty());
+    late.init();
+    CHECK(w.values == std::vector<Value>{Value{0}, Value{1}});
+}
+
+/** A model that goes takes its binding with it. */
+TEST_CASE("receiver_model_initialized_survives_model_removal", "[receiver]")
+{
+    World w;
+    auto model = std::make_unique<jamoma::Model>(w.ns, Address::parse("/m"));
+    w.receiver->set_address(Address::parse("/m:initialized"));
+    model.reset();
+    CHECK_FALSE(w.receiver->bang());
+    model = std::make_unique<jamoma::Model>(w.ns, Address::parse("/m"));
+    model->init();
+    CHECK(w.values == std::vector<Value>{Value{0}, Value{1}});
+    w.receiver->set_address(Address::parse("/m:description")); // models have no other attribute to follow
+    CHECK_FALSE(w.receiver->bang());
 }
