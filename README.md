@@ -56,7 +56,7 @@ per Max launch (`scripts/run-maxtests.sh`).
 
 ## Status: milestone 5 (arrays and the models that need them)
 
-Added: `j.parameter_array`, `j.message_array`, `j.return_array`, `j.remote_array`, `j.oscinstance`, `j.oscroute`, `j.initialized`, the namespace browser
+Added: `j.parameter_array`, `j.message_array`, `j.return_array`, `j.remote_array`, `j.oscinstance`, `j.oscroute`, `j.route`, `j.initialized`, the namespace browser
 with the filters of `j.namespace`, and the models `mapper`, `midiin` and `hi`. Differences from the old objects are in `docs/changes.md`, new features in
 `CHANGELOG.md`, results in `docs/conformance/m5-results.md`.
 

@@ -27,7 +27,3 @@ The two menus of the panel are in their old places, but some items do nothing ye
 
 The two old patchers use `j.receive`, `j.send`, `j.map`, `j.unit` and the script `Jamoma/javascript/j.interfaceArguments.js`, which now exist or can be imported (see the rules
 for imported patchers). The window of Edit Current State can build on the preset editor.
-
-## `j.route` (noted 28 November 2026)
-
-Not built. The only patcher of the package that used it (the namespace browser window) uses Max objects instead. Old patchers that use it show a missing object.

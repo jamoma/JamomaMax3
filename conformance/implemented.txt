@@ -28,3 +28,4 @@ j.oscroute
 j.initialized
 j.namespacebrowser.view
 j.namespacebrowser
+j.route

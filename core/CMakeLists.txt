@@ -30,7 +30,8 @@ add_library(jamoma_core SHARED
     src/data_array.cpp
     src/remote_array.cpp
     src/osc_tools.cpp
-    src/explore_filter.cpp)
+    src/explore_filter.cpp
+    src/route_search.cpp)
 add_library(jamoma::core ALIAS jamoma_core)
 target_include_directories(jamoma_core PUBLIC include)
 target_compile_definitions(jamoma_core PRIVATE JAMOMA_CORE_BUILDING)
@@ -78,7 +79,8 @@ add_executable(jamoma_core_tests
     tests/data_array_test.cpp
     tests/remote_array_test.cpp
     tests/osc_tools_test.cpp
-    tests/explore_filter_test.cpp)
+    tests/explore_filter_test.cpp
+    tests/route_search_test.cpp)
 target_link_libraries(jamoma_core_tests PRIVATE jamoma::core Catch2::Catch2WithMain)
 target_compile_definitions(jamoma_core_tests PRIVATE JAMOMA_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/tests/data")
 # The registry must outlive static destruction (its own executable, checked through its exit code).

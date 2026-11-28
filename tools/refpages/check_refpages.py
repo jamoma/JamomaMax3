@@ -53,6 +53,7 @@ OBJECT_SOURCES = {
     "j.remote_array": ["j.remote_array/j.remote_array.cpp"],
     "j.oscinstance": ["j.oscinstance/j.oscinstance.cpp"],
     "j.oscroute": ["j.oscroute/j.oscroute.cpp"],
+    "j.route": ["j.route/j.route.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.

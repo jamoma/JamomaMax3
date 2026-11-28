@@ -1,6 +1,6 @@
 # Milestone 5 results
 
-**Headline:** the four array objects, `j.oscinstance`, `j.oscroute`, `j.initialized`, the namespace browser (view and window, with the filters of
+**Headline:** the four array objects, `j.oscinstance`, `j.oscroute`, `j.route`, `j.initialized`, the namespace browser (view and window, with the filters of
 `j.namespace`) and the models `mapper`, `midiin` and `hi` are built. Every Max test and every unit test passes. What only a person or a device can
 check is listed below.
 
@@ -20,6 +20,12 @@ macOS 27.2 arm64, Max 9.
 
 Console errors in the full run are those the tests provoke on purpose (an unknown function name, files that do not exist, an edited text without presets).
 The old tests of `j.oscinstance` and `j.oscroute` (five) are part of the run; there are no old tests for the arrays or the three models.
+
+## Added after that run
+
+`j.route` (asked for by the author, whose own patchers use it), also back in the namespace browser window: its unit tests (461 of 461 pass; its own
+also under both sanitizers), its Max test and the browser's two pass, its help patcher and the window open without a missing object. The full Max run
+above was made before it. It has not been reviewed.
 
 ## Final review
 

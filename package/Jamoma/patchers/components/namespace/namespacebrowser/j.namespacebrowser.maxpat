@@ -1734,20 +1734,21 @@
 					"id": "obj-93",
 					"linecount": 3,
 					"maxclass": "newobj",
-					"numinlets": 2,
-					"numoutlets": 2,
+					"numinlets": 1,
+					"numoutlets": 3,
 					"outlettype": [
+						"",
 						"",
 						""
 					],
 					"patching_rect": [
 						-534.0,
 						580.0,
-						52.0,
-						22.0
+						120.0,
+						49.0
 					],
 					"style": "",
-					"text": "zl.nth 2"
+					"text": "j.route @searchstring click @searchpositions 2"
 				}
 			},
 			{
@@ -4039,27 +4040,6 @@
 					"style": "",
 					"text": "select/all"
 				}
-			},
-			{
-				"box": {
-					"id": "obj-click",
-					"maxclass": "newobj",
-					"text": "sel click",
-					"numinlets": 2,
-					"numoutlets": 2,
-					"outlettype": [
-						"bang",
-						""
-					],
-					"patching_rect": [
-						-534.0,
-						608.0,
-						56.0,
-						22.0
-					],
-					"fontname": "Arial",
-					"fontsize": 12.0
-				}
 			}
 		],
 		"lines": [
@@ -5290,7 +5270,7 @@
 					"disabled": 0,
 					"hidden": 0,
 					"source": [
-						"obj-click",
+						"obj-93",
 						0
 					]
 				}
@@ -5326,18 +5306,6 @@
 					"source": [
 						"obj-95",
 						1
-					]
-				}
-			},
-			{
-				"patchline": {
-					"source": [
-						"obj-93",
-						0
-					],
-					"destination": [
-						"obj-click",
-						0
 					]
 				}
 			}
