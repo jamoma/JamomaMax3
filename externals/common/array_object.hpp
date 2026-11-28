@@ -65,7 +65,13 @@ public:
         array_ = std::make_unique<jamoma::DataArray>(jamoma::Registry::instance().names(), S);
         array_->set_clock_maker([] { return std::unique_ptr<jamoma::Clock>(std::make_unique<MaxClock>()); });
         array_->set_output([this](std::size_t index, const jamoma::Value& v) {
+            const std::weak_ptr<int> alive = alive_.weak();
+            const std::uint64_t instance = array_->identity(index);
             c74::max::outlet_int(index_out.max_outlet(), static_cast<c74::max::t_atom_long>(index)); // the index first
+            // What follows the index outlet may have resized the array or freed the object.
+            if (alive.expired() || !array_ || array_->identity(index) != instance) {
+                return;
+            }
             jamoma_max::output_value(data_out.max_outlet(), v);
         });
         std::string name;

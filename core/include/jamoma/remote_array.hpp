@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
@@ -57,6 +58,8 @@ public:
     bool select(const Atom& which);
     /** @return The selected instance, 0 for all. */
     std::size_t selected() const;
+    /** @param index An instance, from 1. @return As DataArray::identity. */
+    std::uint64_t identity(std::size_t index) const;
     /** @brief Remote::from_ui for the selected instances. @param value The value. @return False if the array is empty. */
     bool from_ui(const Value& value);
     /** @brief Remote::set_without_output for the selected instances. @param value The value. @return False if the array is empty. */

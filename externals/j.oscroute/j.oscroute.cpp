@@ -24,7 +24,7 @@ using namespace c74::min;
 
 /** The j.oscroute external. */
 class j_oscroute : public c74::min::object<j_oscroute> {
-    std::vector<std::string> patterns_;                                  /**< What is matched, one per outlet. */
+    std::unique_ptr<jamoma::OscRouter> router_;                          /**< What is matched, one pattern per outlet. */
     std::vector<std::unique_ptr<inlet<>>> inlets_;                       /**< The inlet for messages and one per pattern. */
     std::vector<std::unique_ptr<jamoma_max::dump_outlet>> outlets_;      /**< One per pattern, and the dump outlet last. */
 
@@ -35,28 +35,30 @@ public:
     /** Creates the object. @param args The patterns (symbols or numbers). */
     explicit j_oscroute(const atoms& args = {})
     {
+        std::vector<std::string> patterns;
         for (const auto& a : args) {
             if (a.type() == message_type::symbol_argument) {
-                patterns_.emplace_back(static_cast<symbol>(a).c_str());
+                patterns.emplace_back(static_cast<symbol>(a).c_str());
             } else if (a.type() == message_type::int_argument) {
-                patterns_.push_back(std::to_string(static_cast<long long>(a)));
+                patterns.push_back(std::to_string(static_cast<long long>(a)));
             } else if (a.type() == message_type::float_argument) {
                 char text[256];
                 std::snprintf(text, sizeof(text), "%f", static_cast<double>(a)); // as the old object wrote it
-                patterns_.emplace_back(text);
+                patterns.emplace_back(text);
             }
         }
-        if (patterns_.empty()) {
-            patterns_.emplace_back("/nil");
+        if (patterns.empty()) {
+            patterns.emplace_back("/nil");
         }
         inlets_.push_back(std::make_unique<inlet<>>(this, "(anything) OSC message"));
-        for (const std::string& pattern : patterns_) {
+        for (const std::string& pattern : patterns) {
             inlets_.push_back(std::make_unique<inlet<>>(this, "(symbol) replaces the pattern " + pattern));
         }
-        for (const std::string& pattern : patterns_) {
+        for (const std::string& pattern : patterns) {
             outlets_.push_back(std::make_unique<jamoma_max::dump_outlet>(this, "(anything) matches " + pattern));
         }
         outlets_.push_back(std::make_unique<jamoma_max::dump_outlet>(this, "(anything) dump: what matches nothing"));
+        router_ = std::make_unique<jamoma::OscRouter>(std::move(patterns));
     }
 
     /** A bang leaves the dump outlet. */
@@ -93,18 +95,16 @@ public:
 
     /** A message: in the first inlet it is routed by its selector; in another its selector becomes that inlet's pattern. */
     message<threadsafe::yes> m_anything{this, "anything", MIN_FUNCTION {
-        if (args.empty() || outlets_.empty()) {
+        if (args.empty() || !router_) {
             return {};
         }
         const std::string selector = static_cast<symbol>(args[0]).c_str();
         if (inlet > 0) {
-            if (static_cast<std::size_t>(inlet) <= patterns_.size()) {
-                patterns_[static_cast<std::size_t>(inlet) - 1] = selector;
-            }
+            router_->set(static_cast<std::size_t>(inlet) - 1, selector); // may come while another thread routes
             return {};
         }
         const atoms arguments(args.begin() + 1, args.end());
-        const std::vector<jamoma::OscRouteMatch> matches = jamoma::route_osc(selector, patterns_);
+        const std::vector<jamoma::OscRouteMatch> matches = router_->route(selector);
         if (matches.empty()) {
             send(dump(), selector, arguments);
         }

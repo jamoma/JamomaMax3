@@ -8,6 +8,8 @@
 
 #include "jamoma/remote_array.hpp"
 
+#include "jamoma/data.hpp"
+
 #include <atomic>
 #include <mutex>
 #include <optional>
@@ -21,8 +23,16 @@ namespace {
 /** One instance. */
 struct Link {
     std::unique_ptr<Remote> remote;    /**< The remote. */
-    std::string bound;                 /**< The address it was bound to last (main thread). */
+    std::string bound;                 /**< The address it was bound to last (written on the main thread, guarded by the array's mutex). */
     std::atomic<bool> alive{true};     /**< False once the instance has been removed. */
+    const std::uint64_t id = next_id(); /**< Tells instances apart. */
+
+    /** @return A number no instance has had. */
+    static std::uint64_t next_id()
+    {
+        static std::atomic<std::uint64_t> last{0};
+        return ++last;
+    }
 };
 
 using Links = std::vector<std::shared_ptr<Link>>; /**< Instances in index order. */
@@ -68,6 +78,25 @@ struct RemoteArray::Impl {
         return result;
     }
 
+    /** @param item An instance. @return What it counts as without a value: its node's default, else 0, or none for a string. */
+    Value without_value(const Link& item) const
+    {
+        std::string address;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            address = item.bound;
+        }
+        Value result;
+        bool text = false;
+        ns.read_object(Address::parse(address), [&](Object& object) {
+            if (const auto* data = dynamic_cast<const Data*>(&object)) {
+                result = data->default_value();
+                text = data->type() == DataType::String;
+            }
+        });
+        return result.empty() ? Value{text ? Atom("none") : Atom(0)} : result;
+    }
+
     /** Calls the callback. @param index The instance. @param value Its value (replaced by all values in Array format). */
     void emit(std::size_t index, Value value)
     {
@@ -84,7 +113,8 @@ struct RemoteArray::Impl {
         if (all) {
             value.clear();
             for (const auto& item : snapshot()) {
-                const Value v = item->remote->current().value_or(Value{Atom(0)});
+                const std::optional<Value> current = item->remote->current();
+                const Value v = current ? *current : without_value(*item);
                 value.insert(value.end(), v.begin(), v.end());
             }
         }
@@ -129,10 +159,13 @@ struct RemoteArray::Impl {
             instance = name->instance(index);
         }
         const Address address = r(instance);
-        if (address.str() == item.bound) {
-            return;
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (address.str() == item.bound) {
+                return;
+            }
+            item.bound = address.str();
         }
-        item.bound = address.str();
         item.remote->set_address(address);
     }
 
@@ -286,11 +319,13 @@ bool RemoteArray::set_name(const std::string& name, Resolve resolve)
 bool RemoteArray::resize(std::size_t size)
 {
     const std::shared_ptr<Impl> self = impl_;
+    bool changed = false;
     {
         std::lock_guard<std::mutex> lock(self->mutex);
         if (!self->name || size > kMaxArraySize) {
             return false;
         }
+        changed = self->items.size() != size;
         self->name->size = size;
     }
     self->purge();
@@ -298,7 +333,7 @@ bool RemoteArray::resize(std::size_t size)
     self->fit(self);
     {
         std::lock_guard<std::mutex> lock(self->mutex);
-        if (self->format == ArrayFormat::Array) {
+        if (changed && self->format == ArrayFormat::Array) {
             self->pending = self->items.size();
         }
     }
@@ -329,6 +364,12 @@ std::string RemoteArray::name() const
 {
     std::lock_guard<std::mutex> lock(impl_->mutex);
     return impl_->name ? impl_->name->with_size(impl_->items.size()) : std::string();
+}
+
+std::uint64_t RemoteArray::identity(std::size_t index) const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return index >= 1 && index <= impl_->items.size() ? impl_->items[index - 1]->id : 0;
 }
 
 bool RemoteArray::select(const Atom& which)

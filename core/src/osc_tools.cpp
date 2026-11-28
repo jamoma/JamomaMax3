@@ -91,4 +91,30 @@ std::vector<OscRouteMatch> route_osc(std::string_view selector, std::span<const 
     return result;
 }
 
+OscRouter::OscRouter(std::vector<std::string> patterns) : patterns_(std::move(patterns)) {}
+
+void OscRouter::set(std::size_t index, std::string pattern)
+{
+    const std::lock_guard<std::mutex> lock(mutex_);
+    if (index < patterns_.size()) {
+        patterns_[index] = std::move(pattern);
+    }
+}
+
+std::size_t OscRouter::size() const
+{
+    const std::lock_guard<std::mutex> lock(mutex_);
+    return patterns_.size();
+}
+
+std::vector<OscRouteMatch> OscRouter::route(std::string_view selector) const
+{
+    std::vector<std::string> patterns;
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        patterns = patterns_;
+    }
+    return route_osc(selector, patterns);
+}
+
 } // namespace jamoma

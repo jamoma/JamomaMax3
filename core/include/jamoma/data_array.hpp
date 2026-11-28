@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -72,6 +73,8 @@ public:
     bool select(const Atom& which);
     /** @return The selected instance, 0 for all. */
     std::size_t selected() const;
+    /** @param index An instance, from 1. @return A number that stays the same as long as that instance exists, or 0 if there is none. */
+    std::uint64_t identity(std::size_t index) const;
     /** @brief Sends a message to the selected instances in index order. @param input The message. @return False if the array is empty. */
     bool command(const Value& input);
     /** @brief Data::inc on the selected instances. @param args The arguments. @return False if the array is empty. */

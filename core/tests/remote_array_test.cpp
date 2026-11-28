@@ -196,3 +196,31 @@ TEST_CASE("remote_array_bang_goes_to_nodes", "[remote_array]")
     REQUIRE(r.remote.from_ui(Value{}));
     CHECK(r.shown == Shown{{2, Value{2}}});
 }
+
+/** An instance without a value counts with its default, a string with none. */
+TEST_CASE("remote_array_format_array_strings_without_value_are_none", "[remote_array]")
+{
+    Rig r;
+    r.data.set_attribute("type", Value{"string"});
+    REQUIRE(r.data.set_name("s.[3]", Address(), false));
+    r.remote.set_format(ArrayFormat::Array);
+    REQUIRE(r.remote.set_name("s.[3]", at_root));
+    r.shown.clear();
+    r.data.select(Atom(2));
+    r.data.command(Value{"two"});
+    REQUIRE(r.shown.size() == 1);
+    CHECK(r.shown[0].second == Value{"none", "two", "none"});
+}
+
+/** An instance keeps its identity while it exists. */
+TEST_CASE("remote_array_identity_of_an_instance", "[remote_array]")
+{
+    Rig r;
+    r.bind();
+    const auto third = r.remote.identity(3);
+    CHECK(third != 0);
+    r.remote.resize(2);
+    CHECK(r.remote.identity(3) == 0);
+    r.remote.resize(3);
+    CHECK(r.remote.identity(3) != third);
+}

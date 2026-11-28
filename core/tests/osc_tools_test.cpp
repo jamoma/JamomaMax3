@@ -8,7 +8,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <atomic>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -120,4 +122,25 @@ TEST_CASE("osc_tools_survive_hostile_strings", "[osc]")
         split_osc_instance(text);
         route(text, {"", "*", "**", "*a", "a*", "/"});
     }
+}
+
+/** A pattern may be replaced while another thread routes (checked by the thread sanitizer). */
+TEST_CASE("osc_router_patterns_change_while_routing", "[osc]")
+{
+    jamoma::OscRouter router({"/a", "/b"});
+    CHECK(router.size() == 2);
+    std::atomic<bool> stop{false};
+    std::thread changer([&] {
+        for (int i = 0; !stop; ++i) {
+            router.set(0, i % 2 == 0 ? std::string(100, 'x') : std::string("/a"));
+        }
+    });
+    for (int i = 0; i < 2000; ++i) {
+        CHECK(router.route("/b/c").size() == 1);
+    }
+    stop = true;
+    changer.join();
+    router.set(0, "/z");
+    router.set(7, "/never");
+    CHECK(router.route("/z/1").front().outlet == 0);
 }

@@ -390,3 +390,36 @@ TEST_CASE("data_array_resize_while_building", "[data_array]")
     CHECK(r.array.name() == "a.[2]");
     CHECK(r.at("/a.3") == nullptr);
 }
+
+/** Only a change of the name or the size outputs the list: moving under a model, or setting the same size, says nothing. */
+TEST_CASE("data_array_format_array_is_quiet_when_nothing_changes", "[data_array]")
+{
+    Rig r;
+    r.array.set_format(ArrayFormat::Array);
+    REQUIRE(r.array.set_name("a.[3]", Address(), false));
+    r.log.clear();
+    REQUIRE(r.array.set_name("a.[3]", Address::parse("/model"), false));
+    CHECK(r.at("/model/a.1") != nullptr);
+    REQUIRE(r.array.resize(3, true));
+    CHECK(r.log.empty());
+    REQUIRE(r.array.set_name("b.[3]", Address::parse("/model"), false));
+    CHECK(r.log.size() == 1);
+}
+
+/** An instance keeps its identity while it exists. */
+TEST_CASE("data_array_identity_of_an_instance", "[data_array]")
+{
+    Rig r;
+    r.make("a.[3]");
+    const auto second = r.array.identity(2);
+    const auto third = r.array.identity(3);
+    CHECK(second != 0);
+    CHECK(second != third);
+    CHECK(r.array.identity(0) == 0);
+    CHECK(r.array.identity(4) == 0);
+    r.array.resize(2, true);
+    CHECK(r.array.identity(3) == 0);
+    r.array.resize(3, true);
+    CHECK(r.array.identity(2) == second);
+    CHECK(r.array.identity(3) != third);
+}

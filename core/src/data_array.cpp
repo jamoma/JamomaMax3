@@ -24,6 +24,14 @@ struct Instance {
     Data data;                             /**< The data object. */
     Subscription subscription;             /**< The registration in the namespace. */
     std::atomic<bool> alive{true};         /**< False once the instance has been removed. */
+    const std::uint64_t id = next_id();    /**< Tells instances apart. */
+
+    /** @return A number no instance has had. */
+    static std::uint64_t next_id()
+    {
+        static std::atomic<std::uint64_t> last{0};
+        return ++last;
+    }
 
     /** @param service The role. */
     explicit Instance(Service service) : data(service) {}
@@ -331,11 +339,13 @@ bool DataArray::set_name(const std::string& name, const Address& prefix, bool in
     bool built = false;
     bool keep = false;
     bool moved = false;
+    bool changed = true;
     {
         std::lock_guard<std::mutex> lock(self->mutex);
         built = self->name.has_value();
         keep = built && self->name->same_shape(*parsed);
         moved = keep && self->prefix.str() != prefix.str();
+        changed = !keep || self->items.size() != parsed->size;
     }
     ++self->restructuring;
     if (!keep) {
@@ -365,7 +375,7 @@ bool DataArray::set_name(const std::string& name, const Address& prefix, bool in
     }
     self->fit(self, init_new);
     --self->restructuring;
-    if (built) {
+    if (built && changed) {
         self->emit_after_change();
     }
     return true;
@@ -374,18 +384,22 @@ bool DataArray::set_name(const std::string& name, const Address& prefix, bool in
 bool DataArray::resize(std::size_t size, bool init_new)
 {
     const std::shared_ptr<Impl> self = impl_;
+    bool changed = false;
     {
         std::lock_guard<std::mutex> lock(self->mutex);
         if (!self->name || size > kMaxArraySize) {
             return false;
         }
+        changed = self->items.size() != size;
         self->name->size = size;
     }
     self->purge();
     ++self->restructuring;
     self->fit(self, init_new);
     --self->restructuring;
-    self->emit_after_change();
+    if (changed) {
+        self->emit_after_change();
+    }
     return true;
 }
 
@@ -399,6 +413,12 @@ std::string DataArray::name() const
 {
     std::lock_guard<std::mutex> lock(impl_->mutex);
     return impl_->name ? impl_->name->with_size(impl_->items.size()) : std::string();
+}
+
+std::uint64_t DataArray::identity(std::size_t index) const
+{
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return index >= 1 && index <= impl_->items.size() ? impl_->items[index - 1]->id : 0;
 }
 
 bool DataArray::select(const Atom& which)

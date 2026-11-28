@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstddef>
+#include <mutex>
 #include <optional>
 #include <span>
 #include <string>
@@ -45,5 +46,22 @@ struct OscRouteMatch {
  * @return The outputs in order: none (the dump outlet), one, or two (a plain pattern and then one with `*`, as the old object).
  */
 JAMOMA_API std::vector<OscRouteMatch> route_osc(std::string_view selector, std::span<const std::string> patterns);
+
+/** The patterns of one j.oscroute: they may be replaced on one thread while another routes. */
+class JAMOMA_API OscRouter {
+public:
+    /** @param patterns The patterns, one per outlet. */
+    explicit OscRouter(std::vector<std::string> patterns);
+    /** @brief Replaces a pattern. @param index Which, from 0 (one that is not there is ignored). @param pattern The new pattern. */
+    void set(std::size_t index, std::string pattern);
+    /** @return The number of patterns. */
+    std::size_t size() const;
+    /** @param selector An address. @return route_osc() with the patterns of this moment. */
+    std::vector<OscRouteMatch> route(std::string_view selector) const;
+
+private:
+    mutable std::mutex mutex_;          /**< Guards the patterns. */
+    std::vector<std::string> patterns_; /**< The patterns. */
+};
 
 } // namespace jamoma

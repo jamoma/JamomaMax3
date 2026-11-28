@@ -182,7 +182,18 @@ public:
         }
         const long size = static_cast<long>(args[0]);
         jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, size] {
-            if (array_ && (size < 0 || !array_->resize(static_cast<std::size_t>(size)))) {
+            if (!array_) {
+                return;
+            }
+            const bool possible = size >= 0 && static_cast<std::size_t>(size) <= jamoma::kMaxArraySize;
+            if (!ready_) { // not bound yet (a loadbang): the name as written takes the size
+                const auto name = jamoma::parse_array_name(text_);
+                if (possible && name) {
+                    text_ = name->with_size(static_cast<std::size_t>(size));
+                    return;
+                }
+            }
+            if (!possible || !array_->resize(static_cast<std::size_t>(size))) {
                 c74::max::object_error(maxobj(), "array/resize: %ld is not possible (a size from 0 to %d, once the array has a name)", size,
                                        static_cast<int>(jamoma::kMaxArraySize));
             }
@@ -292,16 +303,28 @@ private:
         jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, index, v] { output(index, v); });
     }
 
-    /** The index, then the value, and a place in the queue of the `set` outlet. @param index The instance. @param v The value. */
+    /**
+     * The index, then the value, and a place in the queue of the `set` outlet. Nothing follows the index if what it set off removed the
+     * instance or freed the object.
+     * @param index The instance. @param v The value.
+     */
     void output(std::size_t index, const jamoma::Value& v)
     {
-        const bool list = array_ && array_->format() == jamoma::ArrayFormat::Array;
+        if (!array_) {
+            return;
+        }
+        const std::weak_ptr<int> alive = alive_.weak();
+        const std::uint64_t instance = array_->identity(index);
+        c74::max::outlet_int(index_out.max_outlet(), static_cast<c74::max::t_atom_long>(index));
+        if (alive.expired() || !array_ || array_->identity(index) != instance) {
+            return;
+        }
+        const bool list = array_->format() == jamoma::ArrayFormat::Array;
         const bool queued = !for_ui_.empty();
         for_ui_.emplace_back(list, v);
         if (!queued) {
             jamoma_max::defer_call(maxobj(), alive_.weak(), [this] { flush(); });
         }
-        c74::max::outlet_int(index_out.max_outlet(), static_cast<c74::max::t_atom_long>(index));
         jamoma_max::output_value(value_out.max_outlet(), v);
     }
 
