@@ -211,8 +211,15 @@ struct RemoteArray::Impl {
     static bool send(const Links& to, const Value& value, bool silent)
     {
         for (const auto& item : to) {
-            if (item->alive) {
-                silent ? item->remote->set_without_output(value) : item->remote->from_ui(value);
+            if (!item->alive) {
+                continue;
+            }
+            if (silent) {
+                item->remote->set_without_output(value);
+            } else if (value.empty()) {
+                item->remote->bang();
+            } else {
+                item->remote->from_ui(value);
             }
         }
         return !to.empty();

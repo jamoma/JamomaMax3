@@ -156,3 +156,5 @@ Corrections after the author went through the help patchers:
 - A float in the right inlet selects an instance, rounded down (the old code treated it as a value).
 - Instances made when an array grows get the attributes set so far; the ones that exist are left alone (the old code applied the box attributes to all of them again).
 - `dump` answers the attributes of the watched instance and `format` on the dump outlet (the old arrays answered nothing).
+- `set` and `setArray` of `j.remote_array` show nothing here for any instance (the old object held back only the first answer when all were selected).
+- `j.remote_array` has no `description` and `tags` attributes, like `j.remote`.

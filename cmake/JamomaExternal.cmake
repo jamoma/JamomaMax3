@@ -54,12 +54,15 @@ function(jamoma_add_external)
         target_link_libraries(${target} PRIVATE "${JAMOMA_MSP_LIB}" "${JAMOMA_JIT_LIB}")
         target_link_options(${target} PRIVATE ${JAMOMA_MAX_LINK_FLAGS})
         # The binary is in <name>.mxo/Contents/MacOS, so the package root is four levels up.
+        # An identifier may not contain an underscore (j.parameter_array).
+        string(REPLACE "_" "-" JE_BUNDLE_NAME "${JE_NAME}")
         set_target_properties(${target} PROPERTIES
             BUNDLE ON
             BUNDLE_EXTENSION "mxo"
             XCODE_ATTRIBUTE_WRAPPER_EXTENSION "mxo"
             XCODE_ATTRIBUTE_PRODUCT_NAME "${JE_NAME}"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "no.trondlossius.jamoma.${JE_NAME}"
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "no.trondlossius.jamoma.${JE_BUNDLE_NAME}"
+            MACOSX_BUNDLE_GUI_IDENTIFIER "no.trondlossius.jamoma.${JE_BUNDLE_NAME}"
             MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/cmake/Info.plist.in"
             BUILD_WITH_INSTALL_RPATH ON
             INSTALL_RPATH "@loader_path/../../../../support")

@@ -186,3 +186,13 @@ TEST_CASE("remote_array_absolute_names", "[remote_array]")
     CHECK(gains.collected() == Value{0.25, 0.25});
     CHECK_FALSE(r.remote.set_name("gain", at_root));
 }
+
+/** A bang asks the selected nodes for their values. */
+TEST_CASE("remote_array_bang_goes_to_nodes", "[remote_array]")
+{
+    Rig r;
+    r.bind();
+    r.remote.select(Atom(2));
+    REQUIRE(r.remote.from_ui(Value{}));
+    CHECK(r.shown == Shown{{2, Value{2}}});
+}
