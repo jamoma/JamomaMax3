@@ -1938,7 +1938,6 @@
             {
                 "box": {
                     "id": "obj-55",
-                    "linecount": 2,
                     "maxclass": "newobj",
                     "numinlets": 1,
                     "numoutlets": 1,
@@ -1988,7 +1987,7 @@
                                     "numinlets": 1,
                                     "numoutlets": 1,
                                     "outlettype": [ "int" ],
-                                    "patching_rect": [ 79.0, 156.0, 31.0, 22.0 ],
+                                    "patching_rect": [ 79.0, 156.0, 31.0, 21.0 ],
                                     "text": "t -1"
                                 }
                             },
@@ -2063,7 +2062,7 @@
                             }
                         ]
                     },
-                    "patching_rect": [ 138.166672, 85.0, 108.0, 35.0 ],
+                    "patching_rect": [ 138.166672, 85.0, 110.0, 22.0 ],
                     "text": "p init_midi_devices"
                 }
             },

@@ -9,7 +9,7 @@
             "modernui": 1
         },
         "classnamespace": "box",
-        "rect": [ 196.0, 232.0, 720.0, 687.0 ],
+        "rect": [ 599.0, 224.0, 720.0, 687.0 ],
         "openinpresentation": 1,
         "gridsize": [ 5.0, 5.0 ],
         "boxes": [
@@ -21,7 +21,7 @@
                     "numoutlets": 3,
                     "outlettype": [ "", "", "int" ],
                     "parameter_enable": 0,
-                    "patching_rect": [ 189.0, 228.0, 100.0, 20.0 ],
+                    "patching_rect": [ 300.0, 216.0, 100.0, 20.0 ],
                     "presentation": 1,
                     "presentation_rect": [ 3.0, 25.0, 41.0, 20.0 ],
                     "text": "Init"
@@ -38,7 +38,7 @@
                     "numoutlets": 2,
                     "outlettype": [ "", "bang" ],
                     "parameter_enable": 0,
-                    "patching_rect": [ 127.0, 469.0, 50.0, 21.0 ],
+                    "patching_rect": [ 238.0, 507.0, 50.0, 21.0 ],
                     "presentation": 1,
                     "presentation_rect": [ 112.832428, 46.0, 34.0, 21.0 ]
                 }
@@ -52,7 +52,7 @@
                     "numinlets": 1,
                     "numoutlets": 4,
                     "outlettype": [ "", "", "", "" ],
-                    "patching_rect": [ 189.0, 469.0, 143.0, 22.0 ],
+                    "patching_rect": [ 300.0, 507.0, 143.0, 22.0 ],
                     "text": "j.remote midiChannel",
                     "varname": "midi_normalize[2]"
                 }
@@ -66,7 +66,7 @@
                     "numinlets": 1,
                     "numoutlets": 1,
                     "outlettype": [ "" ],
-                    "patching_rect": [ 230.0, 113.0, 128.0, 22.0 ],
+                    "patching_rect": [ 300.0, 147.0, 128.0, 22.0 ],
                     "text": "prepend setsymbol"
                 }
             },
@@ -79,7 +79,7 @@
                     "numinlets": 2,
                     "numoutlets": 2,
                     "outlettype": [ "", "" ],
-                    "patching_rect": [ 230.0, 82.0, 68.0, 22.0 ],
+                    "patching_rect": [ 300.0, 116.0, 68.0, 22.0 ],
                     "text": "route set"
                 }
             },
@@ -96,7 +96,7 @@
                     "numoutlets": 3,
                     "outlettype": [ "int", "", "" ],
                     "parameter_enable": 0,
-                    "patching_rect": [ 189.0, 10.0, 100.0, 21.0 ],
+                    "patching_rect": [ 259.0, 44.0, 100.0, 21.0 ],
                     "presentation": 1,
                     "presentation_rect": [ 46.0, 23.204323, 100.832428, 21.0 ]
                 }
@@ -120,7 +120,7 @@
                             "modernui": 1
                         },
                         "classnamespace": "box",
-                        "rect": [ 25.0, 69.0, 339.0, 263.0 ],
+                        "rect": [ 134.0, 168.0, 339.0, 263.0 ],
                         "boxes": [
                             {
                                 "box": {
@@ -156,7 +156,7 @@
                                     "numinlets": 1,
                                     "numoutlets": 1,
                                     "outlettype": [ "int" ],
-                                    "patching_rect": [ 36.0, 101.0, 31.0, 20.0 ],
+                                    "patching_rect": [ 36.0, 101.0, 31.0, 21.0 ],
                                     "text": "t -1"
                                 }
                             },
@@ -212,7 +212,7 @@
                             }
                         ]
                     },
-                    "patching_rect": [ 232.0, 302.0, 129.0, 22.0 ],
+                    "patching_rect": [ 343.0, 290.0, 129.0, 22.0 ],
                     "text": "p init_midi_devices"
                 }
             },
@@ -225,7 +225,7 @@
                     "numinlets": 1,
                     "numoutlets": 4,
                     "outlettype": [ "", "", "", "" ],
-                    "patching_rect": [ 230.0, 46.0, 150.0, 22.0 ],
+                    "patching_rect": [ 300.0, 80.0, 150.0, 22.0 ],
                     "text": "j.remote normalization",
                     "varname": "midi_normalize[1]"
                 }
@@ -239,7 +239,7 @@
                     "numinlets": 1,
                     "numoutlets": 4,
                     "outlettype": [ "", "", "", "" ],
-                    "patching_rect": [ 189.0, 259.0, 148.0, 22.0 ],
+                    "patching_rect": [ 300.0, 247.0, 148.0, 22.0 ],
                     "text": "j.remote initDevice",
                     "varname": "j.parameter[3]"
                 }
@@ -251,14 +251,14 @@
                     "fontsize": 11.0,
                     "hint": "device",
                     "id": "obj-12",
-                    "items": [ "to Max 1", ",", "to Max 2" ],
+                    "items": "Not initialised",
                     "labelclick": 1,
                     "maxclass": "umenu",
                     "numinlets": 1,
                     "numoutlets": 3,
                     "outlettype": [ "int", "", "" ],
                     "parameter_enable": 0,
-                    "patching_rect": [ 232.0, 346.0, 126.0, 21.0 ],
+                    "patching_rect": [ 343.0, 334.0, 126.0, 21.0 ],
                     "presentation": 1,
                     "presentation_rect": [ 3.0, 46.0, 106.832428, 21.0 ],
                     "varname": "device_menu"
@@ -273,7 +273,7 @@
                     "numinlets": 1,
                     "numoutlets": 4,
                     "outlettype": [ "", "", "", "" ],
-                    "patching_rect": [ 286.0, 397.0, 148.0, 22.0 ],
+                    "patching_rect": [ 397.0, 385.0, 148.0, 22.0 ],
                     "text": "j.remote device",
                     "varname": "device_menu[1]"
                 }
@@ -287,7 +287,7 @@
                     "numinlets": 1,
                     "numoutlets": 2,
                     "outlettype": [ "", "" ],
-                    "patching_rect": [ 0.0, 197.0, 48.0, 22.0 ],
+                    "patching_rect": [ 47.0, 242.0, 48.0, 22.0 ],
                     "text": "j.view",
                     "varname": "j.model"
                 }
@@ -301,7 +301,7 @@
                     "numinlets": 0,
                     "numoutlets": 1,
                     "outlettype": [ "" ],
-                    "patching_rect": [ 0.0, 145.0, 29.0, 29.0 ]
+                    "patching_rect": [ 47.0, 190.0, 29.0, 29.0 ]
                 }
             },
             {
@@ -312,7 +312,7 @@
                     "maxclass": "outlet",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 0.0, 263.0, 29.0, 29.0 ]
+                    "patching_rect": [ 47.0, 308.0, 29.0, 29.0 ]
                 }
             },
             {
@@ -350,6 +350,7 @@
             {
                 "patchline": {
                     "destination": [ "obj-12", 0 ],
+                    "midpoints": [ 406.5, 417.0, 328.87890625, 417.0, 328.87890625, 324.0, 352.5, 324.0 ],
                     "source": [ "obj-15", 0 ]
                 }
             },
@@ -392,6 +393,7 @@
             {
                 "patchline": {
                     "destination": [ "obj-1", 0 ],
+                    "midpoints": [ 309.5, 179.0, 244.37109375, 179.0, 244.37109375, 34.0, 268.5, 34.0 ],
                     "source": [ "obj-7", 0 ]
                 }
             },
