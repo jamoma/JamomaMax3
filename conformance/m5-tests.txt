@@ -1,0 +1,6 @@
+# Old integration tests of the objects of milestone 5 (none exist for the arrays or the three models).
+JamomaIntegrationTests/patchers/tests/Modular/j.oscinstance/j.oscinstance.non_osc.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.oscinstance/j.oscinstance.osc_messages_with_no_instances.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.oscinstance/j.oscinstance.osc_messages_with_instances.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.oscroute/j.oscroute.maxtest.maxpat
+JamomaIntegrationTests/patchers/tests/Modular/j.oscroute/j.oscroute.dynamic.maxtest.maxpat
