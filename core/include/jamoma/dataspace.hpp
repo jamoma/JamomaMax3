@@ -3,7 +3,7 @@
 
 /**
  * @file dataspace.hpp
- * @brief Dataspaces: measurement units and conversion between them (gain, time, position).
+ * @brief Dataspaces: measurement units and conversion between them (gain, time, position, temperature, color).
  */
 
 #pragma once
@@ -24,7 +24,8 @@ namespace jamoma {
  *
  * Ported from the old DataspaceLib. Gain: neutral unit linear; units linear, midigain, dB and db-raw. Time: neutral unit second;
  * units second, ms, sample (at 44100 Hz), bpm, Hz, midinote, cents, mel and bark. Position: neutral unit cart3D; units cart3D (xyz),
- * cart2D (xy), spherical (aed), polar (ad), openGL and cylindrical (daz). Units have aliases (dB and db, ms and millisecond, and so on).
+ * cart2D (xy), spherical (aed), polar (ad), openGL and cylindrical (daz). Color: neutral unit rgb (0 to 1);
+ * units cmy and rgb8 (0 to 255), hsl and hsv (hue in degrees, the others 0 to 100). Temperature: neutral unit Kelvin; units Kelvin, Celsius and Fahrenheit. Units have aliases (dB and db, ms and millisecond, and so on).
  * Scalar units convert every element of a list; position units convert the whole vector (missing elements count as 0).
  */
 class JAMOMA_API Dataspace {
@@ -33,12 +34,12 @@ public:
 
     /**
      * @brief Finds a dataspace.
-     * @param name gain, time or position.
+     * @param name gain, time, position, temperature or color.
      * @return The dataspace, or null for an unknown name.
      */
     static const Dataspace* find(std::string_view name);
 
-    /** @return The names of the dataspaces that exist, in a fixed order (gain, time, position, temperature). */
+    /** @return The names of the dataspaces that exist, in a fixed order (gain, time, position, temperature, color). */
     static std::vector<std::string> names();
     /** @return The canonical name of every unit of this dataspace (the first of each unit's names), in the order they were defined. */
     std::vector<std::string> unit_names() const;

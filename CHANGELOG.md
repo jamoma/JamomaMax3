@@ -6,6 +6,7 @@ New features and notable changes for each release of JamomaMax3. Everything that
 
 ### New features
 
+- **The `color` dataspace** (`cmy`, `hsl`, `hsv`, `rgb`, `rgb8`).
 - **`j.namespace` filters** (`filter/set`, `filter/remove`, `filter/info`, `@filter/list`).
 - **`dump` on the array objects** answers the attributes of the watched instance and `format`.
 - **Easing functions for ramps:** `ramp/function` takes the functions of the library, with their parameters.

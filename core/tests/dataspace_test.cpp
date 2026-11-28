@@ -259,7 +259,7 @@ TEST_CASE("temperature conversions match the old tests")
 /** The menus of j.unit: the names of the dataspaces and the canonical names of the units. */
 TEST_CASE("dataspace and unit names")
 {
-    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature"});
+    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature", "color"});
     REQUIRE(Dataspace::find("temperature")->unit_names() == std::vector<std::string>{"Kelvin", "Celsius", "Fahrenheit"});
     REQUIRE(Dataspace::find("gain")->unit_names().front() == "linear");
     REQUIRE(Dataspace::find("temperature")->default_unit() == "Kelvin");
@@ -320,4 +320,63 @@ TEST_CASE("unit converter is race free")
     stop = true;
     reader.join();
     REQUIRE(converted.load() > 0);
+}
+
+namespace {
+
+/** Converts a colour. @param v The numbers. @param from The unit. @param to The unit. @param expected What should come out. */
+void colour(const jamoma::Value& v, const char* from, const char* to, const std::vector<double>& expected)
+{
+    INFO(from << " -> " << to);
+    const jamoma::Dataspace* space = jamoma::Dataspace::find("color");
+    REQUIRE(space != nullptr);
+    const auto out = space->convert(v, from, to);
+    REQUIRE(out);
+    REQUIRE(out->size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        INFO("element " << i << ": " << out->at(i).as_double());
+        REQUIRE(close(out->at(i).as_double(), expected[i]));
+    }
+}
+
+} // namespace
+
+/** The colour dataspace: neutral rgb, with cmy, hsl, hsv and rgb8 (the cases of the old ColorDataspace test among them). */
+TEST_CASE("color conversions to and from rgb")
+{
+    const jamoma::Dataspace* space = jamoma::Dataspace::find("color");
+    REQUIRE(space != nullptr);
+    CHECK(space->default_unit() == "rgb");
+    CHECK(space->unit_names() == std::vector<std::string>{"cmy", "hsl", "hsv", "rgb", "rgb8"});
+    const auto names = jamoma::Dataspace::names();
+    CHECK(std::find(names.begin(), names.end(), "color") != names.end());
+    colour({0.1, 0.6, 0.9}, "rgb", "rgb", {0.1, 0.6, 0.9});
+    colour({255.0, 127.5, 0.0}, "cmy", "rgb", {0.0, 0.5, 1.0});
+    colour({0.0, 0.5, 1.0}, "rgb", "cmy", {255.0, 127.5, 0.0});
+    colour({255.0, 127.5, 0.0}, "rgb8", "rgb", {1.0, 0.5, 0.0});
+    colour({1.0, 0.5, 0.0}, "rgb", "rgb8", {255.0, 127.5, 0.0});
+    colour({120.0, 100.0, 50.0}, "hsl", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 1.0, 0.0}, "rgb", "hsl", {120.0, 100.0, 50.0});
+    colour({240.0, 50.0, 75.0}, "hsl", "rgb", {0.625, 0.625, 0.875});
+    colour({0.625, 0.625, 0.875}, "rgb", "hsl", {240.0, 50.0, 75.0});
+    colour({120.0, 100.0, 100.0}, "hsv", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 1.0, 0.0}, "rgb", "hsv", {120.0, 100.0, 100.0});
+    colour({30.0, 100.0, 50.0}, "hsv", "rgb", {0.5, 0.25, 0.0});
+    colour({210.0, 50.0, 80.0}, "hsv", "rgb", {0.4, 0.6, 0.8});
+    colour({300.0, 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 1.0});
+}
+
+/** Greys, hues outside the circle and short lists give plain numbers. */
+TEST_CASE("color conversions at the edges")
+{
+    colour({0.5, 0.5, 0.5}, "rgb", "hsv", {0.0, 0.0, 50.0});
+    colour({0.0, 0.0, 0.0}, "rgb", "hsv", {0.0, 0.0, 0.0});
+    colour({0.5, 0.5, 0.5}, "rgb", "hsl", {0.0, 0.0, 50.0});
+    colour({1.0, 1.0, 1.0}, "rgb", "hsl", {0.0, 0.0, 100.0});
+    colour({360.0, 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 0.0});
+    colour({-120.0, 100.0, 100.0}, "hsv", "rgb", {0.0, 0.0, 1.0});
+    colour({840.0, 100.0, 50.0}, "hsl", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 0.0, 0.0}, "cmy", "rgb", {1.0, 1.0, 1.0});
+    colour({1.0}, "rgb", "rgb8", {255.0, 0.0, 0.0});
+    colour({std::numeric_limits<double>::infinity(), 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 0.0});
 }

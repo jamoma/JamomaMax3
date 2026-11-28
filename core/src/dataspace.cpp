@@ -121,7 +121,107 @@ Dataspace::Impl make_gain()
     return d;
 }
 
-/** @return The time dataspace tables. */
+/** @param degrees A hue. @return It within [0, 360); 0 if it is not finite. */
+double wrap_hue(double degrees)
+{
+    if (!std::isfinite(degrees)) {
+        return 0.0;
+    }
+    const double h = std::fmod(degrees, 360.0);
+    return h < 0.0 ? h + 360.0 : h;
+}
+
+/**
+ * @brief The red, green and blue of a hue between a darkest and a lightest level.
+ * @param hue The hue in degrees. @param low The level of the weakest component. @param high The level of the strongest. @return The three components.
+ */
+std::vector<double> hue_to_rgb(double hue, double low, double high)
+{
+    const auto component = [&](double h) {
+        h = wrap_hue(h);
+        if (h < 60.0) {
+            return low + (high - low) * h / 60.0;
+        }
+        if (h < 180.0) {
+            return high;
+        }
+        if (h < 240.0) {
+            return low + (high - low) * (240.0 - h) / 60.0;
+        }
+        return low;
+    };
+    const double h = wrap_hue(hue); // before the thirds are added: a hue that is not finite counts as 0
+    return {component(h + 120.0), component(h), component(h - 120.0)};
+}
+
+/** The strongest and weakest component of a colour, and its hue. */
+struct Spread {
+    double high; /**< The strongest of red, green and blue. */
+    double low;  /**< The weakest. */
+    double hue;  /**< The hue in degrees; 0 for a grey. */
+};
+
+/** @param rgb Red, green and blue. @return Their strongest, weakest and hue. */
+Spread spread_of(const std::vector<double>& rgb)
+{
+    const double r = at(rgb, 0);
+    const double g = at(rgb, 1);
+    const double b = at(rgb, 2);
+    Spread s{std::max({r, g, b}), std::min({r, g, b}), 0.0};
+    const double delta = s.high - s.low;
+    if (delta != 0.0) {
+        const double sixths = s.high == r ? (g - b) / delta : s.high == g ? 2.0 + (b - r) / delta : 4.0 + (r - g) / delta;
+        s.hue = wrap_hue(60.0 * sixths);
+    }
+    return s;
+}
+
+/** @param v A colour. @param scale A factor. @param offset Added after the factor. @return The first three elements, each times the factor plus the offset. */
+std::vector<double> scaled(const std::vector<double>& v, double scale, double offset)
+{
+    return {at(v, 0) * scale + offset, at(v, 1) * scale + offset, at(v, 2) * scale + offset};
+}
+
+/** @return The colour dataspace tables (neutral: rgb from 0 to 1; hue in degrees, saturation, lightness and value from 0 to 100). */
+Dataspace::Impl make_color()
+{
+    using V = const std::vector<double>&;
+    Dataspace::Impl d;
+    d.name = "color";
+    d.neutral = "rgb";
+    d.units.push_back(vector_unit({"cmy"}, [](V v) { return scaled(v, -1.0 / 255.0, 1.0); }, [](V v) { return scaled(v, -255.0, 255.0); }));
+    d.units.push_back(vector_unit(
+        {"hsl"},
+        [](V v) {
+            const double s = at(v, 1) / 100.0;
+            const double l = at(v, 2) / 100.0;
+            const double high = l <= 0.5 ? l * (1.0 + s) : l + s - l * s;
+            return hue_to_rgb(at(v, 0), 2.0 * l - high, high);
+        },
+        [](V v) {
+            const Spread c = spread_of(v);
+            const double l = (c.high + c.low) / 2.0;
+            const double range = l < 0.5 ? c.high + c.low : 2.0 - c.high - c.low;
+            const double s = c.high == c.low || range == 0.0 ? 0.0 : (c.high - c.low) / range;
+            return std::vector<double>{c.hue, s * 100.0, l * 100.0};
+        }));
+    d.units.push_back(vector_unit(
+        {"hsv"},
+        [](V v) {
+            const double value = at(v, 2) / 100.0;
+            return hue_to_rgb(at(v, 0), value * (1.0 - at(v, 1) / 100.0), value);
+        },
+        [](V v) {
+            const Spread c = spread_of(v);
+            const double s = c.high == 0.0 ? 0.0 : (c.high - c.low) / c.high;
+            return std::vector<double>{c.hue, s * 100.0, c.high * 100.0};
+        }));
+    d.units.push_back(vector_unit({"rgb"}, [](V v) { return scaled(v, 1.0, 0.0); }, [](V v) { return scaled(v, 1.0, 0.0); }));
+    d.units.push_back(vector_unit({"rgb8"}, [](V v) { return scaled(v, 1.0 / 255.0, 0.0); }, [](V v) { return scaled(v, 255.0, 0.0); }));
+    return d;
+}
+
+/** @return The temperature dataspace tables. */
 Dataspace::Impl make_temperature()
 {
     Dataspace::Impl d;
@@ -238,10 +338,13 @@ struct DataspaceTables {
         static const Dataspace time(&time_impl);
         static const Dataspace position(&position_impl);
         static const Dataspace temperature(&temperature_impl);
+        static const Dataspace::Impl color_impl = make_color();
+        static const Dataspace color(&color_impl);
         if (name == "gain") return &gain;
         if (name == "time") return &time;
         if (name == "position") return &position;
         if (name == "temperature") return &temperature;
+        if (name == "color") return &color;
         return nullptr;
     }
 };
@@ -261,7 +364,7 @@ std::string Dataspace::default_unit() const
     return impl_->neutral;
 }
 
-std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature"}; }
+std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature", "color"}; }
 
 std::vector<std::string> Dataspace::unit_names() const
 {
