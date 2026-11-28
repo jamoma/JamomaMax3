@@ -1,6 +1,48 @@
-# Milestone 5: results
+# Milestone 5 results
 
-(Filled in as the milestone goes; completed in the last task.)
+**Headline:** the four array objects, `j.oscinstance`, `j.oscroute`, `j.initialized`, the namespace browser (view and window, with the filters of
+`j.namespace`) and the models `mapper`, `midiin` and `hi` are built. Every Max test and every unit test passes. What only a person or a device can
+check is listed below.
+
+## Run of 28 November 2026
+
+macOS 27.2 arm64, Max 9.
+
+| What | Result |
+|---|---|
+| Every Max test (`run_maxtests.py --all`), **one test per Max launch** | **181 of 181 pass** (612 assertions) |
+| Core unit tests, with the tool checks `test_layout` and `package_references` | 456 of 456 pass |
+| The same under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer | all pass, no reports |
+| Tool tests (`python3 -m unittest discover` in each folder of `tools`) | 132 pass |
+| Reference pages (`tools/refpages/check_refpages.py`) | no differences |
+| Help patchers and model patchers (`scripts/check-help.sh`; `j.namespace.maxhelp` left out), the browser window and `j.initialized` | no missing object or load error |
+| Doxygen | no warnings |
+
+Console errors in the full run are those the tests provoke on purpose (an unknown function name, files that do not exist, an edited text without presets).
+The old tests of `j.oscinstance` and `j.oscroute` (five) are part of the run; there are no old tests for the arrays or the three models.
+
+## Final review
+
+A read-only review of the branch (before the browser window was added) by a fresh Opus reviewer gave no critical, two important and four minor findings.
+
+- **Fixed with a test that failed first:** `j.oscroute` could crash when a pattern was replaced while another thread routed; arrays in `array` format sent their list while a patch loaded; a value still came out for an instance that what followed the index outlet had removed; `j.remote_array` lost an `array/resize` sent before it had bound; string instances without a value counted as 0.
+- **Deferred, minor:** `array/resize` with a word instead of a number sets the size to 0 instead of giving an error.
+- **Left as before:** a ramp clock could in theory be freed on the scheduler thread after two resizes in quick succession (not reproduced).
+- The filters of `j.namespace` and the browser window were built after this review and have **not** been reviewed.
+
+## Not covered
+
+- **The browser window:** that clicking `≣` binds the view and opens the window, choosing in the lists, searching, the arrow, return and escape keys, and where the window appears.
+- **By eye:** the new help patchers and the `mapper` views.
+- Saving a patch and loading it again with arrays that were resized or renamed.
+- `scripts/max-smoke.sh` (quit with live objects) was not run for this milestone.
+- **Windows is untested in Max.**
+
+## Found on the way
+
+- `j.remote` drops a `bang` sent to it (the old object passed it to the node); not changed.
+- New externals other than the data objects, the arrays and `j.map` may not answer an attribute name sent without a value, as the old objects did.
+- The unit test `unit converter is race free` (milestone 1) failed once on a loaded machine and passed 200 times in a row afterwards.
 
 ## Checks for the author: hardware
 
