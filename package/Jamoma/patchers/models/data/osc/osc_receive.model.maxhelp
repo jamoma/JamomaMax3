@@ -131,7 +131,7 @@
                     "numinlets": 1,
                     "numoutlets": 0,
                     "patching_rect": [ 49.0, 378.0, 141.0, 22.0 ],
-                    "text": "udpsend localhost 11111"
+                    "text": "udpsend localhost 12000"
                 }
             },
             {

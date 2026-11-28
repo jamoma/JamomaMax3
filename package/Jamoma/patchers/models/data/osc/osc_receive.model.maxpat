@@ -230,7 +230,7 @@
                     "numoutlets": 2,
                     "outlettype": [ "", "" ],
                     "patching_rect": [ 78.0, 83.0, 263.0, 22.0 ],
-                    "text": "j.parameter port @type integer @default 11111"
+                    "text": "j.parameter port @type integer @default 12000"
                 }
             },
             {
@@ -270,9 +270,9 @@
                     "outlettype": [ "" ],
                     "patching_rect": [ 78.0, 149.0, 103.0, 22.0 ],
                     "saved_object_attributes": {
-                        "port": 11111
+                        "port": 12000
                     },
-                    "text": "udpreceive 11111"
+                    "text": "udpreceive 12000"
                 }
             },
             {

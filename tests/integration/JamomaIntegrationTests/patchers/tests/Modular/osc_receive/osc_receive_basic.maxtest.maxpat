@@ -152,7 +152,7 @@
       155.4,
       22.0
      ],
-     "text": "udpsend 127.0.0.1 11111"
+     "text": "udpsend 127.0.0.1 12000"
     }
    },
    {
@@ -1128,7 +1128,7 @@
       404.8,
       22.0
      ],
-     "text": "test.assert Jamoma/Modular/osc_receive/basic/listens_on_port_11111"
+     "text": "test.assert Jamoma/Modular/osc_receive/basic/listens_on_port_12000"
     }
    },
    {
