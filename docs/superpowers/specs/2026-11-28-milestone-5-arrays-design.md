@@ -1,6 +1,6 @@
 # Milestone 5: arrays and the models that need them (design)
 
-Status: draft for the author's approval, 28 November 2026. Parent spec: `2026-11-21-jamomamax3-modular-design.md`.
+Status: approved by the author, 28 November 2026. Parent spec: `2026-11-21-jamomamax3-modular-design.md`.
 
 ## Intent
 
