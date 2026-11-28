@@ -26,3 +26,5 @@ j.remote_array
 j.oscinstance
 j.oscroute
 j.initialized
+j.namespacebrowser.view
+j.namespacebrowser
