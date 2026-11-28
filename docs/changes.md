@@ -168,3 +168,4 @@ Corrections after the author went through the help patchers:
 - `array/resize` with something other than a number is an error and leaves the array as it is.
 - The `angle` dataspace (`radian`, `degree`) is built; it behaves as before.
 - The `color` dataspace (units `cmy`, `hsl`, `hsv`, `rgb`, `rgb8`) is built. Differences from the old code: a grey converted to `hsv` has hue 0 (the old gave no number), and hues outside 0 to 360 wrap around (360 degrees in `hsv` gave magenta before).
+- The `mouse` model (with its view, module, presets and help patcher) and `j.function_edit` (with its help patcher) are imported, with default colours and Arial as other imported patchers. The help patchers that showed a placeholder for them, and for `j.unit` with the `color` dataspace, show the real objects again.

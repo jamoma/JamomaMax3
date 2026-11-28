@@ -297,17 +297,22 @@
 							},
 							{
 								"box": {
+									"annotation": "Output information from mouse",
 									"id": "obj-6",
-									"maxclass": "comment",
-									"text": "[mouse.model: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										192.0,
 										339.0,
-										220.0,
-										20.0
-									]
+										100.0,
+										23.0
+									],
+									"style": "",
+									"text": "mouse.model"
 								}
 							},
 							{
@@ -381,17 +386,41 @@
 							},
 							{
 								"box": {
+									"annotation": "none",
+									"args": [
+										"mouse"
+									],
+									"bgmode": 0,
+									"border": 0,
+									"clickthrough": 0,
+									"enablehscroll": 0,
+									"enablevscroll": 0,
 									"id": "obj-1",
-									"maxclass": "comment",
-									"text": "[mouse.view: not in this version yet]",
+									"lockeddragscroll": 0,
+									"maxclass": "bpatcher",
+									"name": "mouse.view.maxpat",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"offset": [
+										0.0,
+										0.0
+									],
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										300.0,
 										339.0,
-										220.0,
-										20.0
-									]
+										150.0,
+										70.0
+									],
+									"presentation_rect": [
+										15.0,
+										15.0,
+										150.0,
+										70.0
+									],
+									"viewvisibility": 1
 								}
 							},
 							{
