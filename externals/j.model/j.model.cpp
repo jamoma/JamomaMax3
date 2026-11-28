@@ -59,8 +59,8 @@ class j_model : public c74::min::object<j_model> {
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
     std::string alias_text_;                   /**< The alias as written (kept for the model that replaces this one). */
     jamoma_max::ContextWatch watch_;           /**< Moves the model below its parent model when that one appears later, is replaced or goes. */
-    std::unique_ptr<jamoma::ModelExplorer> explorer_;                        /**< Tells when parameters below the model come or go. */
-    std::map<std::string, std::unique_ptr<jamoma::Receiver>> watches_;      /**< One receiver per parameter below the model, by its address relative to the model. */
+    std::unique_ptr<jamoma::ModelExplorer> explorer_;                        /**< Tells when parameters and returns below the model come or go. */
+    std::map<std::string, std::unique_ptr<jamoma::Receiver>> watches_;      /**< One receiver per parameter and return below the model, by its address relative to the model. */
     std::string watched_root_;                                              /**< The address of the model the watches belong to. */
 
 public:
@@ -139,7 +139,7 @@ public:
     }}};
 
     inlet<> input{this, "(anything) messages to the model"};              /**< The inlet. */
-    jamoma_max::dump_outlet results_out{this, "(anything) parameter changes: the name of the parameter and its value"}; /**< Outlet 0: every change of a parameter below the model, with the name (relative to the model) in front. */
+    jamoma_max::dump_outlet results_out{this, "(anything) changes of parameters and returns: the name and the value"}; /**< Outlet 0: every change of a parameter or return below the model, with its name (relative to the model) in front. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};              /**< Outlet 1: the dump outlet. */
 
     /** @return The text editor window of the model (the Max method edclose reaches it). */
@@ -644,7 +644,7 @@ private:
     }
 
     /**
-     * Makes the watches match the parameters below the model: a receiver for each one that is new, none for one that has gone. A receiver
+     * Makes the watches match the parameters and returns below the model: a receiver for each one that is new, none for one that has gone. A receiver
      * only reports changes made after it was bound (it is inactive while it binds), so nothing is output for a value that is already there.
      */
     void sync_watches()
@@ -658,8 +658,12 @@ private:
             watches_.clear();
             watched_root_ = root.str();
         }
-        const std::vector<std::string> names = explorer_->contents().parameters;
-        const std::set<std::string> wanted(names.begin(), names.end());
+        // Everything that holds a value, as the old object: parameters and returns, the generic ones too; messages are not watched.
+        const jamoma::ModelContents contents = explorer_->contents();
+        std::set<std::string> wanted;
+        for (const std::vector<std::string>* names : {&contents.parameters, &contents.returns, &contents.generic_parameters, &contents.generic_returns}) {
+            wanted.insert(names->begin(), names->end());
+        }
         for (auto it = watches_.begin(); it != watches_.end();) {
             it = wanted.count(it->first) != 0 ? std::next(it) : watches_.erase(it);
         }
@@ -677,7 +681,7 @@ private:
         }
     }
 
-    /** Outputs `<name> <value>` on the left outlet (on the main thread: another thread defers). @param name The parameter, relative to the model. @param v The new value. */
+    /** Outputs `<name> <value>` on the left outlet (on the main thread: another thread defers). @param name The parameter or return, relative to the model. @param v The new value. */
     void report_change(const std::string& name, const jamoma::Value& v)
     {
         if (c74::max::systhread_ismainthread()) {
@@ -687,7 +691,7 @@ private:
         }
     }
 
-    /** Sends the name and the value out. @param name The parameter. @param v The value. */
+    /** Sends the name and the value out. @param name The parameter or return. @param v The value. */
     void output_change(const std::string& name, const jamoma::Value& v)
     {
         const c74::min::atoms atoms = jamoma_max::to_atoms(v);
