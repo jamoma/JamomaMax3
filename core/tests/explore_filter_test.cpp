@@ -173,3 +173,16 @@ TEST_CASE("explore_filter_rejects_bad_rules", "[explore_filter]")
     CHECK(f.empty());
     CHECK_FALSE(f.info("x"));
 }
+
+/** The old filters for objects that are not nodes here exist, and nothing passes them. */
+TEST_CASE("explore_filter_filters_without_nodes_list_nothing", "[explore_filter]")
+{
+    const World w;
+    for (const char* name : {"remote", "in", "out", "in~", "out~", "view"}) {
+        INFO(name);
+        ExploreFilters f;
+        f.set_list(Value{name});
+        CHECK(f.info(name));
+        CHECK(w.found(f).empty());
+    }
+}

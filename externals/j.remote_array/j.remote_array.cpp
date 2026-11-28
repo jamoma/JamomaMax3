@@ -23,6 +23,7 @@
 #include "max_address.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -94,6 +95,8 @@ public:
             });
         }
         return args;
+    }}, getter{MIN_GETTER_FUNCTION {
+        return atoms{symbol(text_)}; // also when it came as the argument
     }}};
 
     /** The unit the UI object works in (empty: the node's own). */
@@ -180,6 +183,10 @@ public:
         if (args.empty()) {
             return {};
         }
+        if (args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
+            c74::max::object_error(maxobj(), "array/resize needs a number (the array is left as it is)");
+            return {};
+        }
         const long size = static_cast<long>(args[0]);
         jamoma_max::run_on_main(maxobj(), alive_.weak(), [this, size] {
             if (!array_) {
@@ -241,8 +248,12 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_remote_array>(args[0], {"address", "unit", "active", "freeze", "format", "highlight"});
+        jamoma_max::answer_get_messages(args[0], {"address", "unit", "active", "freeze", "format", "highlight"});
+        return {};
+    }};
 
 private:
     /** Gives the array the name as written (once the patcher has loaded). */

@@ -270,17 +270,27 @@ public:
         if (message.size() >= 2 && static_cast<symbol>(message[0]) == symbol("symbol")) {
             message.erase(message.begin());
         }
-        if (message.size() < 2) {
+        if (message.empty()) {
             return {};
         }
         const std::string selector = static_cast<symbol>(message[0]).c_str();
+        if (message.size() == 1) { // a parameter of the function, asked for: answered as the data objects do
+            for (const auto& parameter : mapper_.function_parameters()) {
+                if (parameter == selector) {
+                    const atoms value = jamoma_max::to_atoms(mapper_.function_parameter(parameter));
+                    c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym(selector.c_str()), static_cast<short>(value.size()),
+                                              value.empty() ? nullptr : const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&value[0])));
+                }
+            }
+            return {};
+        }
         c74::max::t_atom* rest = const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&message[1]));
         if (c74::max::object_attr_get(maxobj(), c74::max::gensym(selector.c_str())) != nullptr) {
             c74::max::object_attr_setvalueof(maxobj(), c74::max::gensym(selector.c_str()), static_cast<long>(message.size() - 1), rest);
             return {};
         }
         for (const auto& parameter : mapper_.function_parameters()) {
-            if (parameter == selector || max_name(parameter) == selector) {
+            if (parameter == selector) {
                 atoms value(message.begin() + 1, message.end());
                 if (!mapper_.set_function_parameter(parameter, jamoma_max::to_value(value)))
                     c74::max::object_error(maxobj(), "%s: value refused by %s", selector.c_str(), mapper_.function().c_str());
@@ -297,25 +307,13 @@ public:
                                                     "input/threshold/down", "input/threshold/up", "output/threshold/down", "output/threshold/up", "active",
                                                     "clipmode", "inverse", "ramp", "function", "function/library", "function/parameters",
                                                     "function/samples"});
+        jamoma_max::answer_get_messages(args[0], {"input", "output", "input/min", "input/max", "output/min", "output/max", "input/index",
+                                                  "input/threshold/down", "input/threshold/up", "output/threshold/down", "output/threshold/up", "active",
+                                                  "clipmode", "inverse", "ramp", "function", "function/library", "function/parameters", "function/samples"});
         return {};
     }};
 
 private:
-    /** @param tt_name A parameter name (`powerValue`). @return The form with a slash before each capital (`power/value`), accepted as well. */
-    static std::string max_name(const std::string& tt_name)
-    {
-        std::string out;
-        for (char c : tt_name) {
-            if (std::isupper(static_cast<unsigned char>(c))) {
-                out += '/';
-                out += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-            } else {
-                out += c;
-            }
-        }
-        return out;
-    }
-
     /** Binds both ends to the addresses as written, resolved against the model of the patcher. */
     void rebind()
     {

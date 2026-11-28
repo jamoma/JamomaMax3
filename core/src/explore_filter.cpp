@@ -91,6 +91,11 @@ ExploreFilters::ExploreFilters()
         make(service, {{"object", word("Container")}, {"attribute", word("service")}, {"value", word(service)}});
     }
     make("none", {{"object", word("none")}});
+    // The objects these look for are not nodes in this version: they list nothing, as `view` does.
+    for (const auto& [name, kind] : {std::pair{"remote", "Viewer"}, std::pair{"in", "Input"}, std::pair{"out", "Output"},
+                                     std::pair{"in~", "Input.audio"}, std::pair{"out~", "Output.audio"}}) {
+        make(name, {{"object", word(kind)}});
+    }
     make("genericTag", {{"attribute", word("tags")}, {"value", word("generic")}});
     make("noGenericTag", {{"attribute", word("tags")}, {"value", word("generic")}}, "exclude");
 }

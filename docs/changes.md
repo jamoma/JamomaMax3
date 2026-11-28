@@ -84,13 +84,13 @@ Differences from the old behaviour, on top of the lists above. The old suite has
 ## j.namespace (milestone 4)
 
 - Built: `address`, `output`, `format`, `relative`, `update`, `sort`, `depth`, `namespace`, exploring, and the selection (`select`, `select/all`, `select/none`, `selection/refresh`). A selection is shared by name (`namespace`, also used by `j.cue`); without a name it is private and is not output.
-- **Filters** (built in milestone 5; in milestone 4 they were not): `filter/set`, `filter/remove`, `filter/info`, `@filter/list` and the ready-made filters `data`, `parameter`, `message`, `return`, `model`, `view`, `none`, `genericTag` and `noGenericTag`. Differences: the old ready-made filters `in`, `out`, `in~`, `out~` and `remote` are not there (those objects are not nodes in this version) and `view` finds nothing for the same reason; the texts are C++ (ECMAScript) regular expressions; changing a filter leaves the selection as it is (the old object cleared it).
+- **Filters** (built in milestone 5; in milestone 4 they were not): `filter/set`, `filter/remove`, `filter/info`, `@filter/list` and the ready-made filters `data`, `parameter`, `message`, `return`, `model`, `view`, `none`, `remote`, `in`, `out`, `in~`, `out~`, `genericTag` and `noGenericTag`. As before, changing a filter clears the selection at and below the explored address. Differences: `view`, `remote`, `in`, `out`, `in~` and `out~` list nothing, because those objects are not nodes in this version; the texts are C++ (ECMAScript) regular expressions.
 - An address that does not exist gives an empty result of size 0. `update` explores again only when the result changes.
 
 ## j.map (milestone 4)
 
 - Built: the mapper and all 38 functions of the old function library, the four thresholds, `reset` and `dump`. No `clipmode` and no output clipping by default, as before.
-- The parameters of a function (`base`, `powerValue`, ...) are set by message, not as arguments at creation. (In milestone 4 `function/parameters` listed them as `power/value` and only that form was accepted; since milestone 5 the old names are back, and the form with a slash still works.)
+- The parameters of a function (`base`, `powerValue`, `curveList`, ...) are set by message, not as arguments at creation; the name alone is answered with the value. (In milestone 4 `j.map` listed and accepted them only as `power/value`; since milestone 5 each has one name, the old one.)
 - Numbers that are not finite never leave the outlet: a limit that is not finite is ignored, an input that is not a number gives the lower output limit. An unknown function or symmetry is refused with a console error; the base of `exponential` and `logarithm` is kept between 0.000001 and 100000.
 - `ramp` applies to what is sent to the output parameter, not to the outlet.
 - The graphical editor of freehand curves (`j.function_edit`) is not built.
@@ -163,3 +163,6 @@ Corrections after the author went through the help patchers:
 - `j.map` answers its attributes when their names are sent without a value, as before (milestone 4 did not; `mapper` needs it for `function/parameters`).
 - The namespace browser (`j.namespacebrowser.view` and its window): the window's `j.model` is given the name `namespacebrowser`, which the old naming rule produced from the file name.
 - `j.route` behaves as the old object. An empty `searchstring` matches nothing (the old code read outside its text), positions left over from a longer earlier `searchpositions` are not searched any more, and there is no limit on the length of the search text.
+- Attribute queries: `j.map`, `j.route`, `j.remote`, `j.remote_array`, `j.send`, `j.receive`, `j.model`, `j.view`, `j.node`, `j.in`, `j.out`, `j.cue`, `j.namespace` and `j.unit` answer `<name> <value>` on the dump outlet to an attribute name sent without a value, and to `get<name>`, as the old objects did (before milestone 5 most did not). In `j.ui` and `j.textslider` a colour name without a value restores the automatic colour.
+- A `bang` to `j.remote` goes to the node, which outputs its value to every object on it (before milestone 5 it was lost).
+- `array/resize` with something other than a number is an error and leaves the array as it is.

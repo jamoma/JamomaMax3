@@ -22,6 +22,7 @@
 #include "max_address.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -207,6 +208,8 @@ public:
     message<> filter_set{this, "filter/set", MIN_FUNCTION {
         if (!filters_.set(jamoma_max::to_value(args))) {
             c74::max::object_error(maxobj(), "filter/set needs a name and pairs of object, attribute, value, part, parent, name, instance or mode and a value");
+        } else {
+            clear_selection();
         }
         options_.filters = &filters_;
         return {};
@@ -215,6 +218,7 @@ public:
     /** `filter/remove <name>` forgets one filter; without a name, every filter in use. */
     message<> filter_remove{this, "filter/remove", MIN_FUNCTION {
         filters_.remove(jamoma_max::to_value(args));
+        clear_selection();
         return {};
     }};
 
@@ -285,6 +289,8 @@ public:
 
     /** Class setup: adds `filter/list`, a list of names that Min's attribute types cannot hold. */
     message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_namespace>(args[0], {"address", "output", "format", "relative", "update", "sort", "depth", "namespace"});
+        jamoma_max::answer_get_messages(args[0], {"address", "output", "format", "relative", "update", "sort", "depth", "namespace", "filter/list"});
         c74::max::t_class* c = args[0];
         c74::max::class_addattr(c, c74::max::attr_offset_array_new("filter/list", c74::max::gensym("symbol"), 256, 0,
                                                                    reinterpret_cast<c74::max::method>(&filter_list_getter),
@@ -308,6 +314,10 @@ private:
     /** The setter of `filter/list`: the filters to use, in order. @param o The object. @param argc The count. @param argv The atoms. @return A Max error code. */
     static c74::max::t_max_err filter_list_setter(c74::max::t_object* o, c74::max::t_object*, long argc, c74::max::t_atom* argv)
     {
+        if (argc == 0) { // a query
+            jamoma_max::reply_to_query(o, c74::max::gensym("filter/list"));
+            return c74::max::MAX_ERR_NONE;
+        }
         j_namespace& self = c74::min::wrapper_find_self<j_namespace>(o)->m_min_object;
         jamoma::Value names;
         for (long i = 0; i < argc; ++i) {
@@ -317,6 +327,9 @@ private:
         }
         self.filters_.set_list(names);
         self.options_.filters = &self.filters_;
+        if (self.ready_) {
+            self.clear_selection();
+        }
         return c74::max::MAX_ERR_NONE;
     }
 
@@ -325,6 +338,21 @@ private:
     {
         selection_name_ = name.empty() ? "none" : name;
         selection_ = jamoma::Selection::named(selection_name_);
+    }
+
+    /** Unticks what is ticked at or below the explored address, as the old object did when a filter changed. */
+    void clear_selection()
+    {
+        const std::string base = explored_.str();
+        if (explored_.path().empty()) {
+            selection_->clear();
+            return;
+        }
+        for (const std::string& key : selection_->selected()) {
+            if (key.starts_with(base) && (key.size() == base.size() || key[base.size()] == '/' || key[base.size()] == '.' || key[base.size()] == ':')) {
+                selection_->set(key, false);
+            }
+        }
     }
 
     /** @return The address to explore as an address of the namespace (empty if the text is a relative address that cannot be resolved). */

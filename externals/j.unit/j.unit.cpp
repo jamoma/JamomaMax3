@@ -17,6 +17,7 @@
 #include "jamoma/dataspace.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -116,8 +117,11 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_unit>(args[0], {"dataspace", "input", "output"});
+        return {};
+    }};
 
 private:
     /** Sets a unit if the dataspace has it. @param input True for the input unit, false for the output unit. @param name The unit name. */

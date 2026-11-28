@@ -19,6 +19,7 @@
 #include "jamoma/data.hpp"
 #include "jamoma/registry.hpp"
 #include "max_address.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -111,8 +112,12 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_in>(args[0], {"tags", "mute", "bypass"});
+        jamoma_max::answer_get_messages(args[0], {"tags", "mute", "bypass"});
+        return {};
+    }};
 
 private:
     /** Registers the node below the model of the patcher (or at the root without one). */

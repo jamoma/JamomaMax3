@@ -19,6 +19,7 @@
 #include "jamoma/route_search.hpp"
 #include "max_context.hpp"
 #include "max_osc.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -85,6 +86,7 @@ public:
         c74::max::class_addattr(c, c74::max::attr_offset_new("partialmatch", c74::max::gensym("long"), 0,
                                                              method_of(&partial_getter), method_of(&partial_setter), 0));
         c74::max::class_attr_addattr_parse(c, "partialmatch", "style", c74::max::gensym("symbol"), 0, "onoff");
+        jamoma_max::answer_get_messages(c, {"searchstring", "searchpositions", "partialmatch"});
         return {};
     }};
 

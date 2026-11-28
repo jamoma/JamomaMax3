@@ -205,6 +205,10 @@ public:
         if (args.empty()) {
             return {};
         }
+        if (args[0].type() != c74::min::message_type::int_argument && args[0].type() != c74::min::message_type::float_argument) {
+            c74::max::object_error(this->maxobj(), "array/resize needs a number (the array is left as it is)");
+            return {};
+        }
         const long size = static_cast<long>(args[0]);
         run_on_main(this->maxobj(), alive_.weak(), [this, size] {
             if (array_ && (size < 0 || !array_->resize(static_cast<std::size_t>(size), joined_))) {

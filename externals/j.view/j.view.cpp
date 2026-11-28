@@ -20,6 +20,7 @@
 #include "jamoma/registry.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -126,8 +127,12 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_view>(args[0], {"alias", "description", "tags", "activity"});
+        jamoma_max::answer_get_messages(args[0], {"alias", "description", "tags", "activity"});
+        return {};
+    }};
 
 private:
     /** Sends the state of the binding to the dump outlet. */

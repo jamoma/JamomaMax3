@@ -29,7 +29,7 @@ namespace jamoma {
 /** The filters one explorer knows, and the list of those that are in use. A copy is independent. */
 class JAMOMA_API ExploreFilters {
 public:
-    /** Starts with the ready-made filters (data, parameter, message, return, model, view, none, genericTag, noGenericTag); none is in use. */
+    /** Starts with the ready-made filters (data, parameter, message, return, model, view, none, remote, in, out, in~, out~, genericTag, noGenericTag); none is in use. */
     ExploreFilters();
     /**
      * @brief Makes a filter or adds conditions to one, and puts it in use (the `filter/set` message).

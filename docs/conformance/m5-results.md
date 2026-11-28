@@ -27,12 +27,19 @@ The old tests of `j.oscinstance` and `j.oscroute` (five) are part of the run; th
 also under both sanitizers), its Max test and the browser's two pass, its help patcher and the window open without a missing object. The full Max run
 above was made before it. It has not been reviewed.
 
+## After the author's review (28 November 2026)
+
+Fixed, each with a test that failed first: a `bang` to `j.remote` was lost; `array/resize` with a word emptied the array; many objects did not answer
+attribute queries; the filters `remote`, `in`, `out`, `in~`, `out~` did not exist and a filter change kept the selection; `j.map` accepted a second,
+slash form of the function parameter names and did not answer a parameter name. Then: 462 of 462 unit tests pass, and the Max tests of the affected
+folders (85 of 85, in quick mode). The full run, one test per launch, has not been repeated since `j.route` and these fixes.
+
 ## Final review
 
 A read-only review of the branch (before the browser window was added) by a fresh Opus reviewer gave no critical, two important and four minor findings.
 
 - **Fixed with a test that failed first:** `j.oscroute` could crash when a pattern was replaced while another thread routed; arrays in `array` format sent their list while a patch loaded; a value still came out for an instance that what followed the index outlet had removed; `j.remote_array` lost an `array/resize` sent before it had bound; string instances without a value counted as 0.
-- **Deferred, minor:** `array/resize` with a word instead of a number sets the size to 0 instead of giving an error.
+- **Deferred, minor** (fixed after the author's review): `array/resize` with a word instead of a number.
 - **Left as before:** a ramp clock could in theory be freed on the scheduler thread after two resizes in quick succession (not reproduced).
 - The filters of `j.namespace` and the browser window were built after this review and have **not** been reviewed.
 
@@ -46,8 +53,6 @@ A read-only review of the branch (before the browser window was added) by a fres
 
 ## Found on the way
 
-- `j.remote` drops a `bang` sent to it (the old object passed it to the node); not changed.
-- New externals other than the data objects, the arrays and `j.map` may not answer an attribute name sent without a value, as the old objects did.
 - The unit test `unit converter is race free` (milestone 1) failed once on a loaded machine and passed 200 times in a row afterwards.
 
 ## Checks for the author: hardware
