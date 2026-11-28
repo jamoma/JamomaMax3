@@ -375,3 +375,18 @@ TEST_CASE("data_array_commands_from_another_thread_while_resizing", "[data_array
     CHECK(array.size() == 2);
     CHECK(outputs > 0);
 }
+
+/** A smaller size set while the instances are being made is the one that holds. */
+TEST_CASE("data_array_resize_while_building", "[data_array]")
+{
+    Rig r;
+    const auto watch = r.ns.observe(Address::parse("/a.1"), [&r](const Address&, jamoma::Object*, bool created) {
+        if (created) {
+            r.array.resize(2, false);
+        }
+    });
+    REQUIRE(r.array.set_name("a.[5]", Address(), false));
+    CHECK(r.array.size() == 2);
+    CHECK(r.array.name() == "a.[2]");
+    CHECK(r.at("/a.3") == nullptr);
+}

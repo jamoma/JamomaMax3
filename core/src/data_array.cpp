@@ -184,7 +184,7 @@ struct DataArray::Impl {
         }
     }
 
-    /** Registers an instance. @param item The instance. @param index Its number. */
+    /** Registers an instance (it may be removed by what the registration sets off). @param item The instance. @param index Its number. */
     void subscribe(Instance& item, std::size_t index)
     {
         std::string address;
@@ -193,10 +193,13 @@ struct DataArray::Impl {
             address = prefix.str() + (prefix.str().ends_with('/') ? "" : "/") + name->instance(index);
         }
         item.subscription = Subscription();
-        item.subscription = ns.subscribe(Address::parse(address), item.data);
+        Subscription subscription = ns.subscribe(Address::parse(address), item.data);
+        if (item.alive) {
+            item.subscription = std::move(subscription);
+        }
     }
 
-    /** Builds one instance. @param self This state. @param index Its number. @return The instance, registered. */
+    /** Builds one instance, not yet registered. @param self This state. @param index Its number. @return The instance. */
     std::shared_ptr<Instance> make(const std::shared_ptr<Impl>& self, std::size_t index)
     {
         auto item = std::make_shared<Instance>(service);
@@ -227,40 +230,45 @@ struct DataArray::Impl {
             }
             state->emit(index, v);
         });
-        subscribe(*item, index);
         return item;
     }
 
-    /** Makes the number of instances `size`. @param self This state. @param size The size. @param init_new Whether new instances are initialised. */
-    void set_size(const std::shared_ptr<Impl>& self, std::size_t size, bool init_new)
+    /**
+     * Brings the number of instances to the size in the name, which what a registration sets off may change meanwhile.
+     * @param self This state. @param init_new Whether new instances are initialised.
+     */
+    void fit(const std::shared_ptr<Impl>& self, bool init_new)
     {
+        Instances made;
         for (;;) {
-            std::shared_ptr<Instance> last;
+            std::shared_ptr<Instance> surplus;
+            std::size_t index = 0;
             {
                 std::lock_guard<std::mutex> lock(mutex);
-                if (items.size() <= size) {
+                if (items.size() > name->size) {
+                    surplus = items.back();
+                    items.pop_back();
+                } else if (items.size() < name->size) {
+                    index = items.size() + 1;
+                } else {
+                    selection.resized(items.size());
+                    if (watched > items.size()) {
+                        watched = 1;
+                    }
                     break;
                 }
-                last = items.back();
-                items.pop_back();
             }
-            retire(last);
-        }
-        Instances made;
-        std::size_t count = snapshot().size();
-        while (count < size) {
-            auto item = make(self, ++count);
-            std::lock_guard<std::mutex> lock(mutex);
-            items.push_back(item);
+            if (surplus) {
+                retire(surplus);
+                continue;
+            }
+            auto item = make(self, index);
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                items.push_back(item);
+            }
+            subscribe(*item, index);
             made.push_back(std::move(item));
-        }
-        {
-            std::lock_guard<std::mutex> lock(mutex);
-            name->size = size;
-            selection.resized(size);
-            if (watched > size) {
-                watched = 1;
-            }
         }
         if (init_new && service != Service::Message) {
             for (const auto& item : made) {
@@ -344,18 +352,18 @@ bool DataArray::set_name(const std::string& name, const Address& prefix, bool in
     }
     {
         std::lock_guard<std::mutex> lock(self->mutex);
-        const std::size_t present = self->items.size();
         self->name = *parsed;
-        self->name->size = present;
         self->prefix = prefix;
     }
     if (moved) {
         const Instances items = self->snapshot();
         for (std::size_t i = 0; i < items.size(); ++i) {
-            self->subscribe(*items[i], i + 1);
+            if (items[i]->alive) {
+                self->subscribe(*items[i], i + 1);
+            }
         }
     }
-    self->set_size(self, parsed->size, init_new);
+    self->fit(self, init_new);
     --self->restructuring;
     if (built) {
         self->emit_after_change();
@@ -371,10 +379,11 @@ bool DataArray::resize(std::size_t size, bool init_new)
         if (!self->name || size > kMaxArraySize) {
             return false;
         }
+        self->name->size = size;
     }
     self->purge();
     ++self->restructuring;
-    self->set_size(self, size, init_new);
+    self->fit(self, init_new);
     --self->restructuring;
     self->emit_after_change();
     return true;
