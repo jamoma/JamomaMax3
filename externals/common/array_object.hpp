@@ -280,6 +280,7 @@ public:
                                                              reinterpret_cast<c74::max::method>(&format_setter), 0));
         c74::max::class_attr_addattr_parse(c, "format", "style", c74::max::gensym("symbol"), 0, "enum");
         c74::max::class_attr_addattr_parse(c, "format", "enumvals", c74::max::gensym("atom"), 0, "single array");
+        answer_get_messages(c, {"format"});
         return {};
     }};
 

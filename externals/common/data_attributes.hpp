@@ -19,6 +19,7 @@
 #include "jamoma/dataspace.hpp"
 #include "jamoma/function_library.hpp"
 #include "max_atoms.hpp"
+#include "max_queries.hpp"
 
 namespace jamoma_max {
 
@@ -54,6 +55,7 @@ struct data_attributes {
     {
         for (const std::string& name : jamoma::Data::attribute_names()) {
             add(c, name);
+            answer_get_messages(c, {name.c_str()}); // `get<name>`, which Max does not answer here by itself
         }
         // What the inspector and attrui show.
         show_toggle(c, "repetitions/filter");
