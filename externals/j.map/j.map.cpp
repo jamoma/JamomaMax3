@@ -28,6 +28,7 @@
 #include "max_address.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -201,7 +202,7 @@ public:
     attribute<symbol> function_parameters{this, "function/parameters", "", getter{MIN_GETTER_FUNCTION {
         atoms names;
         for (const auto& n : mapper_.function_parameters())
-            names.push_back(symbol(max_name(n)));
+            names.push_back(symbol(n));
         if (names.empty())
             names.push_back(symbol("none"));
         return names;
@@ -279,7 +280,7 @@ public:
             return {};
         }
         for (const auto& parameter : mapper_.function_parameters()) {
-            if (max_name(parameter) == selector) {
+            if (parameter == selector || max_name(parameter) == selector) {
                 atoms value(message.begin() + 1, message.end());
                 if (!mapper_.set_function_parameter(parameter, jamoma_max::to_value(value)))
                     c74::max::object_error(maxobj(), "%s: value refused by %s", selector.c_str(), mapper_.function().c_str());
@@ -290,11 +291,17 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add; the base class registers the attributes. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value (as in the old object; the model mapper asks that way). */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_map>(args[0], {"input", "output", "input/min", "input/max", "output/min", "output/max", "input/index",
+                                                    "input/threshold/down", "input/threshold/up", "output/threshold/down", "output/threshold/up", "active",
+                                                    "clipmode", "inverse", "ramp", "function", "function/library", "function/parameters",
+                                                    "function/samples"});
+        return {};
+    }};
 
 private:
-    /** @param tt_name A name of the core (`powerValue`). @return The Max form: a slash before each capital (`power/value`). */
+    /** @param tt_name A parameter name (`powerValue`). @return The form with a slash before each capital (`power/value`), accepted as well. */
     static std::string max_name(const std::string& tt_name)
     {
         std::string out;

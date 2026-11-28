@@ -90,7 +90,7 @@ Differences from the old behaviour, on top of the lists above. The old suite has
 ## j.map (milestone 4)
 
 - Built: the mapper and all 38 functions of the old function library, the four thresholds, `reset` and `dump`. No `clipmode` and no output clipping by default, as before.
-- The parameters of a function (`base`, `power/value`, ...) are set by message, not as arguments at creation.
+- The parameters of a function (`base`, `powerValue`, ...) are set by message, not as arguments at creation. (In milestone 4 `function/parameters` listed them as `power/value` and only that form was accepted; since milestone 5 the old names are back, and the form with a slash still works.)
 - Numbers that are not finite never leave the outlet: a limit that is not finite is ignored, an input that is not a number gives the lower output limit. An unknown function or symmetry is refused with a console error; the base of `exponential` and `logarithm` is kept between 0.000001 and 100000.
 - `ramp` applies to what is sent to the output parameter, not to the outlet.
 - The graphical editor of freehand curves (`j.function_edit`) is not built.
@@ -159,3 +159,5 @@ Corrections after the author went through the help patchers:
 - `set` and `setArray` of `j.remote_array` show nothing here for any instance (the old object held back only the first answer when all were selected).
 - `j.remote_array` has no `description` and `tags` attributes, like `j.remote`.
 - `<model>:initialized` can be followed by `j.receive` and `j.initialized` as before (0 while the model initialises, 1 when it is done). Models have no other attribute that can be followed this way.
+- `mapper`: the parts of its help patcher that show the audio model `degrade~` and the model `mouse` are replaced by comments; the same holds for `j.initialized.maxhelp`. The presets of `mapper` still name addresses of those models.
+- `j.map` answers its attributes when their names are sent without a value, as before (milestone 4 did not; `mapper` needs it for `function/parameters`).
