@@ -121,6 +121,17 @@ Dataspace::Impl make_gain()
     return d;
 }
 
+/** @return The angle dataspace tables (neutral: radian; angles are not wrapped). */
+Dataspace::Impl make_angle()
+{
+    Dataspace::Impl d;
+    d.name = "angle";
+    d.neutral = "radian";
+    d.units.push_back(scalar_unit({"radian", "rad"}, [](double x) { return x; }, [](double x) { return x; }));
+    d.units.push_back(scalar_unit({"degree", "deg"}, [](double x) { return x * kDegreesToRadians; }, [](double x) { return x * kRadiansToDegrees; }));
+    return d;
+}
+
 /** @param degrees A hue. @return It within [0, 360); 0 if it is not finite. */
 double wrap_hue(double degrees)
 {
@@ -340,11 +351,14 @@ struct DataspaceTables {
         static const Dataspace temperature(&temperature_impl);
         static const Dataspace::Impl color_impl = make_color();
         static const Dataspace color(&color_impl);
+        static const Dataspace::Impl angle_impl = make_angle();
+        static const Dataspace angle(&angle_impl);
         if (name == "gain") return &gain;
         if (name == "time") return &time;
         if (name == "position") return &position;
         if (name == "temperature") return &temperature;
         if (name == "color") return &color;
+        if (name == "angle") return &angle;
         return nullptr;
     }
 };
@@ -364,7 +378,7 @@ std::string Dataspace::default_unit() const
     return impl_->neutral;
 }
 
-std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature", "color"}; }
+std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature", "color", "angle"}; }
 
 std::vector<std::string> Dataspace::unit_names() const
 {

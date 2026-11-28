@@ -23,7 +23,7 @@ HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.
 
 
 #: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.
-KNOWN_DATASPACES = {"gain", "time", "position", "temperature", "color"}
+KNOWN_DATASPACES = {"gain", "time", "position", "temperature", "color", "angle"}
 #: Patchers of the package that old help patchers load as a bpatcher: they work, so they are kept.
 PACKAGE_PATCHERS = {"j.maxhelpui"}
 

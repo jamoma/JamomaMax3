@@ -256,10 +256,22 @@ TEST_CASE("temperature conversions match the old tests")
     REQUIRE(close(scalar("temperature", 0.0, "K", "C"), -273.15));
 }
 
+/** Angles: radians (the neutral unit) and degrees, with their short names. */
+TEST_CASE("angle conversions")
+{
+    const double pi = std::acos(-1.0);
+    REQUIRE(Dataspace::find("angle") != nullptr);
+    REQUIRE(Dataspace::find("angle")->default_unit() == "radian");
+    REQUIRE(Dataspace::find("angle")->unit_names() == std::vector<std::string>{"radian", "degree"});
+    REQUIRE(close(scalar("angle", pi, "radian", "degree"), 180.0));
+    REQUIRE(close(scalar("angle", -90.0, "degree", "radian"), -pi / 2.0));
+    REQUIRE(close(scalar("angle", 720.0, "deg", "rad"), 4.0 * pi)); // not wrapped
+}
+
 /** The menus of j.unit: the names of the dataspaces and the canonical names of the units. */
 TEST_CASE("dataspace and unit names")
 {
-    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature", "color"});
+    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature", "color", "angle"});
     REQUIRE(Dataspace::find("temperature")->unit_names() == std::vector<std::string>{"Kelvin", "Celsius", "Fahrenheit"});
     REQUIRE(Dataspace::find("gain")->unit_names().front() == "linear");
     REQUIRE(Dataspace::find("temperature")->default_unit() == "Kelvin");
