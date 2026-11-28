@@ -334,10 +334,10 @@
 														22.0
 													],
 													"saved_object_attributes": {
-														"embed": 1
+														"embed": 0
 													},
 													"style": "",
-													"text": "polybuffer~ polyBufExample @embed 1"
+													"text": "polybuffer~ polyBufExample @embed 0"
 												}
 											},
 											{
