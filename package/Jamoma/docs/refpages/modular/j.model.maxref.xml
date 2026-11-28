@@ -208,6 +208,11 @@
 			<digest>Replace the presets by a text</digest>
 			<description>What closing the editor window does: the words are joined with spaces and the two characters backslash n stand for a line break. A text without presets changes nothing.</description>
 		</method>
+		<method name="alias/remove">
+			<arglist />
+			<digest>Remove the alias of the model</digest>
+			<description>Removes the address set with the alias attribute.</description>
+		</method>
 	</methodlist>
 	<attributelist>
 		<attribute name="amenities" get="1" set="1" type="symbol" size="1">
@@ -286,7 +291,7 @@
 				The alias of the model
 			</digest>
 			<description>
-				Accepted so that old patchers load; it has no effect yet.
+				An address under which the model and what is below it can be reached too (a name beside the model, or an absolute address).
 			</description>
 		</attribute>
 		<attribute name="activity" get="1" set="1" type="int" size="1">

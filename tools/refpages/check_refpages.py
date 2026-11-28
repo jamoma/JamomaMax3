@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 
 COMMON = "common/data_object.hpp"
 CORE_DATA = "../core/src/data.cpp"  # the attribute table of the data objects
+ARRAY = "common/array_object.hpp"  # the shared body of the data arrays
 
 #: The sources of each object, relative to the externals folder.
 OBJECT_SOURCES = {
@@ -46,6 +47,12 @@ OBJECT_SOURCES = {
     "j.map": ["j.map/j.map.cpp"],
     "j.cue": ["j.cue/j.cue.cpp"],
     "j.textslider": ["j.textslider/j.textslider.cpp"],
+    "j.parameter_array": [ARRAY, CORE_DATA, "j.parameter_array/j.parameter_array.cpp"],
+    "j.message_array": [ARRAY, CORE_DATA, "j.message_array/j.message_array.cpp"],
+    "j.return_array": [ARRAY, CORE_DATA, "j.return_array/j.return_array.cpp"],
+    "j.remote_array": ["j.remote_array/j.remote_array.cpp"],
+    "j.oscinstance": ["j.oscinstance/j.oscinstance.cpp"],
+    "j.oscroute": ["j.oscroute/j.oscroute.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.

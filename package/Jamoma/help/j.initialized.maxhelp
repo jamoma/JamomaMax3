@@ -235,24 +235,17 @@
 							},
 							{
 								"box": {
-									"annotation": "Emulate the use of lower sample-rates and bit-resolution.",
 									"id": "obj-3",
-									"maxclass": "newobj",
-									"numinlets": 2,
-									"numoutlets": 3,
-									"outlettype": [
-										"signal",
-										"signal",
-										""
-									],
+									"maxclass": "comment",
+									"text": "[degrade~.model: not in this version yet]",
+									"numinlets": 1,
+									"numoutlets": 0,
 									"patching_rect": [
 										24.0,
 										316.0,
-										146.0,
-										22.0
-									],
-									"style": "default",
-									"text": "degrade~.model audioFX"
+										220.0,
+										20.0
+									]
 								}
 							},
 							{
@@ -314,22 +307,17 @@
 							},
 							{
 								"box": {
-									"annotation": "Output information from mouse",
 									"id": "obj-16",
-									"maxclass": "newobj",
+									"maxclass": "comment",
+									"text": "[mouse.model: not in this version yet]",
 									"numinlets": 1,
-									"numoutlets": 1,
-									"outlettype": [
-										""
-									],
+									"numoutlets": 0,
 									"patching_rect": [
 										24.0,
 										275.0,
-										132.0,
-										22.0
-									],
-									"style": "default",
-									"text": "mouse.model mouse.1"
+										220.0,
+										20.0
+									]
 								}
 							},
 							{
@@ -387,22 +375,17 @@
 							},
 							{
 								"box": {
-									"annotation": "Output information from mouse",
 									"id": "obj-1",
-									"maxclass": "newobj",
+									"maxclass": "comment",
+									"text": "[mouse.model: not in this version yet]",
 									"numinlets": 1,
-									"numoutlets": 1,
-									"outlettype": [
-										""
-									],
+									"numoutlets": 0,
 									"patching_rect": [
 										24.0,
 										245.0,
-										122.0,
-										22.0
-									],
-									"style": "default",
-									"text": "mouse.model mouse"
+										220.0,
+										20.0
+									]
 								}
 							},
 							{
@@ -527,48 +510,6 @@
 									"hidden": 0,
 									"source": [
 										"obj-4",
-										0
-									]
-								}
-							},
-							{
-								"patchline": {
-									"destination": [
-										"obj-1",
-										0
-									],
-									"disabled": 0,
-									"hidden": 0,
-									"source": [
-										"obj-7",
-										0
-									]
-								}
-							},
-							{
-								"patchline": {
-									"destination": [
-										"obj-16",
-										0
-									],
-									"disabled": 0,
-									"hidden": 0,
-									"source": [
-										"obj-7",
-										0
-									]
-								}
-							},
-							{
-								"patchline": {
-									"destination": [
-										"obj-3",
-										0
-									],
-									"disabled": 0,
-									"hidden": 0,
-									"source": [
-										"obj-7",
 										0
 									]
 								}
