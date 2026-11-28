@@ -132,6 +132,105 @@ Dataspace::Impl make_angle()
     return d;
 }
 
+/** @param names The names. @param per_neutral How many of the unit make one neutral unit. @return A unit that is a plain division and multiplication. */
+UnitDefinition divided_unit(std::vector<std::string> names, double per_neutral)
+{
+    return scalar_unit(std::move(names), [per_neutral](double x) { return x / per_neutral; }, [per_neutral](double x) { return x * per_neutral; });
+}
+
+/** @return The distance dataspace tables (neutral: meters; the factors for inches and feet are the rounded ones of the old library). */
+Dataspace::Impl make_distance()
+{
+    Dataspace::Impl d;
+    d.name = "distance";
+    d.neutral = "meters";
+    d.units.push_back(divided_unit({"meters", "m"}, 1.0));
+    d.units.push_back(divided_unit({"centimeters", "cm"}, 100.0));
+    d.units.push_back(divided_unit({"inches", "\""}, 39.37));
+    d.units.push_back(divided_unit({"feet", "'"}, 3.281));
+    return d;
+}
+
+/** @return The speed dataspace tables (neutral: meters per second; both factors of a unit are those of the old library, which are not exact inverses). */
+Dataspace::Impl make_speed()
+{
+    Dataspace::Impl d;
+    d.name = "speed";
+    d.neutral = "m/s";
+    const auto unit = [&d](std::vector<std::string> names, double to, double from) {
+        d.units.push_back(scalar_unit(std::move(names), [to](double x) { return x * to; }, [from](double x) { return x * from; }));
+    };
+    unit({"m/s"}, 1.0, 1.0);
+    unit({"mi/h", "mph"}, 0.44704, 2.236936);
+    unit({"km/h", "kmph"}, 1.0 / 3.6, 3.6);
+    unit({"kn"}, 0.514444, 1.943844);
+    unit({"ft/s"}, 0.3048, 3.2808399);
+    return d;
+}
+
+/** @return The none dataspace: one unit, which changes nothing. */
+Dataspace::Impl make_none()
+{
+    Dataspace::Impl d;
+    d.name = "none";
+    d.neutral = "none";
+    d.units.push_back(vector_unit({"none"}, [](const std::vector<double>& v) { return v; }, [](const std::vector<double>& v) { return v; }));
+    return d;
+}
+
+/** @param yaw_pitch_roll Angles in degrees. @return The rotation as a quaternion x y z w. */
+std::vector<double> euler_to_quaternion(const std::vector<double>& yaw_pitch_roll)
+{
+    const double yaw = at(yaw_pitch_roll, 0) * kDegreesToRadians * -0.5;
+    const double pitch = at(yaw_pitch_roll, 1) * kDegreesToRadians * 0.5;
+    const double roll = at(yaw_pitch_roll, 2) * kDegreesToRadians * 0.5;
+    const double sy = std::sin(yaw), cy = std::cos(yaw);
+    const double sp = std::sin(pitch), cp = std::cos(pitch);
+    const double sr = std::sin(roll), cr = std::cos(roll);
+    return {cy * sp * cr - sy * cp * sr, cy * cp * sr + sy * sp * cr, sy * cp * cr + cy * sp * sr, cy * cp * cr - sy * sp * sr};
+}
+
+/** @param q A quaternion x y z w. @return Yaw, pitch and roll in degrees. */
+std::vector<double> quaternion_to_euler(const std::vector<double>& q)
+{
+    const double x = at(q, 0), y = at(q, 1), z = at(q, 2), w = at(q, 3);
+    const double sine = std::clamp(2.0 * (w * x + y * z), -1.0, 1.0); // rounding may push it past 1 at the poles
+    return {kRadiansToDegrees * std::atan2(-2.0 * (z * w - x * y), w * w - x * x + y * y - z * z),
+            kRadiansToDegrees * std::asin(sine),
+            kRadiansToDegrees * std::atan2(2.0 * (w * y + x * z), w * w - x * x - y * y + z * z)};
+}
+
+/** @param axis_angle An axis x y z (any length) and an angle in degrees. @return The rotation as a quaternion; a zero axis gives x y z of 0. */
+std::vector<double> axis_to_quaternion(const std::vector<double>& axis_angle)
+{
+    const double x = at(axis_angle, 0), y = at(axis_angle, 1), z = at(axis_angle, 2);
+    const double half = at(axis_angle, 3) * kDegreesToRadians * 0.5;
+    const double length = std::sqrt(x * x + y * y + z * z);
+    const double scale = length > 0.0 ? std::sin(half) / length : 0.0;
+    return {x * scale, y * scale, z * scale, std::cos(half)};
+}
+
+/** @param q A quaternion x y z w. @return The axis x y z and the angle in degrees. */
+std::vector<double> quaternion_to_axis(const std::vector<double>& q)
+{
+    const double w = at(q, 3);
+    const double sine = std::sqrt(std::max(0.0, 1.0 - w * w));
+    const double scale = sine < 0.0005 ? 1.0 : 1.0 / sine;
+    return {at(q, 0) * scale, at(q, 1) * scale, at(q, 2) * scale, kRadiansToDegrees * 2.0 * std::atan2(sine, w)};
+}
+
+/** @return The orientation dataspace tables (neutral: quaternion x y z w). */
+Dataspace::Impl make_orientation()
+{
+    Dataspace::Impl d;
+    d.name = "orientation";
+    d.neutral = "quaternion";
+    d.units.push_back(vector_unit({"quaternion", "quat"}, [](const std::vector<double>& v) { return v; }, [](const std::vector<double>& v) { return v; }));
+    d.units.push_back(vector_unit({"euler", "ypr"}, euler_to_quaternion, quaternion_to_euler));
+    d.units.push_back(vector_unit({"axis", "xyza"}, axis_to_quaternion, quaternion_to_axis));
+    return d;
+}
+
 /** @param degrees A hue. @return It within [0, 360); 0 if it is not finite. */
 double wrap_hue(double degrees)
 {
@@ -270,6 +369,9 @@ Dataspace::Impl make_time()
         {"bark"},
         [](double x) { return 1.0 / (600.0 * std::sinh(x / 6.0)); },
         [](double x) { return 6.0 * std::asinh(1.0 / (x * 600.0)); }));
+    // Playback speed: the period is inversely proportional to it (speed 2^(n/12) sounds like MIDI note n); the same formula both ways.
+    const auto speed = [](double x) { return std::pow(2.0, 69.0 / 12.0) / (440.0 * x); };
+    d.units.push_back(scalar_unit({"speed"}, speed, speed));
     return d;
 }
 
@@ -353,12 +455,24 @@ struct DataspaceTables {
         static const Dataspace color(&color_impl);
         static const Dataspace::Impl angle_impl = make_angle();
         static const Dataspace angle(&angle_impl);
+        static const Dataspace::Impl distance_impl = make_distance();
+        static const Dataspace distance(&distance_impl);
+        static const Dataspace::Impl speed_impl = make_speed();
+        static const Dataspace speed(&speed_impl);
+        static const Dataspace::Impl orientation_impl = make_orientation();
+        static const Dataspace orientation(&orientation_impl);
+        static const Dataspace::Impl none_impl = make_none();
+        static const Dataspace none(&none_impl);
         if (name == "gain") return &gain;
         if (name == "time") return &time;
         if (name == "position") return &position;
         if (name == "temperature") return &temperature;
         if (name == "color") return &color;
         if (name == "angle") return &angle;
+        if (name == "distance") return &distance;
+        if (name == "speed") return &speed;
+        if (name == "orientation") return &orientation;
+        if (name == "none") return &none;
         return nullptr;
     }
 };
@@ -378,7 +492,7 @@ std::string Dataspace::default_unit() const
     return impl_->neutral;
 }
 
-std::vector<std::string> Dataspace::names() { return {"gain", "time", "position", "temperature", "color", "angle"}; }
+std::vector<std::string> Dataspace::names() { return {"none", "gain", "time", "position", "temperature", "color", "angle", "distance", "speed", "orientation"}; }
 
 std::vector<std::string> Dataspace::unit_names() const
 {
@@ -400,6 +514,9 @@ std::optional<Value> Dataspace::convert(const Value& input, std::string_view fro
     const UnitDefinition* target = impl_->find_unit(to);
     if (source == nullptr || target == nullptr) {
         return std::nullopt;
+    }
+    if (impl_->name == "none") {
+        return input; // as it came, words too
     }
     std::vector<double> numbers;
     numbers.reserve(input.size());
