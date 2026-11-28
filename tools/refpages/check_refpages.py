@@ -82,7 +82,7 @@ def parse_refpage(text):
 def scan_source(text):
     """Returns (attributes, messages) that C++ source text implements (see the module description)."""
     attributes = set(re.findall(r'attribute<[^>]*>\s+\w+\s*\{\s*this\s*,\s*"([^"]+)"', text))
-    attributes |= set(re.findall(r'attr_offset_new\(\s*"([^"]+)"', text))
+    attributes |= set(re.findall(r'attr_offset(?:_array)?_new\(\s*"([^"]+)"', text))
     table = re.search(r"attribute_names\(\)\s*\{.*?names\s*\{(.*?)\};", text, re.S)
     if table:
         attributes |= set(re.findall(r'"([^"]+)"', table.group(1)))

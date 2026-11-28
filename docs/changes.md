@@ -84,7 +84,7 @@ Differences from the old behaviour, on top of the lists above. The old suite has
 ## j.namespace (milestone 4)
 
 - Built: `address`, `output`, `format`, `relative`, `update`, `sort`, `depth`, `namespace`, exploring, and the selection (`select`, `select/all`, `select/none`, `selection/refresh`). A selection is shared by name (`namespace`, also used by `j.cue`); without a name it is private and is not output.
-- **Filters are not built:** `filter/set`, `filter/remove` and `filter/info` warn in the console and do nothing; `filter/list` is accepted without effect.
+- **Filters** (built in milestone 5; in milestone 4 they were not): `filter/set`, `filter/remove`, `filter/info`, `@filter/list` and the ready-made filters `data`, `parameter`, `message`, `return`, `model`, `view`, `none`, `genericTag` and `noGenericTag`. Differences: the old ready-made filters `in`, `out`, `in~`, `out~` and `remote` are not there (those objects are not nodes in this version) and `view` finds nothing for the same reason; the texts are C++ (ECMAScript) regular expressions; changing a filter leaves the selection as it is (the old object cleared it).
 - An address that does not exist gives an empty result of size 0. `update` explores again only when the result changes.
 
 ## j.map (milestone 4)
