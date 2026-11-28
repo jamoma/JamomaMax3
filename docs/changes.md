@@ -144,3 +144,15 @@ Corrections after the author went through the help patchers:
   `model:reference/open <address>` out of the outlet instead of opening the inspector window; **Edit Current State** and **Open Preset Interface** are grey (not built);
   the preset file items act on the `j.model` of the model, as before; the reference, help and internal items only send their message out of the outlet; a model of the same class can be chosen only in a view. New: `menu:list` and `menu:choose`.
 
+
+# Milestone 5: arrays
+
+`j.parameter_array`, `j.message_array`, `j.return_array` (and `j.remote_array`) behave as the old ones, except:
+
+- Values sent to all instances reach them in index order (the old order came from an internal table).
+- Setting an attribute leaves the selection as it is (the old code left it pointing at the last instance).
+- Instance 256 can be selected (the old code failed there).
+- `+` and `-` step every instance when all are selected (the old code stepped only one).
+- A float in the right inlet selects an instance, rounded down (the old code treated it as a value).
+- Instances made when an array grows get the attributes set so far; the ones that exist are left alone (the old code applied the box attributes to all of them again).
+- `dump` answers the attributes of the watched instance and `format` on the dump outlet (the old arrays answered nothing).
