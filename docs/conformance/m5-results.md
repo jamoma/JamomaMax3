@@ -6,33 +6,30 @@ check is listed below.
 
 ## Run of 28 November 2026
 
-macOS 27.2 arm64, Max 9.
+macOS 27.2 arm64, Max 9. The final run, on commit `19a96ac`, after `j.route` and the fixes from the author's review.
 
 | What | Result |
 |---|---|
-| Every Max test (`run_maxtests.py --all`), **one test per Max launch** | **181 of 181 pass** (612 assertions) |
-| Core unit tests, with the tool checks `test_layout` and `package_references` | 456 of 456 pass |
-| The same under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer | all pass, no reports |
+| Every Max test (`run_maxtests.py --all`), **one test per Max launch** | **204 of 204 pass** (801 assertions) |
+| Core unit tests, with the tool checks `test_layout` and `package_references` | 462 of 462 pass |
+| The same under AddressSanitizer + UndefinedBehaviorSanitizer and under ThreadSanitizer | all 462 pass, no reports |
 | Tool tests (`python3 -m unittest discover` in each folder of `tools`) | 132 pass |
 | Reference pages (`tools/refpages/check_refpages.py`) | no differences |
 | Help patchers and model patchers (`scripts/check-help.sh`; `j.namespace.maxhelp` left out), the browser window and `j.initialized` | no missing object or load error |
 | Doxygen | no warnings |
 
-Console errors in the full run are those the tests provoke on purpose (an unknown function name, files that do not exist, an edited text without presets).
-The old tests of `j.oscinstance` and `j.oscroute` (five) are part of the run; there are no old tests for the arrays or the three models.
+Console errors in the full run are those the tests provoke on purpose (an unknown function name, the refused slash form of a parameter, files that do
+not exist, an edited text without presets, `array/resize` with a word). The old tests of `j.oscinstance` and `j.oscroute` (five) are part of the run;
+there are no old tests for the arrays or the three models. An earlier run, before `j.route` and the review fixes, had 181 of 181.
 
-## Added after that run
+## Added after the first full run
 
-`j.route` (asked for by the author, whose own patchers use it), also back in the namespace browser window: its unit tests (461 of 461 pass; its own
-also under both sanitizers), its Max test and the browser's two pass, its help patcher and the window open without a missing object. The full Max run
-above was made before it. It has not been reviewed.
+- `j.route` (asked for by the author, whose own patchers use it), also back in the namespace browser window.
+- From the author's review, each with a test that failed first: a `bang` to `j.remote` was lost; `array/resize` with a word emptied the array; many
+  objects did not answer attribute queries, and the data objects not `get<name>`; the filters `remote`, `in`, `out`, `in~`, `out~` did not exist and a
+  filter change kept the selection; `j.map` accepted a second, slash form of the function parameter names and did not answer a parameter name.
 
-## After the author's review (28 November 2026)
-
-Fixed, each with a test that failed first: a `bang` to `j.remote` was lost; `array/resize` with a word emptied the array; many objects did not answer
-attribute queries; the filters `remote`, `in`, `out`, `in~`, `out~` did not exist and a filter change kept the selection; `j.map` accepted a second,
-slash form of the function parameter names and did not answer a parameter name. Then: 462 of 462 unit tests pass, and the Max tests of the affected
-folders (85 of 85, in quick mode). The full run, one test per launch, has not been repeated since `j.route` and these fixes.
+None of these has been reviewed by a second reader.
 
 ## Final review
 
