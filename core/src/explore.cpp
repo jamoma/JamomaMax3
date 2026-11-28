@@ -42,6 +42,13 @@ ExploreResult explore(const Namespace& ns, const Address& address, const Explore
 {
     ExploreResult result;
     std::vector<Item> items;
+    // Whether a node below `base` passes the filters (the namespace is locked: only the node itself is looked at).
+    const auto passes = [&options](const Address& base, const std::string& relative, const Object* object) {
+        if (options.filters == nullptr || options.filters->empty())
+            return true;
+        const std::string root = base.str();
+        return options.filters->accepts(Address::parse(with_separator(root.empty() ? "/" : root) + relative), object);
+    };
     switch (options.output) {
     case ExploreOutput::Attributes:
         result.found = ns.visit_below(address, [](const std::string&, const std::string&, const std::string&, Object*) {});
@@ -61,7 +68,7 @@ ExploreResult explore(const Namespace& ns, const Address& address, const Explore
         }
         const std::string name = path.back().name;
         result.found = ns.visit_below(address.parent(), [&](const std::string& relative, const std::string& n, const std::string& instance, Object* object) {
-            if (object != nullptr && relative.find('/') == std::string::npos && n == name)
+            if (object != nullptr && relative.find('/') == std::string::npos && n == name && passes(address.parent(), relative, object))
                 items.push_back({instance.empty() ? "0" : instance, priority_of(object)});
         });
         break;
@@ -70,6 +77,8 @@ ExploreResult explore(const Namespace& ns, const Address& address, const Explore
         const bool children = options.output == ExploreOutput::Children;
         result.found = ns.visit_below(address, [&](const std::string& relative, const std::string& n, const std::string&, Object* object) {
             if (object == nullptr)
+                return;
+            if (!passes(address, relative, object))
                 return;
             const bool direct = relative.find('/') == std::string::npos;
             if (children) {
