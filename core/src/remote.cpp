@@ -140,9 +140,15 @@ void Remote::node_changed(const Value& value)
         return;
     }
     if (setting_ == std::this_thread::get_id()) { // the answer to a `set` of this remote: remembered by from_ui, not shown
+        if (observer_ && !freeze_) {
+            observer_(value.empty() ? value : to_ui_unit(value));
+        }
         return;
     }
     if (value.empty()) { // a bang of a node of type none: shown (a button blinks) but it is no value to remember
+        if (!freeze_ && observer_) {
+            observer_(value);
+        }
         if (!freeze_ && to_ui_) {
             to_ui_(value);
         }
@@ -152,6 +158,9 @@ void Remote::node_changed(const Value& value)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         current_ = shown;
+    }
+    if (!freeze_ && observer_) {
+        observer_(shown);
     }
     if (!freeze_ && to_ui_) {
         to_ui_(shown);

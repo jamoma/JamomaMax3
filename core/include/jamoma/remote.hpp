@@ -45,6 +45,12 @@ public:
     Remote(const Remote&) = delete;            /**< A remote is never copied. */
     Remote& operator=(const Remote&) = delete; /**< A remote is never assigned. */
 
+    /**
+     * @brief Also tells every change of the node to an observer, in the UI's unit, the answer to a `set` of this remote included (a view
+     *        reports it). Not while frozen or inactive. Set it before the address.
+     * @param observer Called on the thread that changed the node, with no lock held.
+     */
+    void set_observer(std::function<void(const Value&)> observer) { observer_ = std::move(observer); }
     /** @brief Binds to the node at an address (an empty address unbinds). @param address The address. */
     void set_address(const Address& address);
     /** @brief Sets the unit the UI object works in; empty means the node's own. @param unit The unit. */
@@ -73,6 +79,7 @@ private:
 
     Namespace& ns_;                                  /**< The namespace. */
     std::function<void(const Value&)> to_ui_;        /**< What shows a value in the UI. */
+    std::function<void(const Value&)> observer_;     /**< Who else hears of the changes (may be empty). */
     std::atomic<bool> active_{true};                 /**< Whether anything is passed on. */
     std::atomic<bool> freeze_{false};                /**< Whether the UI direction is stopped. */
     std::atomic<std::thread::id> setting_{};         /**< The thread that is inside set_without_output (none otherwise): what it brings is not shown. */

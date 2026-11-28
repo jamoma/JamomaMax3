@@ -9,6 +9,8 @@
  * without an argument the view binds to the model of the same class in the containing patcher (`qmetro.view` and `qmetro.model`).
  * The message `model:address <address>` names another model later on. The binding follows models coming and going: the view says `model:address <address>` on its dump outlet while it is bound and
  * `model:waiting` while it is not. A message `<parameter> <value...>` is sent to that parameter of the model and echoed out of the left outlet.
+ * The left outlet also reports `<name> <value>` for every change seen by a named `j.remote` (a second argument) in the view, and for every
+ * parameter and return placed in the view patcher.
  */
 
 #include <memory>
@@ -30,6 +32,7 @@ class j_view : public c74::min::object<j_view> {
     std::string argument_;                  /**< The model address as given (may be empty). */
     const void* patcher_ = nullptr;         /**< The patcher of the view. */
     jamoma_max::Alive alive_;               /**< Lets deferred calls see that the object is gone. */
+    std::shared_ptr<void> listening_;       /**< Hears what the named remotes, parameters and returns of the view report. */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -53,13 +56,14 @@ public:
     /** Takes the view out of the map. */
     ~j_view() override
     {
+        listening_.reset();
         if (patcher_ != nullptr) {
             jamoma::Registry::instance().views().remove(patcher_);
         }
     }
 
     inlet<> input{this, "(anything) <parameter> <value> sends the value to a parameter of the model"}; /**< The inlet. */
-    outlet<> echo_out{this, "(anything) the messages sent to the model"};                              /**< Outlet 0. */
+    outlet<> echo_out{this, "(anything) the messages sent to the model"};                              /**< Outlet 0: the messages sent to the model, and the values of the named remotes, parameters and returns of the view. */
     jamoma_max::dump_outlet dump_out{this, "(anything) dump"};                                         /**< Outlet 1: the dump outlet. */
 
     /** The alias of the view (accepted so that old patchers load; it has no effect yet). */
@@ -76,6 +80,13 @@ public:
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
         patcher_ = jamoma_max::patcher_of(maxobj());
         jamoma::Registry::instance().views().add(patcher_, argument_);
+        listening_ = jamoma::Registry::instance().views().listen(patcher_, [this](const std::string& name, const jamoma::Value& v) {
+            if (c74::max::systhread_ismainthread()) {
+                report_value(name, v);
+            } else {
+                jamoma_max::defer_call(maxobj(), alive_.weak(), [this, name, v] { report_value(name, v); });
+            }
+        });
         return {};
     }};
 
@@ -135,6 +146,16 @@ public:
     }};
 
 private:
+    /** Sends `<name> <value>` out of the left outlet (main thread). @param name Who it comes from. @param v The value. */
+    void report_value(const std::string& name, const jamoma::Value& v)
+    {
+        atoms out{symbol(name)};
+        for (const c74::min::atom& a : jamoma_max::to_atoms(v)) {
+            out.push_back(a);
+        }
+        echo_out.send(out);
+    }
+
     /** Sends the state of the binding to the dump outlet. */
     void report_binding()
     {

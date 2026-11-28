@@ -148,12 +148,24 @@ public:
     std::shared_ptr<void> observe(std::function<void(const void* patcher)> callback);
     /** @brief Finds a view. @param patcher The patcher. @return The model argument it was given, or nothing if there is no view there. */
     std::optional<std::string> find(const void* patcher) const;
+    /**
+     * @brief Listens to what the objects of a view report (the left outlet of `j.view`).
+     *
+     * The callback runs on the thread that calls report(), with no lock held.
+     * @param patcher The patcher of the view. @param callback Called with the name and the value.
+     * @return A handle that stops the listening when dropped; it may outlive the map.
+     */
+    std::shared_ptr<void> listen(const void* patcher, std::function<void(const std::string& name, const Value& value)> callback);
+    /** @brief Tells the listeners of a view about a value. @param patcher The patcher of the view. @param name Who it comes from. @param value The value. */
+    void report(const void* patcher, const std::string& name, const Value& value) const;
 
 private:
     struct Observers;                                           /**< The observers, shared with their handles so that a handle may outlive the map. */
+    struct Listeners;                                           /**< The listeners to reports, shared with their handles in the same way. */
     mutable std::mutex mutex_;                                  /**< Guards the entries. */
     std::vector<std::pair<const void*, std::string>> entries_;  /**< The views. */
     std::shared_ptr<Observers> observers_;                      /**< The observers of changed arguments. */
+    std::shared_ptr<Listeners> listeners_;                      /**< The listeners to reports. */
 };
 
 } // namespace jamoma

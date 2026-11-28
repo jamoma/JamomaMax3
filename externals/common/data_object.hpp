@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <stdexcept>
 #include <string>
 
@@ -44,6 +46,7 @@ class data_object : public c74::min::object<Derived> {
     Alive alive_;                          /**< Lets deferred calls see that the object is gone. */
     ContextWatch watch_;                   /**< Finds the model again when it appears later, is replaced or goes. */
     bool joined_ = false;                  /**< True once the patcher has loaded and the model has been looked for. */
+    std::atomic<const void*> view_{nullptr}; /**< The view the object belongs to, if it is a parameter or return in one (its changes are reported there). */
 
 public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
@@ -262,6 +265,9 @@ private:
     /** Finds the model of the patcher (or of an enclosing one) and subscribes below it. */
     void join_model()
     {
+        if (S != jamoma::Service::Message) {
+            view_ = enclosing_view(patcher_of(this->maxobj()));
+        }
         const jamoma::Model* model = find_model(this->maxobj());
         const std::string prefix = model != nullptr ? model->address().str() : std::string();
         if (!joined_) {
@@ -281,6 +287,9 @@ private:
     /** Sends a value out of the data outlet. @param v The value. */
     void output_value(const jamoma::Value& v)
     {
+        if (const void* view = view_) { // first: what the outlet is connected to may free this object
+            jamoma::Registry::instance().views().report(view, name_, v);
+        }
         if (v.empty()) {
             data_out.send("bang");
         } else if (v.size() == 1 && v[0].is_int()) {
