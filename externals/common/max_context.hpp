@@ -183,6 +183,26 @@ inline std::optional<std::string> patcher_argument(const void* patcher)
 }
 
 /**
+ * @brief The view an object belongs to: its patcher, or the nearest one around it, that has a `j.view`.
+ *
+ * The search goes up through subpatchers and stops at a model patcher. Main thread.
+ * @param patcher The patcher of the object.
+ * @return The patcher of the view, or null.
+ */
+inline const void* enclosing_view(const void* patcher)
+{
+    for (const void* p = patcher; p != nullptr; p = parent_patcher(p)) {
+        if (jamoma::Registry::instance().views().find(p)) {
+            return p;
+        }
+        if (patcher_class(p)) {
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+/**
  * @brief The address of the model a view patcher is bound to, if there is one now.
  *
  * With a model argument (that of j.view, else the first argument the view's patcher was loaded with): an absolute address is used as it is, a relative one is

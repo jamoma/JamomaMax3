@@ -12,7 +12,7 @@
 			100.0,
 			100.0,
 			888.0,
-			474.0
+			516.8
 		],
 		"bglocked": 0,
 		"openinpresentation": 0,
@@ -67,7 +67,7 @@
 							0.0,
 							26.0,
 							888.0,
-							448.0
+							490.79999999999995
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -144,7 +144,7 @@
 					},
 					"patching_rect": [
 						83.0,
-						197.0,
+						234.4,
 						85.0,
 						22.0
 					],
@@ -205,7 +205,7 @@
 							100.0,
 							126.0,
 							888.0,
-							448.0
+							536.8
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -252,7 +252,7 @@
 									],
 									"patching_rect": [
 										10.0,
-										91.0,
+										109.2,
 										149.0,
 										22.0
 									],
@@ -268,7 +268,7 @@
 									"numoutlets": 0,
 									"patching_rect": [
 										10.0,
-										116.5,
+										139.8,
 										300.0,
 										20.0
 									],
@@ -287,7 +287,7 @@
 									"numoutlets": 0,
 									"patching_rect": [
 										647.0,
-										145.0,
+										174.0,
 										216.0,
 										54.0
 									],
@@ -297,17 +297,22 @@
 							},
 							{
 								"box": {
+									"annotation": "Output information from mouse",
 									"id": "obj-6",
-									"maxclass": "comment",
-									"text": "[mouse.model: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										192.0,
-										339.0,
-										220.0,
-										20.0
-									]
+										406.8,
+										100.0,
+										23.0
+									],
+									"style": "",
+									"text": "mouse.model"
 								}
 							},
 							{
@@ -319,7 +324,7 @@
 									"numoutlets": 0,
 									"patching_rect": [
 										483.0,
-										339.0,
+										406.8,
 										220.0,
 										20.0
 									]
@@ -351,7 +356,7 @@
 									],
 									"patching_rect": [
 										192.0,
-										161.0,
+										193.2,
 										450.0,
 										105.0
 									],
@@ -373,7 +378,7 @@
 									"numoutlets": 0,
 									"patching_rect": [
 										593.0,
-										339.0,
+										406.8,
 										220.0,
 										20.0
 									]
@@ -381,17 +386,41 @@
 							},
 							{
 								"box": {
+									"annotation": "none",
+									"args": [
+										"mouse"
+									],
+									"bgmode": 0,
+									"border": 0,
+									"clickthrough": 0,
+									"enablehscroll": 0,
+									"enablevscroll": 0,
 									"id": "obj-1",
-									"maxclass": "comment",
-									"text": "[mouse.view: not in this version yet]",
+									"lockeddragscroll": 0,
+									"maxclass": "bpatcher",
+									"name": "mouse.view.maxpat",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"offset": [
+										0.0,
+										0.0
+									],
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										300.0,
-										339.0,
-										220.0,
-										20.0
-									]
+										406.8,
+										150.0,
+										70.0
+									],
+									"presentation_rect": [
+										15.0,
+										15.0,
+										150.0,
+										70.0
+									],
+									"viewvisibility": 1
 								}
 							},
 							{
@@ -410,7 +439,7 @@
 									],
 									"patching_rect": [
 										10.0,
-										161.0,
+										193.2,
 										160.0,
 										22.0
 									],
@@ -457,7 +486,7 @@
 					},
 					"patching_rect": [
 						10.0,
-						85.0,
+						100.0,
 						50.0,
 						22.0
 					],
@@ -495,7 +524,7 @@
 							0.0,
 							26.0,
 							888.0,
-							448.0
+							490.79999999999995
 						],
 						"bglocked": 0,
 						"openinpresentation": 0,
@@ -532,7 +561,7 @@
 					},
 					"patching_rect": [
 						169.0,
-						317.0,
+						378.4,
 						50.0,
 						22.0
 					],

@@ -37,7 +37,7 @@
 				Send a value to a parameter of the model
 			</digest>
 			<description>
-				The message <m>parameter value</m> sends the value to the parameter of the model the view is bound to, and repeats the message out the left outlet. While the view has no model nothing is sent and the console says so.
+				The message <m>parameter value</m> sends the value to the parameter of the model the view is bound to, and repeats the message out the left outlet. While the view has no model nothing is sent and the console says so. The left outlet also reports <m>name value</m> for every change seen by a <o>j.remote</o> of the view that has a name (its second argument) and a relative address, and for every parameter and return placed in the view patcher.
 			</description>
 		</method>
 		<method name="dump">

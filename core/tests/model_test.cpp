@@ -340,6 +340,23 @@ TEST_CASE("view map keeps the argument of a view")
     REQUIRE_FALSE(map.find(&p).has_value());
 }
 
+/** What is reported for a view reaches those who listen for that patcher, until they drop their handle. */
+TEST_CASE("view map passes reports to the listeners of a view")
+{
+    jamoma::ViewMap map;
+    int p = 0;
+    int q = 0;
+    std::vector<std::string> heard;
+    map.report(&p, "nobody", {1}); // no listener: nothing happens
+    auto handle = map.listen(&p, [&](const std::string& name, const jamoma::Value& v) { heard.push_back(name + " " + v.at(0).to_string()); });
+    map.report(&p, "freq", {5});
+    map.report(&q, "other", {6});
+    REQUIRE(heard == std::vector<std::string>{"freq 5"});
+    handle.reset();
+    map.report(&p, "freq", {7});
+    REQUIRE(heard.size() == 1);
+}
+
 /** A view can be given another model address; observers are told which view changed, once per change. */
 TEST_CASE("view map changes the address of a view and tells its observers")
 {

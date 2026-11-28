@@ -256,10 +256,121 @@ TEST_CASE("temperature conversions match the old tests")
     REQUIRE(close(scalar("temperature", 0.0, "K", "C"), -273.15));
 }
 
+/** Angles: radians (the neutral unit) and degrees, with their short names. */
+TEST_CASE("angle conversions")
+{
+    const double pi = std::acos(-1.0);
+    REQUIRE(Dataspace::find("angle") != nullptr);
+    REQUIRE(Dataspace::find("angle")->default_unit() == "radian");
+    REQUIRE(Dataspace::find("angle")->unit_names() == std::vector<std::string>{"radian", "degree"});
+    REQUIRE(close(scalar("angle", pi, "radian", "degree"), 180.0));
+    REQUIRE(close(scalar("angle", -90.0, "degree", "radian"), -pi / 2.0));
+    REQUIRE(close(scalar("angle", 720.0, "deg", "rad"), 4.0 * pi)); // not wrapped
+}
+
+/** Checks a conversion of a list. @param space The dataspace. @param v The numbers. @param from Their unit. @param to The wanted unit. @param expected The result. */
+void vector_case(const char* space, const std::vector<double>& v, const char* from, const char* to, const std::vector<double>& expected)
+{
+    Value in;
+    for (double x : v) {
+        in.push_back(Atom(x));
+    }
+    const auto out = Dataspace::find(space)->convert(in, from, to);
+    REQUIRE(out.has_value());
+    REQUIRE(out->size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        INFO(from << " -> " << to << " element " << i << " got " << out->at(i).as_double());
+        REQUIRE(close(out->at(i).as_double(), expected[i]));
+    }
+}
+
+/** Distance: meters (neutral), centimeters, inches and feet, with the old factors. */
+TEST_CASE("distance conversions")
+{
+    REQUIRE(Dataspace::find("distance") != nullptr);
+    REQUIRE(Dataspace::find("distance")->default_unit() == "meters");
+    REQUIRE(Dataspace::find("distance")->unit_names() == std::vector<std::string>{"meters", "centimeters", "inches", "feet"});
+    REQUIRE(close(scalar("distance", 123.4, "cm", "meters"), 1.234));
+    REQUIRE(close(scalar("distance", 1.234, "m", "centimeters"), 123.4));
+    REQUIRE(close(scalar("distance", 39.37, "inches", "m"), 1.0));
+    REQUIRE(close(scalar("distance", 1.0, "m", "\""), 39.37));
+    REQUIRE(close(scalar("distance", 3.281, "feet", "m"), 1.0));
+    REQUIRE(close(scalar("distance", 1.0, "m", "'"), 3.281));
+}
+
+/** Speed: the cases of the old test; meters per second is the neutral unit. */
+TEST_CASE("speed conversions")
+{
+    REQUIRE(Dataspace::find("speed") != nullptr);
+    REQUIRE(Dataspace::find("speed")->default_unit() == "m/s");
+    REQUIRE(Dataspace::find("speed")->unit_names() == std::vector<std::string>{"m/s", "mi/h", "km/h", "kn", "ft/s"});
+    REQUIRE(close(scalar("speed", 36.0, "kmph", "m/s"), 10.0));
+    REQUIRE(close(scalar("speed", 10.0, "m/s", "km/h"), 36.0));
+    REQUIRE(close(scalar("speed", 50.0, "mph", "m/s"), 22.352));
+    REQUIRE(close(scalar("speed", 1.0, "m/s", "mi/h"), 2.236936));
+    REQUIRE(close(scalar("speed", 45.0, "kn", "m/s"), 45.0 * 0.514444));
+    REQUIRE(close(scalar("speed", 1.0, "m/s", "kn"), 1.943844));
+    REQUIRE(close(scalar("speed", 20.0, "ft/s", "m/s"), 6.096));
+    REQUIRE(close(scalar("speed", 1.0, "m/s", "ft/s"), 3.2808399));
+}
+
+/** The playback speed unit of the time dataspace: 1 is the period of MIDI note 0 seen from the other side, and the conversion is its own inverse. */
+TEST_CASE("time speed unit")
+{
+    const double k = std::pow(2.0, 69.0 / 12.0) / 440.0;
+    REQUIRE(Dataspace::find("time")->has_unit("speed"));
+    REQUIRE(close(scalar("time", 1.0, "speed", "second"), k));
+    REQUIRE(close(scalar("time", k, "second", "speed"), 1.0));
+    REQUIRE(close(scalar("time", 2.0, "speed", "midinote"), 12.0));
+}
+
+/** Orientation: the cases of the old test (quaternion x y z w is the neutral unit; yaw pitch roll and axis angle in degrees). */
+TEST_CASE("orientation conversions")
+{
+    REQUIRE(Dataspace::find("orientation") != nullptr);
+    REQUIRE(Dataspace::find("orientation")->default_unit() == "quaternion");
+    REQUIRE(Dataspace::find("orientation")->unit_names() == std::vector<std::string>{"quaternion", "euler", "axis"});
+    const std::vector<double> quat{0.0, -0.5, -0.7071067811865475, 0.5};
+    const std::vector<double> euler{90.0, 45.0, -45.0};
+    const std::vector<double> axis{0.0, -0.5773502691896258, -0.8164965809277260, 120.0};
+    vector_case("orientation", euler, "euler", "quaternion", quat);
+    vector_case("orientation", axis, "xyza", "quat", quat);
+    vector_case("orientation", quat, "quat", "ypr", euler);
+    vector_case("orientation", quat, "quaternion", "axis", axis);
+    vector_case("orientation", euler, "euler", "axis", axis);
+    vector_case("orientation", axis, "axis", "euler", euler);
+}
+
+/** Orientation: no rotation, a zero axis, and the pole where rounding would push the pitch past 90 degrees. */
+TEST_CASE("orientation at the edges")
+{
+    vector_case("orientation", {0.0, 0.0, 0.0}, "euler", "quat", {0.0, 0.0, 0.0, 1.0});
+    vector_case("orientation", {0.0, 0.0, 0.0, 90.0}, "axis", "quat", {0.0, 0.0, 0.0, std::cos(std::acos(-1.0) / 4.0)});
+    vector_case("orientation", {0.0, 0.0, 0.0, 1.0}, "quat", "axis", {0.0, 0.0, 0.0, 0.0});
+    vector_case("orientation", {0.0, 0.0, 2.0, 180.0}, "axis", "quat", {0.0, 0.0, 1.0, 0.0});
+    const auto pole = Dataspace::find("orientation")->convert(Value{Atom(0.0), Atom(90.0), Atom(0.0)}, "euler", "quat");
+    const auto back = Dataspace::find("orientation")->convert(*pole, "quat", "euler");
+    REQUIRE(std::isfinite(back->at(1).as_double()));
+    REQUIRE(std::abs(back->at(1).as_double() - 90.0) < 1e-4);
+    const auto over = Dataspace::find("orientation")->convert(Value{Atom(0.7072), Atom(0.0), Atom(0.0), Atom(0.7072)}, "quat", "euler");
+    REQUIRE(std::isfinite(over->at(1).as_double()));
+}
+
+/** The none dataspace hands everything on as it came, words too. */
+TEST_CASE("none dataspace")
+{
+    const Dataspace* none = Dataspace::find("none");
+    REQUIRE(none != nullptr);
+    REQUIRE(none->default_unit() == "none");
+    REQUIRE(none->unit_names() == std::vector<std::string>{"none"});
+    const Value in{Atom("word"), Atom(2)};
+    REQUIRE(*none->convert(in, "none", "none") == in);
+}
+
 /** The menus of j.unit: the names of the dataspaces and the canonical names of the units. */
 TEST_CASE("dataspace and unit names")
 {
-    REQUIRE(Dataspace::names() == std::vector<std::string>{"gain", "time", "position", "temperature"});
+    REQUIRE(Dataspace::names() == std::vector<std::string>{"none", "gain", "time", "position", "temperature", "color", "angle", "distance", "speed", "orientation"});
     REQUIRE(Dataspace::find("temperature")->unit_names() == std::vector<std::string>{"Kelvin", "Celsius", "Fahrenheit"});
     REQUIRE(Dataspace::find("gain")->unit_names().front() == "linear");
     REQUIRE(Dataspace::find("temperature")->default_unit() == "Kelvin");
@@ -320,4 +431,63 @@ TEST_CASE("unit converter is race free")
     stop = true;
     reader.join();
     REQUIRE(converted.load() > 0);
+}
+
+namespace {
+
+/** Converts a colour. @param v The numbers. @param from The unit. @param to The unit. @param expected What should come out. */
+void colour(const jamoma::Value& v, const char* from, const char* to, const std::vector<double>& expected)
+{
+    INFO(from << " -> " << to);
+    const jamoma::Dataspace* space = jamoma::Dataspace::find("color");
+    REQUIRE(space != nullptr);
+    const auto out = space->convert(v, from, to);
+    REQUIRE(out);
+    REQUIRE(out->size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        INFO("element " << i << ": " << out->at(i).as_double());
+        REQUIRE(close(out->at(i).as_double(), expected[i]));
+    }
+}
+
+} // namespace
+
+/** The colour dataspace: neutral rgb, with cmy, hsl, hsv and rgb8 (the cases of the old ColorDataspace test among them). */
+TEST_CASE("color conversions to and from rgb")
+{
+    const jamoma::Dataspace* space = jamoma::Dataspace::find("color");
+    REQUIRE(space != nullptr);
+    CHECK(space->default_unit() == "rgb");
+    CHECK(space->unit_names() == std::vector<std::string>{"cmy", "hsl", "hsv", "rgb", "rgb8"});
+    const auto names = jamoma::Dataspace::names();
+    CHECK(std::find(names.begin(), names.end(), "color") != names.end());
+    colour({0.1, 0.6, 0.9}, "rgb", "rgb", {0.1, 0.6, 0.9});
+    colour({255.0, 127.5, 0.0}, "cmy", "rgb", {0.0, 0.5, 1.0});
+    colour({0.0, 0.5, 1.0}, "rgb", "cmy", {255.0, 127.5, 0.0});
+    colour({255.0, 127.5, 0.0}, "rgb8", "rgb", {1.0, 0.5, 0.0});
+    colour({1.0, 0.5, 0.0}, "rgb", "rgb8", {255.0, 127.5, 0.0});
+    colour({120.0, 100.0, 50.0}, "hsl", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 1.0, 0.0}, "rgb", "hsl", {120.0, 100.0, 50.0});
+    colour({240.0, 50.0, 75.0}, "hsl", "rgb", {0.625, 0.625, 0.875});
+    colour({0.625, 0.625, 0.875}, "rgb", "hsl", {240.0, 50.0, 75.0});
+    colour({120.0, 100.0, 100.0}, "hsv", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 1.0, 0.0}, "rgb", "hsv", {120.0, 100.0, 100.0});
+    colour({30.0, 100.0, 50.0}, "hsv", "rgb", {0.5, 0.25, 0.0});
+    colour({210.0, 50.0, 80.0}, "hsv", "rgb", {0.4, 0.6, 0.8});
+    colour({300.0, 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 1.0});
+}
+
+/** Greys, hues outside the circle and short lists give plain numbers. */
+TEST_CASE("color conversions at the edges")
+{
+    colour({0.5, 0.5, 0.5}, "rgb", "hsv", {0.0, 0.0, 50.0});
+    colour({0.0, 0.0, 0.0}, "rgb", "hsv", {0.0, 0.0, 0.0});
+    colour({0.5, 0.5, 0.5}, "rgb", "hsl", {0.0, 0.0, 50.0});
+    colour({1.0, 1.0, 1.0}, "rgb", "hsl", {0.0, 0.0, 100.0});
+    colour({360.0, 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 0.0});
+    colour({-120.0, 100.0, 100.0}, "hsv", "rgb", {0.0, 0.0, 1.0});
+    colour({840.0, 100.0, 50.0}, "hsl", "rgb", {0.0, 1.0, 0.0});
+    colour({0.0, 0.0, 0.0}, "cmy", "rgb", {1.0, 1.0, 1.0});
+    colour({1.0}, "rgb", "rgb8", {255.0, 0.0, 0.0});
+    colour({std::numeric_limits<double>::infinity(), 100.0, 100.0}, "hsv", "rgb", {1.0, 0.0, 0.0});
 }

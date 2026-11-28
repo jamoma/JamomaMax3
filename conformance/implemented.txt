@@ -29,3 +29,7 @@ j.initialized
 j.namespacebrowser.view
 j.namespacebrowser
 j.route
+mouse.model
+mouse.view
+mouse.module
+j.function_edit

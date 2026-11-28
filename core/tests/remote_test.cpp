@@ -180,6 +180,25 @@ TEST_CASE("set updates the node without showing it here")
     REQUIRE(r.shown.size() == 1);
 }
 
+/** The observer of a remote is told every change of the node, the answer to its own `set` included; not while frozen or inactive. */
+TEST_CASE("the observer hears every change")
+{
+    Rig r;
+    std::vector<double> heard;
+    r.remote.set_observer([&](const Value& v) { heard.push_back(v.at(0).as_double()); });
+    r.remote.set_address(Address::parse("/m/x"));
+    heard.clear();
+    r.node.command({2.0});
+    r.remote.set_without_output({3.0});
+    REQUIRE(heard == std::vector<double>{2.0, 3.0});
+    r.remote.set_freeze(true);
+    r.node.command({4.0});
+    r.remote.set_freeze(false);
+    r.remote.set_active(false);
+    r.node.command({5.0});
+    REQUIRE(heard.size() == 2);
+}
+
 /** Ticks of a node with a unit arrive on another thread while the node is removed on this one: nothing reads a freed node (the sanitizer builds are the ones that can fail this). */
 TEST_CASE("node changes with a unit while the node goes away")
 {

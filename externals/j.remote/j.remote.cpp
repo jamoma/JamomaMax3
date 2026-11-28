@@ -10,9 +10,11 @@
  * second outlet as values; the third outlet is reserved (the old object used it to select a UI object) and the last is the dump outlet. A UI object that is
  * dragged while a ramp runs stops the ramp. The message `set <value>` sends a value to the node without output from this object (other j.remote objects
  * of the node show it).
- * `highlight` is accepted and has no effect.
+ * A second argument names the remote: in a view, the changes of a named remote with a relative address also come out of the left outlet of
+ * `j.view` as `<name> <value>`. `highlight` is accepted and has no effect.
  */
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -32,6 +34,8 @@ class j_remote : public c74::min::object<j_remote> {
     // State comes before the attributes: Min runs every attribute setter with its default while constructing them.
     std::unique_ptr<jamoma::Remote> remote_;   /**< The remote (reset first in the destructor, before the outlets go). */
     std::string text_;                         /**< The address as written. */
+    std::string view_name_;                    /**< The second argument: the name under which a view reports the values (empty: not reported). */
+    std::atomic<const void*> view_{nullptr};   /**< The view to report to, while there is a name, a relative address and a view. */
     bool ready_ = false;                       /**< True once the patcher has loaded and the address may be resolved. */
     jamoma_max::Alive alive_;                  /**< Lets deferred calls see that the object is gone. */
     jamoma_max::ContextWatch watch_;           /**< Binds again when the model of the patcher appears, is replaced or goes. */
@@ -42,7 +46,7 @@ public:
     /** The reference pages are written by hand (docs/refpages); Min must not generate stubs next to them. */
     const c74::min::flags class_flags { c74::min::documentation_flags::do_not_generate };
 
-    /** Creates the object. @param args The creation atoms: an optional address, then attributes. */
+    /** Creates the object. @param args The creation atoms: an optional address and name, then attributes. */
     explicit j_remote(const atoms& args = {})
     {
         if (c74::min::dummy()) {
@@ -52,9 +56,20 @@ public:
             const std::string first = static_cast<symbol>(args[0]).c_str();
             if (!first.empty() && first[0] != '@') {
                 text_ = first;
+                if (args.size() >= 2 && args[1].type() == message_type::symbol_argument) {
+                    const std::string second = static_cast<symbol>(args[1]).c_str();
+                    if (!second.empty() && second[0] != '@') {
+                        view_name_ = second;
+                    }
+                }
             }
         }
         remote_ = std::make_unique<jamoma::Remote>(jamoma::Registry::instance().names(), [this](const jamoma::Value& v) { show(v); });
+        remote_->set_observer([this](const jamoma::Value& v) {
+            if (const void* view = view_) {
+                jamoma::Registry::instance().views().report(view, view_name_, v);
+            }
+        });
         jamoma_max::defer_call(maxobj(), alive_.weak(), [this] {
             ready_ = true;
             rebind();
@@ -218,6 +233,8 @@ private:
         if (!ready_ || !remote_) {
             return;
         }
+        // As the old object: only a remote with a name and a relative address is one of the things its view reports.
+        view_ = view_name_.empty() || text_.empty() || text_[0] == '/' ? nullptr : jamoma_max::enclosing_view(jamoma_max::patcher_of(maxobj()));
         bound_ = text_.empty() ? jamoma::Address() : jamoma_max::resolve_in_patcher(maxobj(), text_);
         remote_->set_address(bound_);
     }

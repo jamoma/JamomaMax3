@@ -27,6 +27,14 @@
 				Relative to the model (or to the model of the view) of the patcher, or absolute.
 			</description>
 		</objarg>
+		<objarg name="name" optional="1" type="symbol">
+			<digest>
+				A name under which the view reports the values
+			</digest>
+			<description>
+				In a view, every change of a remote that has a name and a relative address also comes out of the left outlet of <o>j.view</o> as <m>name value</m>.
+			</description>
+		</objarg>
 	</objarglist>
 	<methodlist>
 		<method name="bang">

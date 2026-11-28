@@ -307,17 +307,22 @@
 							},
 							{
 								"box": {
+									"annotation": "Output information from mouse",
 									"id": "obj-16",
-									"maxclass": "comment",
-									"text": "[mouse.model: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										24.0,
 										275.0,
-										220.0,
-										20.0
-									]
+										132.0,
+										22.0
+									],
+									"style": "default",
+									"text": "mouse.model mouse.1"
 								}
 							},
 							{
@@ -375,17 +380,22 @@
 							},
 							{
 								"box": {
+									"annotation": "Output information from mouse",
 									"id": "obj-1",
-									"maxclass": "comment",
-									"text": "[mouse.model: not in this version yet]",
+									"maxclass": "newobj",
 									"numinlets": 1,
-									"numoutlets": 0,
+									"numoutlets": 1,
+									"outlettype": [
+										""
+									],
 									"patching_rect": [
 										24.0,
 										245.0,
-										220.0,
-										20.0
-									]
+										122.0,
+										22.0
+									],
+									"style": "default",
+									"text": "mouse.model mouse"
 								}
 							},
 							{
@@ -510,6 +520,34 @@
 									"hidden": 0,
 									"source": [
 										"obj-4",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-1",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-7",
+										0
+									]
+								}
+							},
+							{
+								"patchline": {
+									"destination": [
+										"obj-16",
+										0
+									],
+									"disabled": 0,
+									"hidden": 0,
+									"source": [
+										"obj-7",
 										0
 									]
 								}

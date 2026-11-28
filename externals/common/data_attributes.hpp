@@ -68,11 +68,7 @@ struct data_attributes {
             functions.push_back(function);
         }
         show_menu(c, "ramp/function", functions);
-        std::vector<std::string> dataspaces{"none"};
-        for (const std::string& dataspace : jamoma::Dataspace::names()) {
-            dataspaces.push_back(dataspace);
-        }
-        show_menu(c, "dataspace", dataspaces);
+        show_menu(c, "dataspace", jamoma::Dataspace::names()); // starts with none
     }
 
 private:

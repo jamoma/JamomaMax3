@@ -263,7 +263,55 @@ struct ViewMap::Observers {
     unsigned next_id = 1;             /**< The id of the next observer. */
 };
 
-ViewMap::ViewMap() : observers_(std::make_shared<Observers>()) {}
+/** The listeners to the reports of views. */
+struct ViewMap::Listeners {
+    /** One listener. */
+    struct Entry {
+        unsigned id;                                                     /**< Identifies the listener for removal. */
+        const void* patcher;                                             /**< The view it listens to. */
+        std::function<void(const std::string&, const Value&)> callback;  /**< What to call. */
+    };
+    std::mutex mutex;                 /**< Guards the entries (never held while a callback runs). */
+    std::vector<Entry> entries;       /**< The listeners. */
+    unsigned next_id = 1;             /**< The id of the next listener. */
+};
+
+ViewMap::ViewMap() : observers_(std::make_shared<Observers>()), listeners_(std::make_shared<Listeners>()) {}
+
+std::shared_ptr<void> ViewMap::listen(const void* patcher, std::function<void(const std::string&, const Value&)> callback)
+{
+    unsigned id;
+    {
+        std::lock_guard<std::mutex> lock(listeners_->mutex);
+        id = listeners_->next_id++;
+        listeners_->entries.push_back({id, patcher, std::move(callback)});
+    }
+    static int token = 0;
+    std::weak_ptr<Listeners> weak = listeners_;
+    return std::shared_ptr<void>(&token, [weak, id](void*) {
+        if (auto listeners = weak.lock()) {
+            std::lock_guard<std::mutex> lock(listeners->mutex);
+            auto& list = listeners->entries;
+            list.erase(std::remove_if(list.begin(), list.end(), [id](const Listeners::Entry& e) { return e.id == id; }), list.end());
+        }
+    });
+}
+
+void ViewMap::report(const void* patcher, const std::string& name, const Value& value) const
+{
+    std::vector<std::function<void(const std::string&, const Value&)>> calls;
+    {
+        std::lock_guard<std::mutex> lock(listeners_->mutex);
+        for (const Listeners::Entry& e : listeners_->entries) {
+            if (e.patcher == patcher) {
+                calls.push_back(e.callback);
+            }
+        }
+    }
+    for (const auto& call : calls) {
+        call(name, value);
+    }
+}
 
 bool ViewMap::set_argument(const void* patcher, std::string argument)
 {
