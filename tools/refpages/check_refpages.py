@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 
 COMMON = "common/data_object.hpp"
 CORE_DATA = "../core/src/data.cpp"  # the attribute table of the data objects
+ARRAY = "common/array_object.hpp"  # the shared body of the data arrays
 
 #: The sources of each object, relative to the externals folder.
 OBJECT_SOURCES = {
@@ -46,6 +47,13 @@ OBJECT_SOURCES = {
     "j.map": ["j.map/j.map.cpp"],
     "j.cue": ["j.cue/j.cue.cpp"],
     "j.textslider": ["j.textslider/j.textslider.cpp"],
+    "j.parameter_array": [ARRAY, CORE_DATA, "j.parameter_array/j.parameter_array.cpp"],
+    "j.message_array": [ARRAY, CORE_DATA, "j.message_array/j.message_array.cpp"],
+    "j.return_array": [ARRAY, CORE_DATA, "j.return_array/j.return_array.cpp"],
+    "j.remote_array": ["j.remote_array/j.remote_array.cpp"],
+    "j.oscinstance": ["j.oscinstance/j.oscinstance.cpp"],
+    "j.oscroute": ["j.oscroute/j.oscroute.cpp"],
+    "j.route": ["j.route/j.route.cpp"],
 }
 
 #: Min messages that are plumbing, not part of the object's interface.
@@ -75,7 +83,7 @@ def parse_refpage(text):
 def scan_source(text):
     """Returns (attributes, messages) that C++ source text implements (see the module description)."""
     attributes = set(re.findall(r'attribute<[^>]*>\s+\w+\s*\{\s*this\s*,\s*"([^"]+)"', text))
-    attributes |= set(re.findall(r'attr_offset_new\(\s*"([^"]+)"', text))
+    attributes |= set(re.findall(r'attr_offset(?:_array)?_new\(\s*"([^"]+)"', text))
     table = re.search(r"attribute_names\(\)\s*\{.*?names\s*\{(.*?)\};", text, re.S)
     if table:
         attributes |= set(re.findall(r'"([^"]+)"', table.group(1)))

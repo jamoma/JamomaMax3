@@ -77,6 +77,13 @@ void Remote::from_ui(const Value& value)
     sender_.send(command);
 }
 
+void Remote::bang()
+{
+    if (active_) {
+        sender_.send(Value{});
+    }
+}
+
 void Remote::set_without_output(const Value& value)
 {
     if (!active_ || value.empty()) {

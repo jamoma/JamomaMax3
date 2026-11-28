@@ -22,6 +22,7 @@
 #include "max_address.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -30,6 +31,7 @@ class j_namespace : public c74::min::object<j_namespace> {
     // State comes before the attributes: Min runs every attribute setter with its default while constructing them.
     std::string address_text_;                         /**< The address as written. */
     jamoma::ExploreOptions options_;                   /**< Which items, in which order, how deep. */
+    jamoma::ExploreFilters filters_;                   /**< The filters the listed nodes have to pass. */
     jamoma::ExploreFormat format_ = jamoma::ExploreFormat::None;  /**< How the result is told. */
     bool relative_ = false;                            /**< Whether relative addresses are taken relative to the model of the patcher. */
     bool update_ = true;                               /**< Whether a change of the namespace is explored again. */
@@ -141,9 +143,6 @@ public:
         return args;
     }}};
 
-    /** The names of the filters (accepted so that old patchers load; filters are not built, so it has no effect). */
-    attribute<symbol> filter_list{this, "filter/list", ""};
-
     /** After construction: registers the last outlet as the dumpout. */
     message<> setup{this, "setup", MIN_FUNCTION {
         c74::max::object_obex_store(maxobj(), c74::max::gensym("dumpout"), reinterpret_cast<c74::max::t_object*>(dump_out.max_outlet()));
@@ -205,19 +204,35 @@ public:
         return {};
     }};
 
-    /** `filter/set`, `filter/remove` and `filter/info` belong to the filters of the old object, which are not built: a warning says so and nothing else happens. */
+    /** `filter/set <name> <condition> <value> ...` makes or changes a filter and puts it in use; the next exploration applies it. */
     message<> filter_set{this, "filter/set", MIN_FUNCTION {
-        c74::max::object_warn(maxobj(), "filters are not built in this version (filter/set is ignored)");
+        if (!filters_.set(jamoma_max::to_value(args))) {
+            c74::max::object_error(maxobj(), "filter/set needs a name and pairs of object, attribute, value, part, parent, name, instance or mode and a value");
+        } else {
+            clear_selection();
+        }
+        options_.filters = &filters_;
         return {};
     }};
-    /** @copydoc filter_set */
+
+    /** `filter/remove <name>` forgets one filter; without a name, every filter in use. */
     message<> filter_remove{this, "filter/remove", MIN_FUNCTION {
-        c74::max::object_warn(maxobj(), "filters are not built in this version (filter/remove is ignored)");
+        filters_.remove(jamoma_max::to_value(args));
+        clear_selection();
         return {};
     }};
-    /** @copydoc filter_set */
+
+    /** `filter/info <name>` answers the conditions of a filter on the dump outlet. */
     message<> filter_info{this, "filter/info", MIN_FUNCTION {
-        c74::max::object_warn(maxobj(), "filters are not built in this version (filter/info is ignored)");
+        if (args.empty()) {
+            return {};
+        }
+        const auto info = filters_.info(jamoma_max::to_value(args).at(0).to_string());
+        if (info) {
+            const atoms values = jamoma_max::to_atoms(*info);
+            c74::max::outlet_anything(dump_out.max_outlet(), c74::max::gensym("filter/info"), static_cast<short>(values.size()),
+                                      const_cast<c74::max::t_atom*>(static_cast<const c74::max::t_atom*>(&values[0])));
+        }
         return {};
     }};
 
@@ -240,6 +255,7 @@ public:
         answer("update", atoms{update_ ? 1 : 0});
         answer("sort", atoms{sort.get()});
         answer("depth", atoms{static_cast<int>(options_.depth)});
+        answer("filter/list", jamoma_max::to_atoms(filters_.list()));
         answer("namespace", atoms{symbol(selection_name_)});
         return {};
     }};
@@ -271,15 +287,72 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add; the base class registers the attributes. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: adds `filter/list`, a list of names that Min's attribute types cannot hold. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_namespace>(args[0], {"address", "output", "format", "relative", "update", "sort", "depth", "namespace"});
+        jamoma_max::answer_get_messages(args[0], {"address", "output", "format", "relative", "update", "sort", "depth", "namespace", "filter/list"});
+        c74::max::t_class* c = args[0];
+        c74::max::class_addattr(c, c74::max::attr_offset_array_new("filter/list", c74::max::gensym("symbol"), 256, 0,
+                                                                   reinterpret_cast<c74::max::method>(&filter_list_getter),
+                                                                   reinterpret_cast<c74::max::method>(&filter_list_setter), 0, 0));
+        return {};
+    }};
 
 private:
+    /** The getter of `filter/list`: the names of the filters in use. @param o The object. @param argc Receives the count. @param argv Receives the atoms. @return A Max error code. */
+    static c74::max::t_max_err filter_list_getter(c74::max::t_object* o, c74::max::t_object*, long* argc, c74::max::t_atom** argv)
+    {
+        const jamoma::Value names = c74::min::wrapper_find_self<j_namespace>(o)->m_min_object.filters_.list();
+        char allocated = 0;
+        c74::max::atom_alloc_array(static_cast<long>(names.size()), argc, argv, &allocated);
+        for (std::size_t i = 0; i < names.size(); ++i) {
+            c74::max::atom_setsym(*argv + i, c74::max::gensym(names[i].to_string().c_str()));
+        }
+        return c74::max::MAX_ERR_NONE;
+    }
+
+    /** The setter of `filter/list`: the filters to use, in order. @param o The object. @param argc The count. @param argv The atoms. @return A Max error code. */
+    static c74::max::t_max_err filter_list_setter(c74::max::t_object* o, c74::max::t_object*, long argc, c74::max::t_atom* argv)
+    {
+        if (argc == 0) { // a query
+            jamoma_max::reply_to_query(o, c74::max::gensym("filter/list"));
+            return c74::max::MAX_ERR_NONE;
+        }
+        j_namespace& self = c74::min::wrapper_find_self<j_namespace>(o)->m_min_object;
+        jamoma::Value names;
+        for (long i = 0; i < argc; ++i) {
+            if (c74::max::atom_gettype(argv + i) == c74::max::A_SYM) {
+                names.emplace_back(std::string(c74::max::atom_getsym(argv + i)->s_name));
+            }
+        }
+        self.filters_.set_list(names);
+        self.options_.filters = &self.filters_;
+        if (self.ready_) {
+            self.clear_selection();
+        }
+        return c74::max::MAX_ERR_NONE;
+    }
+
     /** Takes up a shared selection by name. @param name The name. */
     void set_selection(const std::string& name)
     {
         selection_name_ = name.empty() ? "none" : name;
         selection_ = jamoma::Selection::named(selection_name_);
+    }
+
+    /** Unticks what is ticked at or below the explored address, as the old object did when a filter changed. */
+    void clear_selection()
+    {
+        const std::string base = explored_.str();
+        if (explored_.path().empty()) {
+            selection_->clear();
+            return;
+        }
+        for (const std::string& key : selection_->selected()) {
+            if (key.starts_with(base) && (key.size() == base.size() || key[base.size()] == '/' || key[base.size()] == '.' || key[base.size()] == ':')) {
+                selection_->set(key, false);
+            }
+        }
     }
 
     /** @return The address to explore as an address of the namespace (empty if the text is a relative address that cannot be resolved). */

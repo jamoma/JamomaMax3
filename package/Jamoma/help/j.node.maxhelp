@@ -501,11 +501,12 @@
                             {
                                 "box": {
                                     "id": "obj-24",
-                                    "maxclass": "comment",
-                                    "numinlets": 1,
-                                    "numoutlets": 0,
-                                    "patching_rect": [ 593.25, 3.0, 220.0, 20.0 ],
-                                    "text": "[j.initialized: not in this version yet]"
+                                    "maxclass": "newobj",
+                                    "numinlets": 0,
+                                    "numoutlets": 1,
+                                    "outlettype": [ "" ],
+                                    "patching_rect": [ 593.25, 3.0, 93.0, 22.0 ],
+                                    "text": "j.initialized /*"
                                 }
                             },
                             {
@@ -634,7 +635,14 @@
                                 }
                             }
                         ],
-                        "lines": []
+                        "lines": [
+                            {
+                                "patchline": {
+                                    "destination": [ "obj-11", 0 ],
+                                    "source": [ "obj-24", 0 ]
+                                }
+                            }
+                        ]
                     },
                     "patching_rect": [ 113.75, 112.0, 43.0, 20.0 ],
                     "text": "p Basic"

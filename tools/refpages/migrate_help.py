@@ -18,7 +18,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "package"))
 import clean_patcher  # noqa: E402
 
-HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node", "j.namespace", "j.map", "j.cue", "j.textslider"]
+HELP_OBJECTS = ["j.parameter", "j.message", "j.return", "j.model", "j.init", "j.savebang", "j.pass", "j.send", "j.receive", "j.unit", "j.in", "j.out", "j.view", "j.remote", "j.ui", "j.node", "j.namespace", "j.map", "j.cue", "j.textslider",
+                "j.parameter_array", "j.message_array", "j.return_array", "j.remote_array", "j.oscinstance", "j.oscroute", "j.initialized", "j.route"]
 
 
 #: The dataspaces the core has (see jamoma::Dataspace::names()); a j.unit that asks for another one is replaced by a comment.

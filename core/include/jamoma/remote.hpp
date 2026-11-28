@@ -55,6 +55,8 @@ public:
     void set_freeze(bool on);
     /** @brief The user moved the UI object: sends the value to the node as a command in the UI's unit. @param value The value. */
     void from_ui(const Value& value);
+    /** @brief Sends a bang to the node, which answers with its value (nothing if the remote is inactive). */
+    void bang();
     /**
      * @brief Sends a value to the node like from_ui, but shows nothing of the node's answer here (the `set` message). Other remotes show it.
      * @param value The value.

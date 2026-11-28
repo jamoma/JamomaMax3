@@ -84,13 +84,13 @@ Differences from the old behaviour, on top of the lists above. The old suite has
 ## j.namespace (milestone 4)
 
 - Built: `address`, `output`, `format`, `relative`, `update`, `sort`, `depth`, `namespace`, exploring, and the selection (`select`, `select/all`, `select/none`, `selection/refresh`). A selection is shared by name (`namespace`, also used by `j.cue`); without a name it is private and is not output.
-- **Filters are not built:** `filter/set`, `filter/remove` and `filter/info` warn in the console and do nothing; `filter/list` is accepted without effect.
+- **Filters** (built in milestone 5; in milestone 4 they were not): `filter/set`, `filter/remove`, `filter/info`, `@filter/list` and the ready-made filters `data`, `parameter`, `message`, `return`, `model`, `view`, `none`, `remote`, `in`, `out`, `in~`, `out~`, `genericTag` and `noGenericTag`. As before, changing a filter clears the selection at and below the explored address. Differences: `view`, `remote`, `in`, `out`, `in~` and `out~` list nothing, because those objects are not nodes in this version; the texts are C++ (ECMAScript) regular expressions.
 - An address that does not exist gives an empty result of size 0. `update` explores again only when the result changes.
 
 ## j.map (milestone 4)
 
 - Built: the mapper and all 38 functions of the old function library, the four thresholds, `reset` and `dump`. No `clipmode` and no output clipping by default, as before.
-- The parameters of a function (`base`, `power/value`, ...) are set by message, not as arguments at creation.
+- The parameters of a function (`base`, `powerValue`, `curveList`, ...) are set by message, not as arguments at creation; the name alone is answered with the value. (In milestone 4 `j.map` listed and accepted them only as `power/value`; since milestone 5 each has one name, the old one.)
 - Numbers that are not finite never leave the outlet: a limit that is not finite is ignored, an input that is not a number gives the lower output limit. An unknown function or symmetry is refused with a console error; the base of `exponential` and `logarithm` is kept between 0.000001 and 100000.
 - `ramp` applies to what is sent to the output parameter, not to the outlet.
 - The graphical editor of freehand curves (`j.function_edit`) is not built.
@@ -144,3 +144,25 @@ Corrections after the author went through the help patchers:
   `model:reference/open <address>` out of the outlet instead of opening the inspector window; **Edit Current State** and **Open Preset Interface** are grey (not built);
   the preset file items act on the `j.model` of the model, as before; the reference, help and internal items only send their message out of the outlet; a model of the same class can be chosen only in a view. New: `menu:list` and `menu:choose`.
 
+
+# Milestone 5: arrays
+
+`j.parameter_array`, `j.message_array`, `j.return_array` (and `j.remote_array`) behave as the old ones, except:
+
+- Values sent to all instances reach them in index order (the old order came from an internal table).
+- Setting an attribute leaves the selection as it is (the old code left it pointing at the last instance).
+- Instance 256 can be selected (the old code failed there).
+- `+` and `-` step every instance when all are selected (the old code stepped only one).
+- A float in the right inlet selects an instance, rounded down (the old code treated it as a value).
+- Instances made when an array grows get the attributes set so far; the ones that exist are left alone (the old code applied the box attributes to all of them again).
+- `dump` answers the attributes of the watched instance and `format` on the dump outlet (the old arrays answered nothing).
+- `set` and `setArray` of `j.remote_array` show nothing here for any instance (the old object held back only the first answer when all were selected).
+- `j.remote_array` has no `description` and `tags` attributes, like `j.remote`.
+- `<model>:initialized` can be followed by `j.receive` and `j.initialized` as before (0 while the model initialises, 1 when it is done). Models have no other attribute that can be followed this way.
+- `mapper`: the parts of its help patcher that show the audio model `degrade~` and the model `mouse` are replaced by comments; the same holds for `j.initialized.maxhelp`. The presets of `mapper` still name addresses of those models.
+- `j.map` answers its attributes when their names are sent without a value, as before (milestone 4 did not; `mapper` needs it for `function/parameters`).
+- The namespace browser (`j.namespacebrowser.view` and its window): the window's `j.model` is given the name `namespacebrowser`, which the old naming rule produced from the file name.
+- `j.route` behaves as the old object. An empty `searchstring` matches nothing (the old code read outside its text), positions left over from a longer earlier `searchpositions` are not searched any more, and there is no limit on the length of the search text.
+- Attribute queries: `j.map`, `j.route`, `j.remote`, `j.remote_array`, `j.send`, `j.receive`, `j.model`, `j.view`, `j.node`, `j.in`, `j.out`, `j.cue`, `j.namespace` and `j.unit` answer `<name> <value>` on the dump outlet to an attribute name sent without a value, and to `get<name>`, as the old objects did (before milestone 5 most did not). The data objects and data arrays answered the bare name before and answer `get<name>` since milestone 5 too. In `j.ui` and `j.textslider` a colour name without a value restores the automatic colour.
+- A `bang` to `j.remote` goes to the node, which outputs its value to every object on it (before milestone 5 it was lost).
+- `array/resize` with something other than a number is an error and leaves the array as it is.

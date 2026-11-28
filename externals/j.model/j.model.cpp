@@ -35,6 +35,7 @@
 #include "max_context.hpp"
 #include "max_editor.hpp"
 #include "max_files.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -373,6 +374,13 @@ public:
         if (data != nullptr && data->service() != jamoma::Service::Return) {
             data->command(jamoma_max::to_value(rest));
         }
+        return {};
+    }};
+
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_model>(args[0], {"description", "priority", "alias", "activity", "tags", "presets", "amenities"});
+        jamoma_max::answer_get_messages(args[0], {"description", "priority", "alias", "activity", "tags", "presets", "amenities"});
         return {};
     }};
 

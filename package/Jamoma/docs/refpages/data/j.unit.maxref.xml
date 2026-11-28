@@ -101,6 +101,21 @@ j.unit allows to convert input values into diffent units defined by a choosen da
 				The message <m>units.get</m> outputs a <m>UnitMenu</m> message followed by umenu formatted list of all units belonging to the defined dataspace provided by the Jamoma framework's dataspaceLib. The <m>units.get</m> message can be followed by an optional argument defining a dataspace to get units from
 			</description>
 		</method>
+		<method name="getdataspace">
+			<arglist />
+			<digest>Report the dataspace</digest>
+			<description>Answers <m>dataspace</m> followed by the dataspace on the dump outlet.</description>
+		</method>
+		<method name="getinput">
+			<arglist />
+			<digest>Report the input unit</digest>
+			<description>Answers <m>input</m> followed by the input unit on the dump outlet.</description>
+		</method>
+		<method name="getoutput">
+			<arglist />
+			<digest>Report the output unit</digest>
+			<description>Answers <m>output</m> followed by the output unit on the dump outlet.</description>
+		</method>
 	</methodlist>
 	<attributelist>
 		<attribute name="dataspace" get="1" set="1" type="symbol" size="1">

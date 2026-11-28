@@ -116,6 +116,10 @@ All of these are my calls on how to approach what the author asked for, to be co
 3. **`j.view` and `j.ui` with presets:** the generic UI on Min-API (the text field resolved per section 7), preset store, recall and interpolation, file formats.
 4. **Max 9 additions:** dictionaries/JSON, JavaScript, MC.
 
+*Changed by the author since:* milestone 4 became the rest of the old surface (`2026-11-26-milestone-4-old-surface-design.md`),
+milestone 5 is the array objects and the models that need them (`2026-11-28-milestone-5-arrays-design.md`), and the Max 9
+additions are milestone 6.
+
 ## 13. Open items left to the builder
 
 - **How externals share one namespace.** The starting design is the start-up loader plus a shared library (section 10). The alternative is one binary that registers all classes. The milestone 0 spike on both platforms confirms or replaces it, because it constrains the layout of everything.

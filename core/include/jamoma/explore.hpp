@@ -20,6 +20,7 @@
 
 #include "jamoma/address.hpp"
 #include "jamoma/atom.hpp"
+#include "jamoma/explore_filter.hpp"
 #include "jamoma/export.hpp"
 #include "jamoma/namespace.hpp"
 
@@ -48,6 +49,7 @@ struct ExploreOptions {
     ExploreOutput output = ExploreOutput::Descendants; /**< Which items. */
     ExploreSort sort = ExploreSort::Alphabetic;        /**< In which order. */
     unsigned depth = 0;                                /**< How many levels below the address (0 = all). */
+    const ExploreFilters* filters = nullptr;           /**< The filters nodes have to pass (not applied to attributes), or null. */
 };
 
 /** The items found. */

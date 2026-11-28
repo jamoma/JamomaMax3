@@ -23,6 +23,7 @@
 #include "max_address.hpp"
 #include "max_atoms.hpp"
 #include "max_context.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -79,6 +80,8 @@ public:
         text_ = std::string(static_cast<symbol>(args[0]).c_str());
         rebind();
         return args;
+    }}, getter{MIN_GETTER_FUNCTION {
+        return atoms{symbol(text_)}; // also when it came as the argument
     }}};
 
     /** The unit the UI object works in (empty: the node's own). */
@@ -114,9 +117,13 @@ public:
         return {};
     }};
 
-    /** A bang is sent to the node (which outputs its value). */
+    /** A bang is sent to the node, which outputs its value: it comes out here, of the node's object and of every other object on the node. */
     message<threadsafe::yes> bang{this, "bang", MIN_FUNCTION {
-        send_later(jamoma::Value{});
+        jamoma_max::run_on_main(maxobj(), alive_.weak(), [this] {
+            if (remote_) {
+                remote_->bang();
+            }
+        });
         return {};
     }};
 
@@ -156,8 +163,12 @@ public:
         return {};
     }};
 
-    /** Class setup: nothing to add. */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_remote>(args[0], {"address", "unit", "active", "freeze", "highlight"});
+        jamoma_max::answer_get_messages(args[0], {"address", "unit", "active", "freeze", "highlight"});
+        return {};
+    }};
 
 private:
     /** Handles a message other than bang, int, float and list (on the main thread). @param args The message with its selector first. */

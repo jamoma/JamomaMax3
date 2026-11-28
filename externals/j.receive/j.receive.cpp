@@ -17,6 +17,7 @@
 #include "jamoma/receiver.hpp"
 #include "jamoma/registry.hpp"
 #include "max_address.hpp"
+#include "max_queries.hpp"
 
 using namespace c74::min;
 
@@ -73,6 +74,8 @@ public:
         text_ = std::string(static_cast<symbol>(args[0]).c_str());
         rebind();
         return args;
+    }}, getter{MIN_GETTER_FUNCTION {
+        return atoms{symbol(text_)}; // also when it came as the argument
     }}};
 
     /** Whether new values are output (when off, only a bang outputs). */
@@ -130,10 +133,12 @@ public:
         return {};
     }};
 
-    /**
-     * Class setup: nothing to add; the base class registers the attributes.
-     */
-    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION { return {}; }};
+    /** Class setup: every attribute answers when its name is sent without a value, and to `get<name>`, as the old objects did. */
+    message<> maxclass_setup{this, "maxclass_setup", MIN_FUNCTION {
+        jamoma_max::answer_queries<j_receive>(args[0], {"address", "active"});
+        jamoma_max::answer_get_messages(args[0], {"address", "active"});
+        return {};
+    }};
 
 private:
     /** Binds (again) to the address as written, resolved against the model of the patcher. */
