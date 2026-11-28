@@ -8,6 +8,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <thread>
 #include <cmath>
@@ -423,6 +424,9 @@ TEST_CASE("unit converter is race free")
             }
         }
     });
+    while (converted.load() == 0) {
+        std::this_thread::yield(); // the other thread has to be running before the changes start, or the test tests nothing
+    }
     for (int i = 0; i < 2000; ++i) {
         c.set_dataspace(i % 2 == 0 ? "gain" : "temperature");
         c.set_input(i % 2 == 0 ? "db" : "Celsius");

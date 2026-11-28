@@ -8,6 +8,7 @@
 
 #include "jamoma/dataspace.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <vector>

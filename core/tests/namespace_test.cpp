@@ -277,6 +277,9 @@ TEST_CASE("concurrent use is race free")
     };
     std::thread first(reader);
     std::thread second(reader);
+    while (searches.load() == 0) {
+        std::this_thread::yield(); // the other thread has to be running before the changes start, or the test tests nothing
+    }
     std::vector<std::unique_ptr<Probe>> objects;
     for (int i = 0; i < 2000; ++i) {
         objects.push_back(std::make_unique<Probe>());
@@ -376,6 +379,9 @@ TEST_CASE("concurrent observers are race free")
             ++rounds;
         }
     });
+    while (rounds.load() == 0) {
+        std::this_thread::yield(); // the other thread has to be running before the changes start, or the test tests nothing
+    }
     std::vector<std::unique_ptr<Probe>> objects;
     for (int n = 0; n < 1000; ++n) {
         objects.push_back(std::make_unique<Probe>());
